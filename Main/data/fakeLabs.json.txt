@@ -1,0 +1,32 @@
+[
+  {
+    "labName": "GK301",
+    "labTotalSlots": 5600,
+    "labAvailSlots": 5600,
+    "labStatus": "AVAILABLE"
+  },
+  {
+    "labName": "GK402",
+    "labTotalSlots": 5600,
+    "labAvailSlots": 5600,
+    "labStatus": "AVAILABLE"
+  },
+  {
+    "labName": "GK206",
+    "labTotalSlots": 5600,
+    "labAvailSlots": 5600,
+    "labStatus": "FULL"
+  },
+  {
+    "labName": "GK307",
+    "labTotalSlots": 5600,
+    "labAvailSlots": 5600,
+    "labStatus": "AVAILABLE"
+  },
+  {
+    "labName": "GK208",
+    "labTotalSlots": 5600,
+    "labAvailSlots": 5600,
+    "labStatus": "UNAVAILABLE"
+  }
+]
