@@ -16,10 +16,11 @@ export default function SignUpPage() {
               Enter your email below to create an account
             </p>
           </div>
-          <div className="grid gap-4">
+          <form action={signup} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
+                name="email"
                 id="email"
                 type="email"
                 placeholder="m@example.com"
@@ -30,12 +31,12 @@ export default function SignUpPage() {
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" name="password" type="password" required />
             </div>
-            <Button type="submit" formAction={signup} className="w-full">
+            <Button type="submit" className="w-full">
               Sign Up
             </Button>
-          </div>
+          </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link href="/login" className="underline">
