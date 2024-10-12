@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { signup } from "./action";
 
 export default function SignUpPage() {
   return (
@@ -31,8 +32,8 @@ export default function SignUpPage() {
               </div>
               <Input id="password" type="password" required />
             </div>
-            <Button type="submit" className="w-full">
-              Login
+            <Button type="submit" formAction={signup} className="w-full">
+              Sign Up
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
