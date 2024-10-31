@@ -1,10 +1,14 @@
+import ProfileCalender from './profile-calendar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, MailOpen, Mails, MapPin, Phone } from 'lucide-react';
 
 export default function ProfilePage() {
+  const verticalGradient =
+    'linear-gradient(to bottom, #74DB4E 0%, #4696A2 40%, #4E3ABA 100%)';
+
   return (
-    <div className="flex h-screen w-full flex-col justify-center gap-10 px-32">
+    <div className="flex h-screen w-full flex-col justify-center gap-10 px-64 py-24">
       <div className="flex h-[300px] w-full items-center justify-between py-6">
         <div className="flex w-full gap-5">
           <Avatar className="h-[211px] w-[211px]">
@@ -46,7 +50,45 @@ export default function ProfilePage() {
           <Button className="w-full">Edit Profile</Button>
         </div>
       </div>
-      <div className="flex justify-between"></div>
+      <div className="flex h-[350px] justify-between">
+        <div className="h-full">
+          <ProfileCalender />
+        </div>
+        <div
+          className="flex w-[320px] flex-col items-center justify-center rounded-md"
+          style={{ backgroundImage: verticalGradient }}
+        >
+          <div className="flex flex-col gap-1">
+            <div className="mb-2 h-5 w-5 rounded-full bg-white"></div>
+            <h1 className="text-2xl font-bold text-white">Book a New Room</h1>
+            <h3 className="w-[128px] text-[16px] leading-none text-[#E2E8F0]">
+              Click here to reserve a new room.
+            </h3>
+          </div>
+        </div>
+        <div className="flex h-full w-[370px] flex-col justify-between p-5">
+          <div className="flex flex-col gap-2 text-lg">
+            <h2 className="font-medium">
+              View or Edit all of your reservations
+            </h2>
+            <h2 className="text-[#64748B]">
+              Access here to edit and view your current reservations
+            </h2>
+          </div>
+          <div className="flex flex-col gap-2 text-lg">
+            <h2 className="font-medium">Discover New MoRoomies</h2>
+            <h2 className="text-[#64748B]">
+              Find other User in your Institution
+            </h2>
+          </div>
+          <div className="flex flex-col gap-2 text-lg">
+            <h2 className="font-medium">Browse the Rooms</h2>
+            <h2 className="text-[#64748B]">
+              Access the availability and description of the rooms
+            </h2>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
