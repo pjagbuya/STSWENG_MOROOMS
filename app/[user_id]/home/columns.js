@@ -24,3 +24,30 @@ export const roomColumns = [
     header: 'Room Capacity',
   },
 ];
+
+export const reservationColumns = [
+  {
+    accessorKey: 'reservationId',
+    header: 'Reservation ID',
+  },
+  {
+    accessorKey: 'reservationTime',
+    header: 'Reservation Time',
+  },
+  {
+    accessorKey: 'reservationPurpose',
+    header: 'Purpose',
+  },
+  {
+    accessorKey: 'reservationType',
+    header: 'Type',
+  },
+  {
+    accessorKey: 'reservationIsSharing',
+    header: 'Is Sharing',
+  },
+  {
+    accessorKey: 'reservationCount',
+    header: 'Count',
+  },
+];
