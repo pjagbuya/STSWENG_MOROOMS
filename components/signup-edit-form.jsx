@@ -9,8 +9,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-export function SignupEditForm({ userFirstName, userLastName, userSchoolId }) {
-  console.log(userFirstName);
+export function SignupEditForm({
+  formAction,
+  userFirstName,
+  userLastName,
+  userSchoolId,
+}) {
   return (
     <Card className="mx-auto w-[425px] max-w-lg">
       <CardHeader>
@@ -20,12 +24,12 @@ export function SignupEditForm({ userFirstName, userLastName, userSchoolId }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form action={formAction}>
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="first-name">First Name</Label>
               <Input
-                name="user_first_name"
+                name="user_firstname"
                 id="first-name"
                 type="text"
                 placeholder="John"
@@ -36,7 +40,7 @@ export function SignupEditForm({ userFirstName, userLastName, userSchoolId }) {
             <div className="grid gap-2">
               <Label htmlFor="last-name">Last Name</Label>
               <Input
-                name="user_last_name"
+                name="user_lastname"
                 id="last-name"
                 type="text"
                 placeholder="Doe"
