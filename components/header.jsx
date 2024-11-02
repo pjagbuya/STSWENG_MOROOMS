@@ -2,6 +2,7 @@ import HeaderNavLink from './header_navlink';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { createClient } from '@/utils/supabase/server';
+import { Mail } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -37,12 +38,23 @@ export default async function Header() {
 
       <div className="flex gap-3">
         {isLoggedIn ? (
-          <Link href="/profile">
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </Link>
+          <>
+            <Link href="/profile">
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </Link>
+
+            <Button
+              asChild
+              className="hover:brightness-110 active:brightness-75"
+            >
+              <Link href="/signup">
+                <Mail className="w-11 text-white" />
+              </Link>
+            </Button>
+          </>
         ) : (
           <>
             <Button
