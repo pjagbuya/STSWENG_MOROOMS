@@ -1,5 +1,5 @@
-import { columns } from './columns';
-import { DataTable } from './data-table';
+import { roomColumns } from './columns';
+import { DataTable } from '@/components/data-table';
 
 async function getRoomData() {
   return [
@@ -98,8 +98,15 @@ export default async function DemoPage() {
   const data = await getRoomData();
 
   return (
-    <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
+    <div className="flex justify-between px-12">
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold">Recommended Rooms</h1>
+        <h3 className="text-base font-light">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+          laoreet, metus nec.
+        </h3>
+        <DataTable columns={roomColumns} data={data} />
+      </div>
     </div>
   );
 }

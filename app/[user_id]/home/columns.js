@@ -1,4 +1,4 @@
-export const columns = [
+export const roomColumns = [
   {
     accessorKey: 'roomId',
     header: 'Room Id',
