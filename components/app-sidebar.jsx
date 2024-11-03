@@ -8,39 +8,58 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react';
+import { createClient } from '@/utils/supabase/server';
+import { Calendar, Home, Inbox, Search } from 'lucide-react';
 import Link from 'next/link';
+
+function LinkAccess(userRole, item, userId) {
+  if (item.access === 'All' || userRole == item.access) {
+    return (
+      <SidebarMenuItem key={item.title}>
+        <SidebarMenuButton asChild>
+          <Link href={`/${userId}${item.url}`}>
+            <item.icon />
+            <span>{item.title}</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    );
+  }
+}
 
 // Menu items.
 const items = [
   {
     title: 'Home',
-    url: '#',
+    url: '/home',
     icon: Home,
+    access: 'All',
   },
   {
     title: 'Inbox',
-    url: '#',
+    url: '/home/mail',
     icon: Inbox,
+    access: 'All',
   },
   {
-    title: 'Calendar',
-    url: '#',
+    title: 'Reservations',
+    url: '/admin/reservations',
     icon: Calendar,
+    access: 'Admin',
   },
   {
-    title: 'Search',
-    url: '#',
+    title: 'User Access',
+    url: '/admin/users',
     icon: Search,
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: Settings,
+    access: 'Admin',
   },
 ];
 
-export function AppSidebar() {
+export async function AppSidebar() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return (
     <Sidebar>
       <SidebarContent>
@@ -48,16 +67,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map(item => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map(item => LinkAccess('User', item, user.id))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
