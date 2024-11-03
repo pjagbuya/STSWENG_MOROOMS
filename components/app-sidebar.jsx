@@ -43,13 +43,13 @@ const items = [
   },
   {
     title: 'Reservations',
-    url: '/admin/reservations',
+    url: '/home/admin/reservations',
     icon: Calendar,
     access: 'Admin',
   },
   {
     title: 'User Access',
-    url: '/admin/users',
+    url: '/home/admin/users',
     icon: Search,
     access: 'Admin',
   },
@@ -67,7 +67,7 @@ export async function AppSidebar() {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map(item => LinkAccess('User', item, user.id))}
+              {items.map(item => LinkAccess('Admin', item, user.id))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
