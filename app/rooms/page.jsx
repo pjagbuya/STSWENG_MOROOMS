@@ -1,9 +1,9 @@
 import Header from '@/components/header';
+import SearchFilter from '@/components/rooms/search_filter';
 import { SetResult } from '@/components/rooms/set_result';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { SlidersHorizontal } from 'lucide-react';
 
 export default function RoomSearchPage() {
   return (
@@ -30,10 +30,7 @@ export default function RoomSearchPage() {
             <Search className="h-[3.25rem] w-[3.25rem]" />
           </Button>
 
-          <Button className="flex gap-2 rounded-lg shadow-sm">
-            <SlidersHorizontal />
-            <span>Filter</span>
-          </Button>
+          <SearchFilter />
         </div>
 
         <div className="space-y-8">
