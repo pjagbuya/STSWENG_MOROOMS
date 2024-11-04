@@ -17,7 +17,7 @@ function LinkAccess(userRole, item, userId) {
     return (
       <SidebarMenuItem key={item.title}>
         <SidebarMenuButton asChild>
-          <Link href={`/${userId}${item.url}`}>
+          <Link href={`users/${userId}${item.url}`}>
             <item.icon />
             <span>{item.title}</span>
           </Link>
