@@ -54,4 +54,5 @@ export async function addRoomTypeAction(prevState, formData) {
   }
 
   revalidatePath('/manage/room_types');
+  return {};
 }

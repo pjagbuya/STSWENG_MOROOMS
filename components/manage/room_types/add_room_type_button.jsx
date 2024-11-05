@@ -38,10 +38,12 @@ export default function AddRoomTypeButton() {
     },
   });
 
-  const [state, formAction] = useFormState(addRoomTypeAction, null);
+  const [state, formAction] = useFormState(addRoomTypeAction, {});
 
   useEffect(() => {
-    if (!state || !state.errors) {
+    console.log(state);
+
+    if (!state || !state.errors || Object.keys(state.errors).length === 0) {
       form.reset();
       setOpen(false);
       return;
