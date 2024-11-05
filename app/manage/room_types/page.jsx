@@ -5,6 +5,7 @@ import RoomTypeTable from '@/components/manage/room_types/room_type_table';
 
 export default async function ManageRoomTypesPage() {
   const roomTypesList = await fetchRoomTypes();
+  console.log(roomTypesList);
 
   return (
     <>

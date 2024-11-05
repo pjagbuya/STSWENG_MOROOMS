@@ -18,19 +18,6 @@ export async function addRoomType(name, details) {
   }
 }
 
-export async function fetchRoomTypes() {
-  const supabase = createClient();
-
-  const { data, error } = await supabase.rpc('get_room_types');
-
-  if (error) {
-    console.error('Error fetching room types:', error);
-    throw error;
-  }
-
-  return data;
-}
-
 export async function addRoomTypeAction(prevState, formData) {
   const parse = FORM_SCHEMA.safeParse({
     name: formData.get('name'),
@@ -55,4 +42,37 @@ export async function addRoomTypeAction(prevState, formData) {
 
   revalidatePath('/manage/room_types');
   return {};
+}
+
+export async function deleteRoomType(id) {
+  console.log(123);
+
+  const supabase = createClient();
+
+  const { error } = await supabase.rpc('delete_room_type', {
+    p_room_type_id: id,
+  });
+
+  if (error) {
+    console.error('Error deleting room type:', error);
+    throw error;
+  }
+}
+
+export async function deleteRoomTypeAction(id) {
+  await deleteRoomType(id);
+  revalidatePath('/manage/room_types');
+}
+
+export async function fetchRoomTypes() {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc('get_room_types');
+
+  if (error) {
+    console.error('Error fetching room types:', error);
+    throw error;
+  }
+
+  return data;
 }
