@@ -1,4 +1,4 @@
-import ActionDropdown from '@/components/action-dropdown';
+import ActionDropdown from '@/components/util/action_dropdown';
 
 export const userColumns = [
   {

@@ -1,8 +1,8 @@
 'use client';
 
-import ActionDropdown from '@/components/action-dropdown';
-import { DataTable } from '@/components/data-table';
-import { SortableHeader } from '@/components/data_table';
+import { addActionColumn } from '@/components/util/action_dropdown';
+import { DataTable } from '@/components/util/data_table';
+import { SortableHeader } from '@/components/util/sortable_header';
 
 const COLUMNS = [
   {
@@ -15,19 +15,18 @@ const COLUMNS = [
     accessorKey: 'details',
     header: 'Details',
   },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      return <ActionDropdown />;
-    },
-  },
 ];
 
 export default function RoomTypeTable({ data }) {
+  const finalColumns = addActionColumn(
+    COLUMNS,
+    () => {},
+    () => {},
+  );
+
   return (
     <>
-      <DataTable columns={COLUMNS} data={data} />
+      <DataTable columns={finalColumns} data={data} />
     </>
   );
 }

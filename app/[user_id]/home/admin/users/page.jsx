@@ -1,7 +1,7 @@
 'use client';
 
 import { userColumns } from './columns';
-import { DataTable } from '@/components/data-table';
+import { DataTable } from '@/components/util/data_table';
 
 export const userData = [
   {
