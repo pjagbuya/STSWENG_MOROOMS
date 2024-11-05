@@ -1,5 +1,6 @@
 import { columns } from './columns';
 import UserDataTable from './table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createClient } from '@/utils/supabase/server';
 import { convertKeysToCamelCase } from '@/utils/utils';
 
@@ -59,7 +60,24 @@ export default async function UserManagement() {
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
         laoreet, metus nec.
       </h3>
-      <UserDataTable columns={columns} data={convertKeysToCamelCase(data)} />
+      <Tabs defaultValue="user" className="h-full w-full">
+        <TabsList>
+          <TabsTrigger value="user">User</TabsTrigger>
+          <TabsTrigger value="role_settings">Role Settings</TabsTrigger>
+        </TabsList>
+        <TabsContent value="user">
+          <UserDataTable
+            columns={columns}
+            data={convertKeysToCamelCase(data)}
+          />
+        </TabsContent>
+        <TabsContent value="role_settings">
+          <UserDataTable
+            columns={columns}
+            data={convertKeysToCamelCase(data)}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
