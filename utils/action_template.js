@@ -15,7 +15,8 @@ export async function callFunctionWithFormData(
   };
 
   for (const [key, value] of Object.entries(rawFormData)) {
-    userInfo[`p_${key.toLowerCase()}`] = convertToNull(value);
+    const snakeCaseKey = 'p_' + key.replace(/([A-Z])/g, '_$1').toLowerCase();
+    userInfo[snakeCaseKey] = value;
   }
 
   console.log(userInfo);
