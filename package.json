@@ -9,7 +9,7 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "prepare": "husky install",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.0",
