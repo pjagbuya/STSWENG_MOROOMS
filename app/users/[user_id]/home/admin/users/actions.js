@@ -16,3 +16,15 @@ export async function deleteUser(id, url) {
 export async function updateUserRole(userId, url, formData) {
   callFunctionWithFormData(userId, 'update_user_role', url, formData);
 }
+
+export async function addRole(userId, url, formData) {
+  callFunctionWithFormData(userId, 'add_role', url, formData);
+}
+
+export async function updateRole(userId, url, formData) {
+  callFunctionWithFormData(userId, 'update_role', url, formData);
+}
+
+export async function deleteRole(id, url) {
+  callFunctionWithNoFormData({ p_user_id: id }, 'delete_role', url);
+}
