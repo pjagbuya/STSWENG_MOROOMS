@@ -1,24 +1,33 @@
 'use client';
 
-import { DataTable, SortableHeader } from '@/components/data_table';
+import ActionDropdown from '@/components/action-dropdown';
+import { DataTable } from '@/components/data-table';
+import { SortableHeader } from '@/components/data_table';
 
 const COLUMNS = [
   {
-    accessorKey: 'event_name',
+    accessorKey: 'name',
     header: ({ column }) => (
       <SortableHeader column={column}>Name</SortableHeader>
     ),
   },
   {
-    accessorKey: 'event_date',
-    header: () => 'Details',
+    accessorKey: 'details',
+    header: 'Details',
+  },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      return <ActionDropdown />;
+    },
   },
 ];
 
-export default function RoomTypeTable() {
+export default function RoomTypeTable({ data }) {
   return (
     <>
-      <DataTable className="border-2" columns={COLUMNS} data={[]} />
+      <DataTable columns={COLUMNS} data={data} />
     </>
   );
 }

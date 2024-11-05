@@ -1,5 +1,8 @@
 'use client';
 
+import { addRoomType } from '@/app/manage/room_types/actions';
+import { addRoomTypeAction } from '@/app/manage/room_types/actions';
+import { FORM_SCHEMA } from '@/app/manage/room_types/form_schema';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -19,23 +22,40 @@ import {
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useFormState } from 'react-dom';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-const FORM_SCHEMA = z.object({
-  name: z.string().min(2, {
-    message: 'Type name must be at least 2 characters.',
-  }),
-  details: z.string().optional(),
-});
 
 export default function AddRoomTypeButton() {
+  const [open, setOpen] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(FORM_SCHEMA),
+    defaultValues: {
+      name: '',
+      details: '',
+    },
   });
 
+  const [state, formAction] = useFormState(addRoomTypeAction, null);
+
+  useEffect(() => {
+    if (!state || !state.errors) {
+      form.reset();
+      setOpen(false);
+      return;
+    }
+
+    for (const [field, errors] of Object.entries(state.errors)) {
+      form.setError(field, {
+        message: errors.join(', '),
+      });
+    }
+  }, [state, form]);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-lg shadow-md">
           <Plus className="mr-0.5" />
@@ -49,10 +69,7 @@ export default function AddRoomTypeButton() {
         </DialogHeader>
 
         <Form {...form}>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(() => {})}
-          >
+          <form className="flex flex-col gap-4" action={formAction}>
             <FormField
               control={form.control}
               name="name"
@@ -74,7 +91,7 @@ export default function AddRoomTypeButton() {
                 <FormItem>
                   <FormLabel className="font-bold">Details</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input placeholder="Details" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
