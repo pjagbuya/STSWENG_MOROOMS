@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-export default function RoomDeletePopup({
+export default function RoomTypeDeletePopup({
   open,
   onCancel,
   onDelete,

@@ -1,7 +1,7 @@
 'use client';
 
-import RoomDeletePopup from './room_delete_popup';
-import RoomEditPopup from './room_edit_popup';
+import RoomTypeDeletePopup from './room_type_delete_popup';
+import RoomTypeEditPopup from './room_type_edit_popup';
 import {
   deleteRoomTypeAction,
   editRoomTypeAction,
@@ -71,7 +71,7 @@ export default function RoomTypeTable({ data }) {
     <>
       <DataTable columns={finalColumns} data={data} />
 
-      <RoomDeletePopup
+      <RoomTypeDeletePopup
         open={openDeleteDialog}
         onCancel={() => {
           setRow(null);
@@ -87,7 +87,7 @@ export default function RoomTypeTable({ data }) {
         }}
       />
 
-      <RoomEditPopup
+      <RoomTypeEditPopup
         row={row}
         open={openEditDialog}
         onEdit={handleEditContinue}

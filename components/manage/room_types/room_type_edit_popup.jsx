@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function RoomEditPopup({ row, open, onEdit, onOpenChange }) {
+export default function RoomTypeEditPopup({ row, open, onEdit, onOpenChange }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
