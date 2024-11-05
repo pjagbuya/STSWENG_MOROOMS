@@ -19,3 +19,19 @@ export async function IsAdminServerSide() {
 
   return data.toLowerCase() == 'admin';
 }
+
+export function convertKeysToCamelCase(data) {
+  return data.map(obj => {
+    const newObj = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        // Convert snake_case to camelCase
+        const camelCaseKey = key.replace(/_([a-z])/g, (_, letter) =>
+          letter.toUpperCase(),
+        );
+        newObj[camelCaseKey] = obj[key];
+      }
+    }
+    return newObj;
+  });
+}

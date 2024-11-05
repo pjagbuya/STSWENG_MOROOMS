@@ -1,7 +1,7 @@
-'use client';
-
-import { userColumns } from './columns';
-import { DataTable } from '@/components/data-table';
+import { columns } from './columns';
+import UserDataTable from './table';
+import { createClient } from '@/utils/supabase/server';
+import { convertKeysToCamelCase } from '@/utils/utils';
 
 export const userData = [
   {
@@ -36,7 +36,22 @@ export const userData = [
   },
 ];
 
-export default function UserManagement() {
+export default async function UserManagement() {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('get_all_users');
+  if (error) {
+    console.error(error.message);
+  }
+
+  const { data: roles, error: error2 } = await supabase.from('role').select();
+  if (error2) {
+    console.error(error2.message);
+  }
+
+  data.forEach(element => {
+    element['roleList'] = roles;
+  });
+
   return (
     <div className="flex w-full flex-col gap-2 p-8">
       <h1 className="text-3xl font-bold">Reservation Rooms</h1>
@@ -44,7 +59,7 @@ export default function UserManagement() {
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
         laoreet, metus nec.
       </h3>
-      <DataTable columns={userColumns} data={userData} />
+      <UserDataTable columns={columns} data={convertKeysToCamelCase(data)} />
     </div>
   );
 }

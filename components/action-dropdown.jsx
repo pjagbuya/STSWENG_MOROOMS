@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -6,8 +8,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
 
-export default function ActionDropdown() {
+export default function ActionDropdown({ url }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -17,8 +20,12 @@ export default function ActionDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
-        <DropdownMenuItem>Delete</DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link href={`../${url}/edit`}>Edit</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link href={`../${url}/delete`}>Delete</Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
