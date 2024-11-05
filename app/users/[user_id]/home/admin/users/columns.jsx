@@ -1,7 +1,7 @@
 'use client';
 
-import ActionDropdown from '@/components/action-dropdown';
 import { RoleCombobox } from '@/components/role-combobox';
+import ActionDropdown from '@/components/util/action_dropdown';
 
 export const columns = [
   {
