@@ -23,8 +23,6 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { useEffect } from 'react';
-import { useFormState } from 'react-dom';
 import { useForm } from 'react-hook-form';
 
 export default function AddRoomTypeButton() {
@@ -38,23 +36,16 @@ export default function AddRoomTypeButton() {
     },
   });
 
-  const [state, formAction] = useFormState(addRoomTypeAction, {});
+  async function handleSubmit(values) {
+    const err = await addRoomTypeAction(values.name, values.details);
 
-  useEffect(() => {
-    console.log(state);
-
-    if (!state || !state.errors || Object.keys(state.errors).length === 0) {
-      form.reset();
-      setOpen(false);
+    if (err) {
+      form.setError('name', err);
       return;
     }
 
-    for (const [field, errors] of Object.entries(state.errors)) {
-      form.setError(field, {
-        message: errors.join(', '),
-      });
-    }
-  }, [state, form]);
+    setOpen(false);
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -71,7 +62,10 @@ export default function AddRoomTypeButton() {
         </DialogHeader>
 
         <Form {...form}>
-          <form className="flex flex-col gap-4" action={formAction}>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(handleSubmit)}
+          >
             <FormField
               control={form.control}
               name="name"
