@@ -1,6 +1,7 @@
-import { columns } from './columns';
+import { columns, getColumns } from './columns';
 import UserDataTable from './table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ActionDropdown from '@/components/util/action_dropdown';
 import { createClient } from '@/utils/supabase/server';
 import { convertKeysToCamelCase } from '@/utils/utils';
 
@@ -36,6 +37,24 @@ export const userData = [
     userRole: 'teacher',
   },
 ];
+
+export function addActionColumn(columns, onDelete, onEdit) {
+  return [
+    ...columns,
+    {
+      id: 'actions',
+      enableHiding: false,
+      cell: ({ row }) => {
+        return (
+          <ActionDropdown
+            onDelete={() => onDelete?.(row)}
+            onEdit={() => onEdit?.(row)}
+          />
+        );
+      },
+    },
+  ];
+}
 
 export default async function UserManagement() {
   const supabase = createClient();

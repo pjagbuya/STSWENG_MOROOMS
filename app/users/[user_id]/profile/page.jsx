@@ -96,7 +96,6 @@ function UserHomePageLower() {
           </h2>
         </div>
       </div>
-      {u}
     </div>
   );
 }

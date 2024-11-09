@@ -18,12 +18,13 @@ import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import * as React from 'react';
 
-export function RoleCombobox({ data }) {
+export function RoleCombobox({ data, className }) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState('');
+  className = className ? className : '';
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover className={className} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
