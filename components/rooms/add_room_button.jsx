@@ -25,7 +25,7 @@ export default function AddRoomButton({ roomSets, roomTypes }) {
     );
 
     if (err) {
-      form.setError(err.field, err);
+      form.setError('name', err);
       return;
     }
 

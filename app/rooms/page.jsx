@@ -17,7 +17,6 @@ export default async function RoomSearchPage() {
   const roomTypes = await fetchRoomTypes();
 
   const rooms = await fetchRoomsBySet();
-  console.log(rooms);
 
   return (
     <>
@@ -68,7 +67,13 @@ export default async function RoomSearchPage() {
 
         <div className="space-y-8">
           {rooms.map(({ set_id, set_name, rooms }) => (
-            <SetResult key={set_id} setName={set_name} rooms={rooms} />
+            <SetResult
+              key={set_id}
+              setName={set_name}
+              rooms={rooms.map(r => ({ ...r, room_set_id: set_id }))}
+              roomSets={roomSets}
+              roomTypes={roomTypes}
+            />
           ))}
         </div>
       </main>
