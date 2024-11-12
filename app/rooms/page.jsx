@@ -70,7 +70,11 @@ export default async function RoomSearchPage() {
             <SetResult
               key={set_id}
               setName={set_name}
-              rooms={rooms.map(r => ({ ...r, room_set_id: set_id }))}
+              rooms={rooms.map(r => ({
+                ...r,
+                room_set_id: set_id,
+                location: set_name,
+              }))}
               roomSets={roomSets}
               roomTypes={roomTypes}
             />
