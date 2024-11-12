@@ -1,3 +1,5 @@
+import { fetchRoomSets } from '@/app/manage/room_sets/actions';
+import { fetchRoomTypes } from '@/app/manage/room_types/actions';
 import Header from '@/components/header';
 import AddRoomButton from '@/components/rooms/add_room_button';
 import SearchFilter from '@/components/rooms/search_filter';
@@ -9,7 +11,10 @@ import { Settings } from 'lucide-react';
 import { Layers } from 'lucide-react';
 import Link from 'next/link';
 
-export default function RoomSearchPage() {
+export default async function RoomSearchPage() {
+  const roomSets = await fetchRoomSets();
+  const roomTypes = await fetchRoomTypes();
+
   return (
     <>
       <Header />
@@ -40,7 +45,8 @@ export default function RoomSearchPage() {
 
           {/* Admin controls */}
           <div className="flex gap-4">
-            <AddRoomButton />
+            <AddRoomButton roomSets={roomSets} roomTypes={roomTypes} />
+
             <Button asChild className="rounded-lg shadow-md">
               <Link href="/manage/room_types">
                 <Settings className="mr-0.5" />
