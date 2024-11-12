@@ -23,7 +23,7 @@ export default async function RoomSearchPage() {
       <Header />
 
       <main className="mb-1 px-8 py-4">
-        <h2 className="mb-4 text-3xl font-semibold">Rooms</h2>
+        <h2 className="mb-4 text-3xl font-semibold">Reserve a Room</h2>
 
         <div className="mb-8 flex items-center gap-4">
           <div className="flex flex-1 items-center gap-4">
