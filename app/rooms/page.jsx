@@ -1,5 +1,6 @@
 import { fetchRoomSets } from '@/app/manage/room_sets/actions';
 import { fetchRoomTypes } from '@/app/manage/room_types/actions';
+import { fetchRoomsBySet } from '@/app/rooms/actions';
 import Header from '@/components/header';
 import AddRoomButton from '@/components/rooms/add_room_button';
 import SearchFilter from '@/components/rooms/search_filter';
@@ -14,6 +15,9 @@ import Link from 'next/link';
 export default async function RoomSearchPage() {
   const roomSets = await fetchRoomSets();
   const roomTypes = await fetchRoomTypes();
+
+  const rooms = await fetchRoomsBySet();
+  console.log(rooms);
 
   return (
     <>
@@ -63,38 +67,9 @@ export default async function RoomSearchPage() {
         </div>
 
         <div className="space-y-8">
-          <SetResult
-            set={{ name: 'Velasco' }}
-            rooms={[
-              {
-                name: 'Velasco 501',
-                location: 'Velasco Bldg.',
-                capacity: 40,
-                status: 'Available',
-                image: '/test_image.png',
-              },
-              {
-                name: 'Velasco 502',
-                location: 'Velasco Bldg.',
-                capacity: 40,
-                status: 'Waiting List',
-                image: '/test_image.png',
-              },
-            ]}
-          />
-
-          <SetResult
-            set={{ name: 'Andrew' }}
-            rooms={[
-              {
-                name: 'Andrew 201',
-                location: 'Andrew Bldg.',
-                capacity: 30,
-                status: 'Unavailable',
-                image: '/test_image.png',
-              },
-            ]}
-          />
+          {rooms.map(({ set_id, set_name, rooms }) => (
+            <SetResult key={set_id} setName={set_name} rooms={rooms} />
+          ))}
         </div>
       </main>
     </>

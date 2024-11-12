@@ -24,3 +24,16 @@ export async function addRoomAction(name, details, roomTypeId, roomSetId) {
   revalidatePath('/rooms');
   return err;
 }
+
+export async function fetchRoomsBySet() {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc('get_all_rooms_by_set');
+
+  if (error) {
+    console.error('Error fetching room types:', error);
+    throw error;
+  }
+
+  return data;
+}
