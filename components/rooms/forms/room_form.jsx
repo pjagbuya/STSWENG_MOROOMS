@@ -58,6 +58,7 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="details"

@@ -66,10 +66,17 @@ export async function editRoomAction(id, name, details, roomTypeId, roomSetId) {
   return err;
 }
 
-export async function fetchRoomsBySet() {
+export async function filterRooms(filter) {
   const supabase = createClient();
 
-  const { data, error } = await supabase.rpc('get_all_rooms_by_set');
+  console.log(filter);
+
+  const { data, error } = await supabase.rpc('filter_rooms', {
+    p_name: filter.name,
+    p_date_time_range: `{[${filter.date} ${filter.startTime}, ${filter.date} ${filter.endTime})}`,
+    p_room_set_id: filter.roomSetId,
+    // p_min_capacity: filter.minCapacity,
+  });
 
   if (error) {
     console.error('Error fetching room types:', error);
