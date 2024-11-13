@@ -9,6 +9,7 @@ import {
 import { addActionColumn } from '@/components/util/action_dropdown';
 import { DataTable } from '@/components/util/data_table';
 import { SortableHeader } from '@/components/util/sortable_header';
+import { getHHMMTime } from '@/utils/time';
 import { useState } from 'react';
 
 const COLUMNS = [
@@ -21,6 +22,24 @@ const COLUMNS = [
   {
     accessorKey: 'details',
     header: 'Details',
+  },
+  {
+    accessorKey: 'capacity',
+    header: 'Capacity',
+  },
+  {
+    accessorKey: 'min_reservation_time',
+    header: 'Minimum Reservation Time',
+    cell: ({ getValue }) => {
+      return getHHMMTime(getValue());
+    },
+  },
+  {
+    accessorKey: 'max_reservation_time',
+    header: 'Maximum Reservation Time',
+    cell: ({ getValue }) => {
+      return getHHMMTime(getValue());
+    },
   },
 ];
 
@@ -52,10 +71,15 @@ export default function RoomTypeTable({ data }) {
   }
 
   async function handleEditContinue(row, form, values) {
+    console.log(values);
+
     const err = await editRoomTypeAction(
       row.original.id,
       values.name,
       values.details,
+      values.capacity,
+      values.minReserveTime,
+      values.maxReserveTime,
     );
 
     if (err) {

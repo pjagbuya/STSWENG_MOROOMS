@@ -5,4 +5,7 @@ export const FORM_SCHEMA = z.object({
     message: 'Type name must be at least 2 characters.',
   }),
   details: z.string().optional(),
+  capacity: z.number().int().gte(1),
+  minReserveTime: z.string(),
+  maxReserveTime: z.string(),
 });

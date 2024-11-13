@@ -75,7 +75,7 @@ export async function filterRooms(filter) {
     p_name: filter.name,
     p_date_time_range: `{[${filter.date} ${filter.startTime}, ${filter.date} ${filter.endTime})}`,
     p_room_set_id: filter.roomSetId,
-    // p_min_capacity: filter.minCapacity,
+    p_min_capacity: filter.minCapacity,
   });
 
   if (error) {

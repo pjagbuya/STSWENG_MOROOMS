@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { getDateString } from '@/utils/time';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { min } from 'date-fns';
 import { SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -51,7 +52,7 @@ export default function SearchFilter({ filters, roomSets, onSearch }) {
     defaultValues: {
       ...filters,
       date: new Date(filters.date),
-      setRoomId: 'none',
+      minCapacity: Number(filters.minCapacity),
     },
   });
 
@@ -94,7 +95,6 @@ export default function SearchFilter({ filters, roomSets, onSearch }) {
           <form
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit(values => {
-              console.log(values);
               onSearch({
                 name: filters.name || undefined,
                 date: getDateString(values.date),

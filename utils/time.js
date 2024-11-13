@@ -12,3 +12,13 @@ export function getDateString(date) {
 
   return `${month}-${day}-${year}`;
 }
+
+export function getHHMMTime(dateString) {
+  const [hoursStr, minutes, seconds] = dateString.split(':');
+  let hours = parseInt(hoursStr, 10);
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  const strTime = `${hours}:${minutes} ${ampm}`;
+  return strTime;
+}

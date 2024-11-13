@@ -17,7 +17,13 @@ export default function AddRoomTypeButton() {
   const [open, setOpen] = useState(false);
 
   async function handleSubmit(form, values) {
-    const err = await addRoomTypeAction(values.name, values.details);
+    const err = await addRoomTypeAction(
+      values.name,
+      values.details,
+      values.capacity,
+      values.minReserveTime,
+      values.maxReserveTime,
+    );
 
     if (err) {
       form.setError('name', err);
