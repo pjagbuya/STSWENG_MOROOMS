@@ -9,7 +9,9 @@ export default function HourSelector({
   minHour = 7,
   maxHour = 19,
   onSelectionChange = () => {},
+  initialHourStates = {},
 }) {
+  const [hourStates, setHourStates] = useState(initialHourStates);
   const [selectedHours, setSelectedHours] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);
@@ -25,6 +27,8 @@ export default function HourSelector({
   });
 
   const toggleHourSelection = hour => {
+    if (hourStates[hour] === 'unavailable') return;
+
     setSelectedHours(prev => {
       if (prev.includes(hour)) {
         return prev.filter(h => h !== hour);
@@ -35,6 +39,8 @@ export default function HourSelector({
   };
 
   const handleMouseDown = hour => {
+    if (hourStates[hour] === 'unavailable') return;
+
     setIsDragging(true);
     setDragStart(hour);
     setIsSelecting(!selectedHours.includes(hour));
@@ -63,10 +69,13 @@ export default function HourSelector({
       setSelectedHours(prev => {
         let newSelection = [...prev];
         affectedHours.forEach(h => {
-          if (isSelecting && !newSelection.includes(h)) {
-            newSelection.push(h);
-          } else if (!isSelecting && newSelection.includes(h)) {
-            newSelection = newSelection.filter(selected => selected !== h);
+          // only allows for hours that arent labelled as "unavailable" to be selected
+          if (hourStates[h] !== 'unavailable') {
+            if (isSelecting && !newSelection.includes(h)) {
+              newSelection.push(h);
+            } else if (!isSelecting && newSelection.includes(h)) {
+              newSelection = newSelection.filter(selected => selected !== h);
+            }
           }
         });
         return newSelection;
@@ -87,6 +96,23 @@ export default function HourSelector({
     };
   }, [isDragging, selectedHours]);
 
+  // Function for determining what color the certain hour should be
+  const getHourStyle = hour => {
+    const isSelected = selectedHours.includes(hour);
+    const state = hourStates[hour] || 'available';
+
+    switch (state) {
+      case 'available':
+        return isSelected ? 'bg-green-500' : 'bg-green-200';
+      case 'pending':
+        return isSelected ? 'bg-yellow-500' : 'bg-yellow-200';
+      case 'unavailable':
+        return 'bg-red-500 cursor-not-allowed';
+      default:
+        return 'bg-slate-700';
+    }
+  };
+
   return (
     <div
       className={`rounded-lg border p-4 text-muted-foreground shadow ${noSelectClass}`}
@@ -106,8 +132,7 @@ export default function HourSelector({
 
           const borderStyle =
             hour !== maxHour ? 'border-b border-gray-200' : '';
-          const isSelected = selectedHours.includes(hour);
-          const selectedStyle = isSelected ? 'bg-green-500' : 'bg-slate-700';
+          const hourStyle = getHourStyle(hour);
 
           return (
             <div
@@ -118,9 +143,9 @@ export default function HourSelector({
             >
               <p className="text-[0.8rem]">{`${displayHour} ${period}`}</p>
               <span
-                className={`p-3.5 ${borderStyle} ${selectedStyle} cursor-pointer transition-colors duration-150 ${noSelectClass}`}
+                className={`p-3.5 ${borderStyle} ${hourStyle} cursor-pointer transition-colors duration-150 ${noSelectClass}`}
                 role="checkbox"
-                aria-checked={isSelected}
+                aria-checked={selectedHours.includes(hour)}
                 tabIndex={0}
                 onKeyDown={e => {
                   if (e.key === 'Enter' || e.key === ' ') {
