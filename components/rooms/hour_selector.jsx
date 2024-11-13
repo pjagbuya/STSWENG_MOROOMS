@@ -1,13 +1,14 @@
 'use client';
 
+import { Separator } from '@/components/ui/separator';
 import React, { useEffect, useState } from 'react';
 
 const noSelectClass = 'select-none user-select-none -webkit-user-select-none';
 
 export default function HourSelector({
   selectedDay = new Date(),
-  minHour = 7,
-  maxHour = 19,
+  minHour,
+  maxHour,
   onSelectionChange = () => {},
   initialHourStates = {},
 }) {
@@ -157,6 +158,10 @@ export default function HourSelector({
             </div>
           );
         })}
+      </div>
+      <div>
+        <Separator className="my-4" />
+        <i>Click and Drag to select a time</i>
       </div>
     </div>
   );

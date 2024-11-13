@@ -11,6 +11,7 @@ import { useState } from 'react';
 
 export default function RoomReservationForm() {
   // TEST DATA FOR HOUR STATES
+  // TODO: Change to actual data for available hours
   const hourStates = {
     8: 'unavailable',
     9: 'unavailable',
@@ -68,12 +69,17 @@ export default function RoomReservationForm() {
     }
   };
 
+  // Reset input fields
   const handleReset = () => {
     setFormData({
       selectedDate: null,
       selectedHours: null,
       purpose: '',
-      endorsementLetter: null,
+      count: 0,
+      user_id: null, // TODO: add userID however its gotten
+      reservation_name: '',
+      room_id: null, // TODO: add roomID however its gotten
+      letter: null,
     });
     setErrors({});
   };
@@ -120,6 +126,8 @@ export default function RoomReservationForm() {
                 handleFormChange('selectedHours', hours)
               }
               initialHourStates={hourStates}
+              minHour={7} // TODO: Change to room minHour
+              maxHour={23} // TODO: Change to room maxHour
             />
             {errors.selectedHours && (
               <p className="text-red-500">{errors.selectedHours}</p>
@@ -167,6 +175,13 @@ export default function RoomReservationForm() {
               <div className="space-x-2">
                 <Button type="submit" className="rounded-md px-4 py-2">
                   Confirm Reservation
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-md px-4 py-2"
+                >
+                  firm Reservation
                 </Button>
                 <Button
                   type="button"
