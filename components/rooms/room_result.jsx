@@ -49,7 +49,7 @@ export function RoomResult({ room, roomSets, roomTypes }) {
               {room.name}
             </h4>
             <p className="text-sm">Location: {room.location}</p>
-            <p className="text-sm">Capacity: {room.capacity} pax</p>
+            <p className="text-sm">Capacity: {room.room_type_capacity} pax</p>
 
             <RoomStatus status={room.status} />
           </div>
