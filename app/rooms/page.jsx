@@ -54,7 +54,7 @@ export default async function RoomSearchPage({ searchParams }) {
 
           {/* Admin controls */}
           <div className="flex gap-4">
-            <AddRoomButton roomSets={roomSets} roomTypes={roomTypes} />
+            <AddRoomButton />
 
             <Button asChild className="rounded-lg shadow-md">
               <Link href="/manage/room_types">
@@ -72,19 +72,25 @@ export default async function RoomSearchPage({ searchParams }) {
         </div>
 
         <div className="space-y-8">
-          {rooms.map(({ set_id, set_name, rooms }) => (
-            <SetResult
-              key={set_id}
-              setName={set_name}
-              rooms={rooms.map(r => ({
-                ...r,
-                room_set_id: set_id,
-                location: set_name,
-              }))}
-              roomSets={roomSets}
-              roomTypes={roomTypes}
-            />
-          ))}
+          {rooms.length === 0 ? (
+            <p className="text-center text-xl font-bold italic text-gray-700">
+              No rooms available 😅.
+            </p>
+          ) : (
+            rooms.map(({ set_id, set_name, rooms }) => (
+              <SetResult
+                key={set_id}
+                setName={set_name}
+                rooms={rooms.map(r => ({
+                  ...r,
+                  room_set_id: set_id,
+                  location: set_name,
+                }))}
+                roomSets={roomSets}
+                roomTypes={roomTypes}
+              />
+            ))
+          )}
         </div>
       </main>
     </>

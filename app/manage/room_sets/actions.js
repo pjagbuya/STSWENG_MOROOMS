@@ -57,6 +57,7 @@ export async function editRoomSet(id, name) {
 export async function editRoomSetAction(id, name) {
   const err = await editRoomSet(id, name);
   revalidatePath('/manage/room_sets');
+  revalidatePath('/manage/rooms');
   return err;
 }
 
