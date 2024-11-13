@@ -1,8 +1,11 @@
+import { fetchRoomTypes } from './actions';
 import Header from '@/components/header';
 import AddRoomTypeButton from '@/components/manage/room_types/add_room_type_button';
 import RoomTypeTable from '@/components/manage/room_types/room_type_table';
 
-export default function ManageRoomTypesPage() {
+export default async function ManageRoomTypesPage() {
+  const roomTypesList = await fetchRoomTypes();
+
   return (
     <>
       <Header />
@@ -14,7 +17,7 @@ export default function ManageRoomTypesPage() {
           <AddRoomTypeButton />
         </div>
 
-        <RoomTypeTable />
+        <RoomTypeTable data={roomTypesList} />
       </main>
     </>
   );

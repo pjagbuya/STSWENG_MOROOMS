@@ -1,10 +1,40 @@
+'use client';
+
+import RoomTypeForm from './forms/room_type_form';
+import { addRoomTypeAction } from '@/app/manage/room_types/actions';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
+import { useState } from 'react';
 
 export default function AddRoomTypeButton() {
+  const [open, setOpen] = useState(false);
+
+  async function handleSubmit(form, values) {
+    const err = await addRoomTypeAction(
+      values.name,
+      values.details,
+      values.capacity,
+      values.minReserveTime,
+      values.maxReserveTime,
+    );
+
+    if (err) {
+      form.setError('name', err);
+      return;
+    }
+
+    setOpen(false);
+  }
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="rounded-lg shadow-md">
           <Plus className="mr-0.5" />
@@ -12,7 +42,13 @@ export default function AddRoomTypeButton() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>{/* <RoomTypeForm /> */}</DialogContent>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add Room Type</DialogTitle>
+        </DialogHeader>
+
+        <RoomTypeForm onSubmit={handleSubmit} />
+      </DialogContent>
     </Dialog>
   );
 }

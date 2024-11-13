@@ -7,11 +7,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Trash } from 'lucide-react';
 
-export default function DeleteRoomButton({
+export default function RoomSetDeletePopup({
   open,
   onCancel,
   onDelete,
@@ -19,19 +17,15 @@ export default function DeleteRoomButton({
 }) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogTrigger asChild>
-        <button className="shadcn-button rounded-full p-2 shadow-md hover:bg-gray-800 hover:bg-opacity-80">
-          <Trash className="h-5 w-5 text-gray-300" />
-        </button>
-      </AlertDialogTrigger>
-
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
           <AlertDialogDescription>
-            Deleting a room cannot be undone.
+            Deleting this room set will also delete all associated rooms of the
+            set to delete.
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
           <AlertDialogAction onClick={onDelete}>Continue</AlertDialogAction>
