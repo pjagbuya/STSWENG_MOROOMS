@@ -39,7 +39,7 @@ export function RoomResult({ room, roomSets, roomTypes }) {
 
   return (
     <div className="relative">
-      <Link href="/rooms/test" className="block">
+      <Link href={`/rooms/${room.id}`} className="block">
         <article
           className="relative h-52 overflow-hidden rounded-lg border bg-cover bg-center shadow-md transition hover:shadow-lg"
           style={{ backgroundImage: `url(${room.image})` }}
