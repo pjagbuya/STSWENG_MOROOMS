@@ -25,9 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { getDateString } from '@/utils/time';
+import { get24HourTime, getDateString } from '@/utils/time';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { min } from 'date-fns';
 import { SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -162,23 +161,19 @@ export default function SearchFilter({ filters, roomSets, onSearch }) {
                     <FormItem>
                       <FormLabel className="font-bold">Set</FormLabel>
                       <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
+                        <select
+                          className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+                          value={field.value}
+                          onChange={e => field.onChange(e.target.value)}
                         >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select Room Set" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem selected>None</SelectItem>
+                          <option value="">None</option>
 
-                            {roomSets.map(s => (
-                              <SelectItem key={s.id} value={s.id}>
-                                {s.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          {roomSets.map(s => (
+                            <option key={s.id} value={s.id}>
+                              {s.name}
+                            </option>
+                          ))}
+                        </select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -214,7 +209,15 @@ export default function SearchFilter({ filters, roomSets, onSearch }) {
               <Button
                 variant="outline"
                 type="button"
-                onClick={() => form.reset()}
+                onClick={() =>
+                  form.reset({
+                    date: new Date(),
+                    startTime: get24HourTime(new Date()),
+                    endTime: '23:59',
+                    roomSetId: '',
+                    minCapacity: 0,
+                  })
+                }
               >
                 Reset
               </Button>
