@@ -21,12 +21,12 @@ export async function callFunctionWithFormData(
     userInfo[snakeCaseKey] = value;
   }
 
-  console.log(userInfo);
+  console.log('userInfo', userInfo);
   const { error } = await supabase.rpc(function_name, userInfo);
 
   if (error) {
     console.error(error);
-    redirect('/error');
+    // redirect('/error');
   }
 
   revalidatePath(url);

@@ -13,14 +13,6 @@ export const columns = [
     accessorKey: 'userLastname',
     header: 'Last name',
   },
-  {
-    accessorKey: 'roleName',
-    header: 'Role',
-  },
-  {
-    accessorKey: 'userSchoolId',
-    header: 'School Id',
-  },
   // {
   //   id: 'actions',
   //   enableHiding: false,

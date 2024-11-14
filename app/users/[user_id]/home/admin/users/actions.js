@@ -10,6 +10,7 @@ import { revalidatePath, unstable_noStore } from 'next/cache';
 
 export async function updateUserInfo(userId, url, formData) {
   callFunctionWithFormData(userId, 'update_user', url, formData);
+  revalidatePath(url);
 }
 
 export async function deleteUser(id, url) {
@@ -59,7 +60,7 @@ export async function getRoles() {
   const roleData = data.map(role => {
     return {
       id: role.role_id,
-      value: role.role_name.toLowerCase(),
+      value: role.role_name,
     };
   });
 
