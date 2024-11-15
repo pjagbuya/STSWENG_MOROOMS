@@ -30,8 +30,14 @@ export async function updateUserRole(userId, role, url) {
   revalidatePath(url);
 }
 
-export async function addRole(userId, url, formData) {
-  callFunctionWithFormData(userId, 'add_role', url, formData, 'role_id');
+export async function addRole(url, formData) {
+  callFunctionWithFormData(
+    null,
+    'create_role_and_permission',
+    url,
+    formData,
+    null,
+  );
 }
 
 export async function updateRole(userId, url, formData) {

@@ -9,7 +9,7 @@ export const userEditFormSchema = z.object({
   }),
 });
 
-export const roleEditFormSchema = z.object({
+export const roleFormSchema = z.object({
   roleName: z.string().min(2, {
     message: 'Type name must be at least 2 characters.',
   }),

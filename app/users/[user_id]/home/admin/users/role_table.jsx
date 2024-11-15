@@ -1,10 +1,12 @@
 'use client';
 
-import { deleteUser, updateRole, updateUserInfo } from './actions';
+import { addRole, deleteUser, updateRole, updateUserInfo } from './actions';
 import { roleColumns } from './columns';
-import { roleEditFormSchema, userEditFormSchema } from './form_schema';
+import { roleFormSchema, userEditFormSchema } from './form_schema';
+import { AddPopup } from '@/components/add_popup';
 import { DeletePopup } from '@/components/delete_popup';
 import EditPopup from '@/components/edit_popup';
+import { Button } from '@/components/ui/button';
 import { addActionColumn } from '@/components/util/action_dropdown';
 import { DataTable } from '@/components/util/data_table';
 import { objectToFormData } from '@/utils/server_utils';
@@ -20,6 +22,7 @@ export function RoleTable({ data }) {
   const [rowData, setRowData] = useState(null);
   const [openEditPopup, setOpenEditPopup] = useState(false);
   const [openDeletePopup, setOpenDeletePopup] = useState(false);
+  const [openAddPopup, setOpenAddPopup] = useState(false);
   const url = usePathname();
   console.log('role data', data);
 
@@ -38,7 +41,7 @@ export function RoleTable({ data }) {
     <div>
       <DataTable columns={finalColumns} data={data} />
       <EditPopup
-        formSchema={roleEditFormSchema}
+        formSchema={roleFormSchema}
         title={'Edit User Data'}
         row={rowData}
         open={openEditPopup}
@@ -81,6 +84,26 @@ export function RoleTable({ data }) {
           }
         }}
       />
+
+      <AddPopup
+        formSchema={roleFormSchema}
+        title={'Add role'}
+        open={openAddPopup}
+        onAdd={async (form, values) => {
+          await addRole(url, await objectToFormData(values));
+          setOpenAddPopup(false);
+        }}
+        onOpenChange={v => {
+          setOpenAddPopup(v);
+        }}
+      />
+      <Button
+        onClick={() => setOpenAddPopup(true)}
+        className={'mt-4 w-full'}
+        variant="secondary"
+      >
+        Add Role
+      </Button>
     </div>
   );
 }
