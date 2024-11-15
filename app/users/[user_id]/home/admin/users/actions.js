@@ -31,21 +31,38 @@ export async function updateUserRole(userId, role, url) {
 }
 
 export async function addRole(userId, url, formData) {
-  callFunctionWithFormData(userId, 'add_role', url, formData);
+  callFunctionWithFormData(userId, 'add_role', url, formData, 'role_id');
 }
 
 export async function updateRole(userId, url, formData) {
-  callFunctionWithFormData(userId, 'update_role', url, formData);
+  callFunctionWithFormData(
+    userId,
+    'update_role_and_permissions',
+    url,
+    formData,
+    'role_id',
+  );
 }
 
 export async function deleteRole(id, url) {
-  callFunctionWithNoFormData({ p_user_id: id }, 'delete_role', url);
+  callFunctionWithNoFormData({ p_role_id: id }, 'delete_role', url);
 }
 
 export async function getUsers() {
   unstable_noStore();
   const supabase = createClient();
   const { data, error } = await supabase.rpc('get_all_users');
+  if (error) {
+    console.error(error.message);
+  }
+
+  return convertKeysToCamelCase(data);
+}
+
+export async function getRolesWithPermission() {
+  unstable_noStore();
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('get_roles_with_permissions');
   if (error) {
     console.error(error.message);
   }

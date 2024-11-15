@@ -103,7 +103,7 @@ export function UserTable({ data, roles }) {
           const action = async () => {
             await deleteUser(rowData.userId, url);
             setRowData(null);
-            setOpenRoleChangePopup(false);
+            setOpenDeletePopup(false);
           };
 
           action();

@@ -8,12 +8,13 @@ export async function callFunctionWithFormData(
   function_name,
   url,
   formData,
+  idColumnName = 'user_id',
 ) {
   const supabase = createClient();
   const rawFormData = Object.fromEntries(formData);
 
   const userInfo = {
-    p_user_id: userId,
+    ['p_' + idColumnName]: userId,
   };
 
   for (const [key, value] of Object.entries(rawFormData)) {
