@@ -14,7 +14,11 @@ export async function updateUserInfo(userId, url, formData) {
 }
 
 export async function deleteUser(id, url) {
-  callFunctionWithNoFormData({ p_user_id: id }, 'delete_user', url);
+  const supabaseAdmin = createClient(true);
+  const err = callFunctionWithNoFormData({ p_user_id: id }, 'delete_user', url);
+  if (!err) {
+    await supabaseAdmin.auth.admin.deleteUser(id);
+  }
 }
 
 export async function updateUserRole(userId, role, url) {

@@ -39,7 +39,9 @@ export async function callFunctionWithNoFormData(data, function_name, url) {
 
   if (error) {
     console.error(error.message);
+    return error;
   }
 
   revalidatePath(url);
+  return null;
 }

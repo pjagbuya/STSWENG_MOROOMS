@@ -1,8 +1,9 @@
 'use client';
 
-import { updateUserInfo, updateUserRole } from './actions';
+import { deleteUser, updateUserInfo, updateUserRole } from './actions';
 import { columns } from './columns';
 import { userEditFormSchema } from './form_schema';
+import { DeletePopup } from '@/components/delete_popup';
 import EditPopup from '@/components/edit_popup';
 import { UserRoleChangePopup } from '@/components/user_role_change_popup';
 import { addActionColumn } from '@/components/util/action_dropdown';
@@ -83,6 +84,32 @@ export function UserTable({ data, roles }) {
         }}
         onOpenChange={v => {
           setOpenEditPopup(v);
+
+          if (!v) {
+            setRowData(null);
+          }
+        }}
+      />
+
+      <DeletePopup
+        title={'delete user'}
+        body={'Do you want to delete this user'}
+        open={openDeletePopup}
+        onCancel={() => {
+          setRowData(null);
+          setOpenDeletePopup(false);
+        }}
+        onDelete={() => {
+          const action = async () => {
+            await deleteUser(rowData.userId, url);
+            setRowData(null);
+            setOpenRoleChangePopup(false);
+          };
+
+          action();
+        }}
+        onOpenChange={v => {
+          setOpenDeletePopup(v);
 
           if (!v) {
             setRowData(null);
