@@ -51,7 +51,11 @@ export async function updateRole(userId, url, formData) {
 }
 
 export async function deleteRole(id, url) {
-  callFunctionWithNoFormData({ p_role_id: id }, 'delete_role', url);
+  callFunctionWithNoFormData(
+    { p_role_id: id },
+    'delete_role_and_permission',
+    url,
+  );
 }
 
 export async function getUsers() {

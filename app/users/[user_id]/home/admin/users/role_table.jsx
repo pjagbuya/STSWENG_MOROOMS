@@ -1,6 +1,12 @@
 'use client';
 
-import { addRole, deleteUser, updateRole, updateUserInfo } from './actions';
+import {
+  addRole,
+  deleteRole,
+  deleteUser,
+  updateRole,
+  updateUserInfo,
+} from './actions';
 import { roleColumns } from './columns';
 import { roleFormSchema, userEditFormSchema } from './form_schema';
 import { AddPopup } from '@/components/add_popup';
@@ -69,7 +75,7 @@ export function RoleTable({ data }) {
         }}
         onDelete={() => {
           const action = async () => {
-            await deleteUser(rowData.userId, url);
+            await deleteRole(rowData.roleId, url);
             setRowData(null);
             setOpenDeletePopup(false);
           };
