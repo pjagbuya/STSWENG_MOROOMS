@@ -2,11 +2,11 @@ import ProfileCalender from './profile-calendar';
 import GradientBox from '@/components/gradient-box';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { IsAdminServerSide } from '@/utils/utils';
+import { isAdminServerSide } from '@/utils/utils';
 import { ExternalLink, MailOpen, Mails, MapPin, Phone } from 'lucide-react';
 
 export default async function ProfilePage() {
-  const isAdmin = await IsAdminServerSide();
+  const isAdmin = await isAdminServerSide();
   return (
     <div className="flex h-screen w-full flex-col justify-center gap-10 px-64 py-24">
       <div className="flex h-[300px] w-full items-center justify-between py-6">

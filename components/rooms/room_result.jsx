@@ -7,7 +7,7 @@ import { deleteRoomAction, editRoomAction } from '@/app/rooms/actions';
 import Link from 'next/link';
 import { useState } from 'react';
 
-export function RoomResult({ room, roomSets, roomTypes }) {
+export function RoomResult({ isAdmin, room, roomSets, roomTypes }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
 
@@ -56,22 +56,24 @@ export function RoomResult({ room, roomSets, roomTypes }) {
         </article>
       </Link>
 
-      <div className="absolute bottom-2 right-2 flex space-x-2">
-        <EditRoomButton
-          room={room}
-          roomSets={roomSets}
-          roomTypes={roomTypes}
-          open={openEditDialog}
-          onEdit={handleRoomEdit}
-          onOpenChange={setOpenEditDialog}
-        />
-        <DeleteRoomButton
-          open={openDeleteDialog}
-          onCancel={handleDeleteCancel}
-          onDelete={handleRoomDelete}
-          onOpenChange={setOpenDeleteDialog}
-        />
-      </div>
+      {isAdmin && (
+        <div className="absolute bottom-2 right-2 flex space-x-2">
+          <EditRoomButton
+            room={room}
+            roomSets={roomSets}
+            roomTypes={roomTypes}
+            open={openEditDialog}
+            onEdit={handleRoomEdit}
+            onOpenChange={setOpenEditDialog}
+          />
+          <DeleteRoomButton
+            open={openDeleteDialog}
+            onCancel={handleDeleteCancel}
+            onDelete={handleRoomDelete}
+            onOpenChange={setOpenDeleteDialog}
+          />
+        </div>
+      )}
     </div>
   );
 }
