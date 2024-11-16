@@ -20,12 +20,14 @@ import {
 } from '@/components/ui/tooltip';
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useFormState } from 'react-dom';
 
 export default function AddRoomButton() {
   const [roomSets, setRoomSets] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
-
   const [open, setOpen] = useState(false);
+
+  const [state, formAction] = useFormState(addRoomAction, null);
 
   useEffect(() => {
     async function fetchThings() {
@@ -39,21 +41,17 @@ export default function AddRoomButton() {
     fetchThings();
   }, []);
 
-  async function handleSubmit(form, values) {
-    const err = await addRoomAction(
-      values.name,
-      values.details,
-      values.room_type_id,
-      values.room_set_id,
-    );
-
-    if (err) {
-      form.setError('name', err);
+  useEffect(() => {
+    if (!state) {
       return;
     }
 
-    setOpen(false);
-  }
+    if (state.status === 'success') {
+      setOpen(false);
+    } else if (state.status === 'error') {
+      console.log('Error adding room:', state.error);
+    }
+  }, [state]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -93,7 +91,7 @@ export default function AddRoomButton() {
         <RoomForm
           roomSets={roomSets}
           roomTypes={roomTypes}
-          onSubmit={handleSubmit}
+          onSubmit={formAction}
         />
       </DialogContent>
     </Dialog>

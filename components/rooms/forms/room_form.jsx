@@ -16,19 +16,23 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const FORM_SCHEMA = z.object({
   name: z.string().min(2, {
-    message: 'Set name must be at least 2 characters.',
+    message: 'Room name must be at least 2 characters.',
   }),
   details: z.string().optional(),
+  image_file: z.any(),
   room_type_id: z.string().uuid(),
   room_set_id: z.string().uuid(),
 });
 
 export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
+  const formRef = useRef();
+
   const form = useForm({
     resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
@@ -42,8 +46,11 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
   return (
     <Form {...form}>
       <form
+        ref={formRef}
         className="flex flex-col gap-4"
-        onSubmit={form.handleSubmit(values => onSubmit(form, values))}
+        onSubmit={form.handleSubmit(() =>
+          onSubmit(new FormData(formRef.current)),
+        )}
       >
         <FormField
           control={form.control}
@@ -75,12 +82,33 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
 
         <FormField
           control={form.control}
+          name="image_file"
+          render={({ field: { value, onChange, ...fieldProps } }) => (
+            <FormItem>
+              <FormLabel className="font-bold">Image</FormLabel>
+              <FormControl>
+                <Input
+                  {...fieldProps}
+                  type="file"
+                  placeholder="Upload Image"
+                  accept="image/*"
+                  onChange={e => onChange(e.target.files && e.target.files[0])}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="room_type_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="font-bold">Room Type</FormLabel>
               <FormControl>
                 <Select
+                  {...field}
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -110,6 +138,7 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
               <FormLabel className="font-bold">Room Set</FormLabel>
               <FormControl>
                 <Select
+                  {...field}
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >

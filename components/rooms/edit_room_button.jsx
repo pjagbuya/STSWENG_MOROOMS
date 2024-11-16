@@ -35,7 +35,7 @@ export default function EditRoomButton({
           values={room}
           roomSets={roomSets}
           roomTypes={roomTypes}
-          onSubmit={(form, values) => onEdit(room, form, values)}
+          onSubmit={onEdit}
         />
       </DialogContent>
     </Dialog>

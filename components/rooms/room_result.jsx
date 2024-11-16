@@ -5,11 +5,29 @@ import EditRoomButton from './edit_room_button';
 import { RoomStatus } from './room_status';
 import { deleteRoomAction, editRoomAction } from '@/app/rooms/actions';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useFormState } from 'react-dom';
 
 export function RoomResult({ isAdmin, room, roomSets, roomTypes }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
+
+  const [state, formAction] = useFormState(
+    editRoomAction.bind(null, room.id),
+    null,
+  );
+
+  useEffect(() => {
+    if (!state) {
+      return;
+    }
+
+    if (state.status === 'success') {
+      setOpenEditDialog(false);
+    } else if (state.status === 'error') {
+      console.log('Error editing room:', state.error);
+    }
+  }, [state]);
 
   async function handleRoomDelete() {
     await deleteRoomAction(room.id);
@@ -18,23 +36,6 @@ export function RoomResult({ isAdmin, room, roomSets, roomTypes }) {
 
   function handleDeleteCancel() {
     setOpenDeleteDialog(false);
-  }
-
-  async function handleRoomEdit(room, form, values) {
-    const err = await editRoomAction(
-      room.id,
-      values.name,
-      values.details,
-      values.room_type_id,
-      values.room_set_id,
-    );
-
-    if (err) {
-      form.setError('name', err);
-      return;
-    }
-
-    setOpenEditDialog(false);
   }
 
   return (
@@ -63,7 +64,7 @@ export function RoomResult({ isAdmin, room, roomSets, roomTypes }) {
             roomSets={roomSets}
             roomTypes={roomTypes}
             open={openEditDialog}
-            onEdit={handleRoomEdit}
+            onEdit={formAction}
             onOpenChange={setOpenEditDialog}
           />
           <DeleteRoomButton

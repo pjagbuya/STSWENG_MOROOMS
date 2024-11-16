@@ -3,73 +3,201 @@
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-export async function addRoom(name, details, roomTypeId, roomSetId) {
+const BUCKET_URL =
+  'https://rcfzezkhwvgtwpqcyhac.supabase.co/storage/v1/object/public/Morooms-file';
+
+export async function addRoomAction(prevState, formData) {
   const supabase = createClient();
 
-  const { error } = await supabase.rpc('create_room', {
-    p_room_name: name,
-    p_room_details: details,
-    p_room_type_id: roomTypeId,
-    p_room_set_id: roomSetId,
+  const { data: roomID, error: roomCreateError } = await supabase.rpc(
+    'create_room',
+    {
+      p_room_name: formData.get('name'),
+      p_room_details: formData.get('details'),
+      p_room_image: '',
+      p_room_type_id: formData.get('room_type_id'),
+      p_room_set_id: formData.get('room_set_id'),
+    },
+  );
+
+  if (roomCreateError) {
+    console.error('Error adding room:', roomCreateError);
+    return {
+      status: 'error',
+      error: roomCreateError,
+    };
+  }
+
+  const imageFile = formData.get('image_file');
+
+  if (!imageFile) {
+    revalidatePath('/rooms');
+
+    return {
+      status: 'success',
+    };
+  }
+
+  const fileExtension = imageFile.type.split('/')[1];
+  const imgUrl = `/room_images/${roomID}.${fileExtension}`;
+
+  const { error: imgUploadError } = await supabase.storage
+    .from('Morooms-file')
+    .upload(imgUrl, imageFile, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+  if (imgUploadError) {
+    console.error('Error uploading room image:', imgUploadError);
+    return {
+      status: 'error',
+      error: imgUploadError,
+    };
+  }
+
+  const { error: roomImgAddError } = await supabase.rpc('edit_room', {
+    p_room_id: roomID,
+    p_new_image: `${BUCKET_URL}${imgUrl}`,
   });
 
-  if (error) {
-    console.error('Error adding room:', error);
-    return error;
+  if (roomImgAddError) {
+    console.error('Error setting room image:', roomImgAddError);
+    return {
+      status: 'error',
+      error: roomImgAddError,
+    };
   }
-}
 
-export async function addRoomAction(name, details, roomTypeId, roomSetId) {
-  const err = await addRoom(name, details, roomTypeId, roomSetId);
   revalidatePath('/rooms');
-  return err;
-}
 
-export async function deleteRoom(id) {
-  const supabase = createClient();
-
-  const { error } = await supabase.rpc('delete_room', {
-    p_room_id: id,
-  });
-
-  if (error) {
-    console.error('Error deleting room:', error);
-    return error;
-  }
+  return {
+    status: 'success',
+  };
 }
 
 export async function deleteRoomAction(id) {
-  await deleteRoom(id);
-  revalidatePath('/rooms');
-}
-
-export async function editRoom(id, name, details, roomTypeId, roomSetId) {
   const supabase = createClient();
 
-  const { error } = await supabase.rpc('edit_room', {
+  const { data } = await supabase.rpc('get_room_by_id', {
     p_room_id: id,
-    p_new_name: name,
-    p_new_details: details,
-    p_new_type_id: roomTypeId,
-    p_new_set_id: roomSetId,
   });
 
-  if (error) {
-    console.error('Error editing room:', error);
-    return error;
+  const room_image = data[0].room_image;
+  const fileExtension = room_image.split('.').pop();
+
+  const { error: imgDeleteError } = await supabase.storage
+    .from('Morooms-file')
+    .remove([`room_images/${id}.${fileExtension}`]);
+
+  if (imgDeleteError) {
+    console.error('Error deleting room image:', imgUploadError);
+    return {
+      status: 'error',
+      error: imgDeleteError,
+    };
   }
+
+  const { error: roomDeleteError } = await supabase.rpc('delete_room', {
+    p_room_id: id,
+  });
+
+  if (roomDeleteError) {
+    console.error('Error deleting room:', error);
+    return {
+      status: 'error',
+      error: roomDeleteError,
+    };
+  }
+
+  revalidatePath('/rooms');
+
+  return {
+    status: 'success',
+  };
 }
 
-export async function editRoomAction(id, name, details, roomTypeId, roomSetId) {
-  const err = await editRoom(id, name, details, roomTypeId, roomSetId);
-  revalidatePath('/rooms');
-  return err;
+export async function editRoomAction(id, prevState, formData) {
+  const supabase = createClient();
+
+  const { error: roomEditError } = await supabase.rpc('edit_room', {
+    p_room_id: id,
+    p_new_name: formData.get('name'),
+    p_new_details: formData.get('details'),
+    p_new_type_id: formData.get('room_type_id'),
+    p_new_set_id: formData.get('room_set_id'),
+  });
+
+  if (roomEditError) {
+    console.error('Error editing room:', roomEditError);
+    return {
+      status: 'error',
+      error: roomEditError,
+    };
+  }
+
+  const imageFile = formData.get('image_file');
+
+  if (!imageFile || imageFile.size === 0) {
+    revalidatePath('/rooms');
+
+    return {
+      status: 'success',
+    };
+  }
+
+  const fileExtension = imageFile.type.split('/')[1];
+  const imgUrl = `/room_images/${id}.${fileExtension}`;
+
+  const { error: imgDeleteError } = await supabase.storage
+    .from('Morooms-file')
+    .remove([`room_images/${id}.${fileExtension}`]);
+
+  if (imgDeleteError) {
+    console.error('Error updating room image:', imgDeleteError);
+    return {
+      status: 'error',
+      error: imgDeleteError,
+    };
+  }
+
+  const { error: imgUploadError } = await supabase.storage
+    .from('Morooms-file')
+    .upload(imgUrl, imageFile, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+  if (imgUploadError) {
+    console.error('Error updating room image:', imgUploadError);
+    return {
+      status: 'error',
+      error: imgUploadError,
+    };
+  }
+
+  const { error: roomImgAddError } = await supabase.rpc('edit_room', {
+    p_room_id: id,
+    p_new_image: `${BUCKET_URL}${imgUrl}`,
+  });
+
+  if (roomImgAddError) {
+    console.error('Error setting room image:', roomImgAddError);
+    return {
+      status: 'error',
+      error: roomImgAddError,
+    };
+  }
+
+  revalidatePath('/rooms', 'page');
+
+  return {
+    status: 'success',
+  };
 }
 
 export async function filterRooms(filter) {
   const supabase = createClient();
-
-  console.log(filter);
 
   const { data, error } = await supabase.rpc('filter_rooms', {
     p_name: filter.name,
