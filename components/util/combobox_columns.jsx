@@ -1,6 +1,11 @@
 import { Combobox } from '../role-combobox';
 
-export function addCombobox(columns, data, onSelect) {
+export function addCombobox(
+  columns,
+  data,
+  onSelect,
+  rowColumnName = 'roleName',
+) {
   return [
     {
       accessorKey: 'roleList',
@@ -11,7 +16,7 @@ export function addCombobox(columns, data, onSelect) {
         return (
           <Combobox
             data={data}
-            currentValue={row.original.roleName}
+            currentValue={row.original[rowColumnName]}
             onSelect={onSelect.bind(null, row.id)}
           />
         );

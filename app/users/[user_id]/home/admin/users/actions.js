@@ -97,3 +97,30 @@ export async function getRoles() {
 
   return roleData;
 }
+
+export async function getApproveTypes() {
+  unstable_noStore();
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('approve_types');
+  if (error) {
+    console.error(error.message);
+  }
+
+  const roleData = data.map(type => {
+    return {
+      id: type,
+      value: type,
+    };
+  });
+
+  return roleData;
+}
+
+export async function updateUserApprovalType(userId, approveType, url) {
+  callFunctionWithNoFormData(
+    { p_user_id: userId, p_is_approved: approveType },
+    'update_user_approval',
+    url,
+  );
+  revalidatePath(url);
+}

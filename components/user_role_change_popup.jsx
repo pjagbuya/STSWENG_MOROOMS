@@ -19,9 +19,9 @@ export function UserRoleChangePopup({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Confirm User Role Change</AlertDialogTitle>
+          <AlertDialogTitle>Approve User</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to change his/her role?
+            Are you sure you want to approve this user?
           </AlertDialogDescription>
         </AlertDialogHeader>
 

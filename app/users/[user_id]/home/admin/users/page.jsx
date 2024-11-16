@@ -1,6 +1,12 @@
-import { getRoles, getRolesWithPermission, getUsers } from './actions';
+import {
+  getApproveTypes,
+  getRoles,
+  getRolesWithPermission,
+  getUsers,
+} from './actions';
 import { RoleTable } from './role_table';
 import { UserTable } from './user_table';
+import { VerifyUserTable } from './verify_user_table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import React from 'react';
 
@@ -8,7 +14,8 @@ const Management = async () => {
   const users = await getUsers();
   const roles = await getRoles();
   const rolesWithPermission = await getRolesWithPermission();
-  console.log(users, roles);
+  const approveTypes = await getApproveTypes();
+
   return (
     <div className="flex w-full flex-col gap-2 p-8">
       <h1 className="text-3xl font-bold">Reservation Rooms</h1>
@@ -20,12 +27,16 @@ const Management = async () => {
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="role_settings">Role Settings</TabsTrigger>
+          <TabsTrigger value="verify_user">Verify User</TabsTrigger>
         </TabsList>
         <TabsContent value="users">
           <UserTable data={users} roles={roles} />
         </TabsContent>
         <TabsContent value="role_settings">
           <RoleTable data={rolesWithPermission} roles={roles} />
+        </TabsContent>
+        <TabsContent value="verify_user">
+          <VerifyUserTable data={users} approveTypes={approveTypes} />
         </TabsContent>
       </Tabs>
     </div>
