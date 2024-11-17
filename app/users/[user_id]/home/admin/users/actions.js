@@ -124,3 +124,32 @@ export async function updateUserApprovalType(userId, approveType, url) {
   );
   revalidatePath(url);
 }
+
+export async function getRoleRequests() {
+  unstable_noStore();
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('get_all_role_requests');
+  if (error) {
+    console.error(error.message);
+  }
+
+  return convertKeysToCamelCase(data);
+}
+
+export async function approveRoleRequest(roleRequestId, url) {
+  callFunctionWithNoFormData(
+    { p_role_request_id: roleRequestId },
+    'approve_role_request',
+    url,
+  );
+  revalidatePath(url);
+}
+
+export async function declineRoleRequest(roleRequestId, url) {
+  callFunctionWithNoFormData(
+    { p_role_request_id: roleRequestId },
+    'decline_role_request',
+    url,
+  );
+  revalidatePath(url);
+}

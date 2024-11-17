@@ -1,10 +1,12 @@
 import {
   getApproveTypes,
+  getRoleRequests,
   getRoles,
   getRolesWithPermission,
   getUsers,
 } from './actions';
 import { RoleTable } from './role_table';
+import { UpgradeRoleUserTable } from './upgrade_role_user_table';
 import { UserTable } from './user_table';
 import { VerifyUserTable } from './verify_user_table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,6 +17,9 @@ const Management = async () => {
   const roles = await getRoles();
   const rolesWithPermission = await getRolesWithPermission();
   const approveTypes = await getApproveTypes();
+  const roleRequests = await getRoleRequests();
+
+  console.log('role requests', roleRequests);
 
   return (
     <div className="flex w-full flex-col gap-2 p-8">
@@ -28,6 +33,7 @@ const Management = async () => {
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="role_settings">Role Settings</TabsTrigger>
           <TabsTrigger value="verify_user">Verify User</TabsTrigger>
+          <TabsTrigger value="role_request">Role Request</TabsTrigger>
         </TabsList>
         <TabsContent value="users">
           <UserTable data={users} roles={roles} />
@@ -37,6 +43,9 @@ const Management = async () => {
         </TabsContent>
         <TabsContent value="verify_user">
           <VerifyUserTable data={users} approveTypes={approveTypes} />
+        </TabsContent>
+        <TabsContent value="role_request">
+          <UpgradeRoleUserTable data={roleRequests} />
         </TabsContent>
       </Tabs>
     </div>
