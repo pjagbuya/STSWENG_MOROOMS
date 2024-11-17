@@ -1,8 +1,11 @@
+import { fetchRoomSets } from './actions';
 import Header from '@/components/header';
 import AddRoomSetButton from '@/components/manage/room_sets/add_room_set_button';
 import RoomSetTable from '@/components/manage/room_sets/room_set_table';
 
-export default function ManageRoomSetsPage() {
+export default async function ManageRoomSetsPage() {
+  const roomSetsList = await fetchRoomSets();
+
   return (
     <>
       <Header />
@@ -13,7 +16,7 @@ export default function ManageRoomSetsPage() {
           <AddRoomSetButton />
         </div>
 
-        <RoomSetTable />
+        <RoomSetTable data={roomSetsList} />
       </main>
     </>
   );

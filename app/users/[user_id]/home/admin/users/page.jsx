@@ -1,57 +1,25 @@
-import { columns } from './columns';
-import UserDataTable from './table';
+import {
+  getApproveTypes,
+  getRoleRequests,
+  getRoles,
+  getRolesWithPermission,
+  getUsers,
+} from './actions';
+import { RoleTable } from './role_table';
+import { UpgradeRoleUserTable } from './upgrade_role_user_table';
+import { UserTable } from './user_table';
+import { VerifyUserTable } from './verify_user_table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { createClient } from '@/utils/supabase/server';
-import { convertKeysToCamelCase } from '@/utils/utils';
+import React from 'react';
 
-export const userData = [
-  {
-    userFirstname: 'Alice',
-    userLastname: 'Smith',
-    userSchoolId: 'S12345',
-    userRole: 'student',
-  },
-  {
-    userFirstname: 'Bob',
-    userLastname: 'Johnson',
-    userSchoolId: 'S23456',
-    userRole: 'teacher',
-  },
-  {
-    userFirstname: 'Charlie',
-    userLastname: 'Williams',
-    userSchoolId: 'S34567',
-    userRole: 'admin',
-  },
-  {
-    userFirstname: 'Dana',
-    userLastname: 'Brown',
-    userSchoolId: 'S45678',
-    userRole: 'student',
-  },
-  {
-    userFirstname: 'Evan',
-    userLastname: 'Taylor',
-    userSchoolId: 'S56789',
-    userRole: 'teacher',
-  },
-];
+const Management = async () => {
+  const users = await getUsers();
+  const roles = await getRoles();
+  const rolesWithPermission = await getRolesWithPermission();
+  const approveTypes = await getApproveTypes();
+  const roleRequests = await getRoleRequests();
 
-export default async function UserManagement() {
-  const supabase = createClient();
-  const { data, error } = await supabase.rpc('get_all_users');
-  if (error) {
-    console.error(error.message);
-  }
-
-  const { data: roles, error: error2 } = await supabase.from('role').select();
-  if (error2) {
-    console.error(error2.message);
-  }
-
-  data.forEach(element => {
-    element['roleList'] = roles;
-  });
+  console.log('role requests', roleRequests);
 
   return (
     <div className="flex w-full flex-col gap-2 p-8">
@@ -60,24 +28,28 @@ export default async function UserManagement() {
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
         laoreet, metus nec.
       </h3>
-      <Tabs defaultValue="user" className="h-full w-full">
+      <Tabs defaultValue="users" className="w-full">
         <TabsList>
-          <TabsTrigger value="user">User</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="role_settings">Role Settings</TabsTrigger>
+          <TabsTrigger value="verify_user">Verify User</TabsTrigger>
+          <TabsTrigger value="role_request">Role Request</TabsTrigger>
         </TabsList>
-        <TabsContent value="user">
-          <UserDataTable
-            columns={columns}
-            data={convertKeysToCamelCase(data)}
-          />
+        <TabsContent value="users">
+          <UserTable data={users} roles={roles} />
         </TabsContent>
         <TabsContent value="role_settings">
-          <UserDataTable
-            columns={columns}
-            data={convertKeysToCamelCase(data)}
-          />
+          <RoleTable data={rolesWithPermission} roles={roles} />
+        </TabsContent>
+        <TabsContent value="verify_user">
+          <VerifyUserTable data={users} approveTypes={approveTypes} />
+        </TabsContent>
+        <TabsContent value="role_request">
+          <UpgradeRoleUserTable data={roleRequests} />
         </TabsContent>
       </Tabs>
     </div>
   );
-}
+};
+
+export default Management;

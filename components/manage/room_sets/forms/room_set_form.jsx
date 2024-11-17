@@ -1,4 +1,4 @@
-import { FORM_SCHEMA } from '@/app/manage/room_types/form_schema';
+import { FORM_SCHEMA } from '@/app/manage/room_sets/form_schema';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -12,12 +12,12 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-export default function RoomTypeForm({ values, onSubmit }) {
+export default function RoomSetForm({ values, onSubmit }) {
   const form = useForm({
     resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       name: values?.name ?? '',
-      details: values?.details ?? '',
+      description: values?.description ?? '',
     },
   });
 
@@ -34,21 +34,7 @@ export default function RoomTypeForm({ values, onSubmit }) {
             <FormItem>
               <FormLabel className="font-bold">Name</FormLabel>
               <FormControl>
-                <Input placeholder="Type" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="details"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-bold">Details</FormLabel>
-              <FormControl>
-                <Input placeholder="Details" {...field} />
+                <Input placeholder="Name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

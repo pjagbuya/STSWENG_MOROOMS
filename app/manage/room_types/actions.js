@@ -1,6 +1,5 @@
 'use server';
 
-import { FORM_SCHEMA } from './form_schema';
 import { createClient } from '@/utils/supabase/client';
 import { revalidatePath } from 'next/cache';
 
@@ -14,8 +13,53 @@ export async function addRoomType(name, details) {
 
   if (error) {
     console.error('Error adding room type:', error);
-    throw error;
+    return error;
   }
+}
+
+export async function addRoomTypeAction(name, details) {
+  const err = await addRoomType(name, details);
+  revalidatePath('/manage/room_types');
+  return err;
+}
+
+export async function deleteRoomType(id) {
+  const supabase = createClient();
+
+  const { error } = await supabase.rpc('delete_room_type', {
+    p_room_type_id: id,
+  });
+
+  if (error) {
+    console.error('Error deleting room type:', error);
+    return error;
+  }
+}
+
+export async function deleteRoomTypeAction(id) {
+  await deleteRoomType(id);
+  revalidatePath('/manage/room_types');
+}
+
+export async function editRoomType(id, name, details) {
+  const supabase = createClient();
+
+  const { error } = await supabase.rpc('edit_room_type', {
+    p_room_type_id: id,
+    p_new_name: name,
+    p_new_details: details,
+  });
+
+  if (error) {
+    console.error('Error editing room type:', error);
+    return error;
+  }
+}
+
+export async function editRoomTypeAction(id, name, details) {
+  const err = await editRoomType(id, name, details);
+  revalidatePath('/manage/room_types');
+  return err;
 }
 
 export async function fetchRoomTypes() {
@@ -29,29 +73,4 @@ export async function fetchRoomTypes() {
   }
 
   return data;
-}
-
-export async function addRoomTypeAction(prevState, formData) {
-  const parse = FORM_SCHEMA.safeParse({
-    name: formData.get('name'),
-    details: formData.get('details'),
-  });
-
-  if (!parse.success) {
-    return {
-      errors: parse.error.flatten().fieldErrors,
-    };
-  }
-
-  const { data } = parse;
-
-  try {
-    await addRoomType(data.name, data.details);
-  } catch (e) {
-    return {
-      errors: { name: [e.message] },
-    };
-  }
-
-  revalidatePath('/manage/room_types');
 }
