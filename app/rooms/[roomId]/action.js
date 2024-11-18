@@ -6,11 +6,13 @@ import { redirect } from 'next/navigation';
 
 export async function reserve(formData) {
   const supabase = createClient();
-
+  console.log('form data in reserve: ', formData); // BUG: FORM DATA DATE RECEIVED IS A DAY OFF??????????
   // function to convert the hour data & date data into the proper tzmultirange format
   function toTZMultiRange(date, hours) {
     // Convert the date to a base date at midnight
+    console.log('input date tzmulti: ', date);
     const baseDate = new Date(date);
+    console.log('base date: ', baseDate);
     baseDate.setUTCHours(0, 0, 0, 0);
 
     // Helper function to format date and time as "YYYY-MM-DD HH:MM:SS"
@@ -53,6 +55,7 @@ export async function reserve(formData) {
     p_reservation_count: formData.count, // INT
     p_reservation_user_id: formData.user_id, // UUID
     p_room_id: formData.room_id, // UUID
+    p_endorsement_letter_url: formData.endorsementLetterUrl, // Add the file URL to the reservation
   });
 
   if (error) {
@@ -68,90 +71,65 @@ export async function reserve(formData) {
   revalidatePath('/reservations');
 }
 
-// 'use server';
+const extractElements = ranges => {
+  return ranges.flat().map(range => {
+    return {
+      start: range[0],
+      end: range[1],
+    };
+  });
+};
 
-// import { createClient } from '@/utils/supabase/server';
-// import { revalidatePath } from 'next/cache';
+export async function get_labelled_room_hours(room_id, reservation_date) {
+  const supabase = createClient();
+  console.log('inputted date: ', reservation_date);
+  const formattedDate = reservation_date.toISOString();
+  console.log('formatted date:', formattedDate);
 
-// export async function addRoom(name, details, roomTypeId, roomSetId) {
-//   const supabase = createClient();
+  const { data, error } = await supabase.rpc('get_unavailable_reservations', {
+    p_room_id: room_id,
+    p_reservation_date: formattedDate,
+  });
 
-//   const { error } = await supabase.rpc('create_room', {
-//     p_room_name: name,
-//     p_room_details: details,
-//     p_room_type_id: roomTypeId,
-//     p_room_set_id: roomSetId,
-//   });
+  if (error) {
+    console.error('Error fetching reservation details:', error);
+    throw error;
+  }
+  console.log(data);
 
-//   if (error) {
-//     console.error('Error adding room:', error);
-//     return error;
-//   }
-// }
+  // Initialize hourStates with all hours as 'available'
+  const hourStates = {};
+  for (let i = 0; i < 24; i++) {
+    hourStates[i] = 'available';
 
-// export async function addRoomAction(name, details, roomTypeId, roomSetId) {
-//   const err = await addRoom(name, details, roomTypeId, roomSetId);
-//   revalidatePath('/rooms');
-//   return err;
-// }
+    // TODO: DELETE AFTER
+    if (i % 3 === 0) {
+      hourStates[i] = 'unavailable';
+    } else if (i % 4 === 0) {
+      hourStates[i] = 'pending';
+    }
+  }
 
-// export async function deleteRoom(id) {
-//   const supabase = createClient();
+  //console.log(hourStates)
+  return hourStates;
+}
 
-//   const { error } = await supabase.rpc('delete_room', {
-//     p_room_id: id,
-//   });
+export async function uploadFile(file) {
+  const supabase = createClient();
 
-//   if (error) {
-//     console.error('Error deleting room:', error);
-//     return error;
-//   }
-// }
+  const fileName = `${Date.now()}_${file.name}`;
+  const { data, error } = await supabase.storage
+    .from('endorsement_files') // Replace with your bucket name
+    .upload(`endorsements/${fileName}`, file);
 
-// export async function deleteRoomAction(id) {
-//   await deleteRoom(id);
-//   revalidatePath('/rooms');
-// }
+  if (error) {
+    console.error('Error uploading file:', error.message);
+    throw new Error('File upload failed');
+  }
 
-// export async function editRoom(id, name, details, roomTypeId, roomSetId) {
-//   const supabase = createClient();
+  const { publicUrl } = supabase.storage
+    .from('your-bucket-name')
+    .getPublicUrl(`endorsements/${fileName}`);
 
-//   const { error } = await supabase.rpc('edit_room', {
-//     p_room_id: id,
-//     p_new_name: name,
-//     p_new_details: details,
-//     p_new_type_id: roomTypeId,
-//     p_new_set_id: roomSetId,
-//   });
-
-//   if (error) {
-//     console.error('Error editing room:', error);
-//     return error;
-//   }
-// }
-
-// export async function editRoomAction(id, name, details, roomTypeId, roomSetId) {
-//   const err = await editRoom(id, name, details, roomTypeId, roomSetId);
-//   revalidatePath('/rooms');
-//   return err;
-// }
-
-// export async function filterRooms(filter) {
-//   const supabase = createClient();
-
-//   console.log(filter);
-
-//   const { data, error } = await supabase.rpc('filter_rooms', {
-//     p_name: filter.name,
-//     p_date_time_range: `{[${filter.date} ${filter.startTime}, ${filter.date} ${filter.endTime})}`,
-//     p_room_set_id: filter.roomSetId,
-//     p_min_capacity: filter.minCapacity,
-//   });
-
-//   if (error) {
-//     console.error('Error fetching room types:', error);
-//     throw error;
-//   }
-
-//   return data;
-// }
+  return publicUrl;
+}

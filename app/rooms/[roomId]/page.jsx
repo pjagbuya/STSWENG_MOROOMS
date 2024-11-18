@@ -2,7 +2,8 @@ import Header from '@/components/header';
 import RoomReservationForm from '@/components/reservation-form';
 import Image from 'next/image';
 
-export default function RoomReservationPage() {
+export default function RoomReservationPage({ params }) {
+  const { roomId } = params;
   return (
     <>
       <Header />
@@ -26,7 +27,7 @@ export default function RoomReservationPage() {
             />
           </div>
         </div>
-        <RoomReservationForm />
+        <RoomReservationForm roomId={roomId} />
       </main>
     </>
   );

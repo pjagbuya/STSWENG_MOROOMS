@@ -100,7 +100,7 @@ export default function HourSelector({
   // Function for determining what color the certain hour should be
   const getHourStyle = hour => {
     const isSelected = selectedHours.includes(hour);
-    const state = hourStates[hour] || 'available';
+    const state = hourStates[hour] || 'available'; // assumes available unless stated
 
     switch (state) {
       case 'available':
