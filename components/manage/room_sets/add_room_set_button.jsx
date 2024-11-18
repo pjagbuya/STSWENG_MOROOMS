@@ -1,7 +1,7 @@
 'use client';
 
 import RoomSetForm from './forms/room_set_form';
-import { addRoomSetAction } from '@/app/manage/room_sets/actions';
+import { addRoomSet } from '@/app/manage/room_sets/actions';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,7 +17,7 @@ export default function AddRoomSetButton() {
   const [open, setOpen] = useState(false);
 
   async function handleSubmit(form, values) {
-    const err = await addRoomSetAction(values.name);
+    const err = await addRoomSet(values.name);
 
     if (err) {
       form.setError('name', err);
