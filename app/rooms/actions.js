@@ -1,5 +1,6 @@
 'use server';
 
+import { FORM_SCHEMA } from './form_schema';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
@@ -8,6 +9,19 @@ const BUCKET_URL =
 
 export async function addRoomAction(prevState, formData) {
   const supabase = createClient();
+
+  const parseResult = FORM_SCHEMA.safeParse(
+    Object.fromEntries(formData.entries()),
+  );
+
+  if (!parseResult.success) {
+    console.error('Validation error:', parseResult.error);
+
+    return {
+      status: 'error',
+      error: { message: parseResult.error.message },
+    };
+  }
 
   const { data: roomID, error: roomCreateError } = await supabase.rpc(
     'create_room',
@@ -119,6 +133,19 @@ export async function deleteRoomAction(id) {
 
 export async function editRoomAction(id, prevState, formData) {
   const supabase = createClient();
+
+  const parseResult = FORM_SCHEMA.safeParse(
+    Object.fromEntries(formData.entries()),
+  );
+
+  if (!parseResult.success) {
+    console.error('Validation error:', parseResult.error);
+
+    return {
+      status: 'error',
+      error: { message: parseResult.error.message },
+    };
+  }
 
   const { error: roomEditError } = await supabase.rpc('edit_room', {
     p_room_id: id,

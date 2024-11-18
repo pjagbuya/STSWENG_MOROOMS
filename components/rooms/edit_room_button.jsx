@@ -1,6 +1,7 @@
 'use client';
 
 import RoomForm from './forms/room_form';
+import { editRoomAction } from '@/app/rooms/actions';
 import {
   Dialog,
   DialogContent,
@@ -9,15 +10,39 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Edit } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { useFormState } from 'react-dom';
 
 export default function EditRoomButton({
   roomSets,
   roomTypes,
   room,
   open,
-  onEdit,
+  // onEdit,
   onOpenChange,
 }) {
+  const roomFormRef = useRef();
+
+  const [state, formAction] = useFormState(
+    editRoomAction.bind(null, room.id),
+    null,
+  );
+
+  useEffect(() => {
+    const roomForm = roomFormRef.current;
+
+    if (!state) {
+      return;
+    }
+
+    if (state.status === 'success') {
+      onOpenChange(false);
+    } else if (state.status === 'error') {
+      console.log('Error editing room:', state.error);
+      roomForm.form.setError('name', state.error); // Temporary hack
+    }
+  }, [state, onOpenChange]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
@@ -32,10 +57,11 @@ export default function EditRoomButton({
         </DialogHeader>
 
         <RoomForm
+          ref={roomFormRef}
           values={room}
           roomSets={roomSets}
           roomTypes={roomTypes}
-          onSubmit={onEdit}
+          onSubmit={formAction}
         />
       </DialogContent>
     </Dialog>

@@ -1,3 +1,4 @@
+import { FORM_SCHEMA } from '@/app/rooms/form_schema';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -16,21 +17,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
-const FORM_SCHEMA = z.object({
-  name: z.string().min(2, {
-    message: 'Room name must be at least 2 characters.',
-  }),
-  details: z.string().optional(),
-  image_file: z.any(),
-  room_type_id: z.string().uuid(),
-  room_set_id: z.string().uuid(),
-});
-
-export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
+const RoomForm = forwardRef(function RoomForm(
+  { roomSets, roomTypes, values, onSubmit },
+  ref,
+) {
   const formRef = useRef();
 
   const form = useForm({
@@ -42,6 +35,14 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
       room_set_id: values?.room_set_id ?? '',
     },
   });
+
+  useImperativeHandle(ref, () => {
+    return {
+      get form() {
+        return form;
+      },
+    };
+  }, [form]);
 
   return (
     <Form {...form}>
@@ -165,4 +166,6 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
       </form>
     </Form>
   );
-}
+});
+
+export default RoomForm;

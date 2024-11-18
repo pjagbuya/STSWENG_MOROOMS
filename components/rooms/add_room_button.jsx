@@ -19,10 +19,12 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormState } from 'react-dom';
 
 export default function AddRoomButton() {
+  const roomFormRef = useRef();
+
   const [roomSets, setRoomSets] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [open, setOpen] = useState(false);
@@ -42,6 +44,8 @@ export default function AddRoomButton() {
   }, []);
 
   useEffect(() => {
+    const roomForm = roomFormRef.current;
+
     if (!state) {
       return;
     }
@@ -50,6 +54,7 @@ export default function AddRoomButton() {
       setOpen(false);
     } else if (state.status === 'error') {
       console.log('Error adding room:', state.error);
+      roomForm.form.setError('name', state.error); // Temporary hack
     }
   }, [state]);
 
@@ -89,6 +94,7 @@ export default function AddRoomButton() {
         </DialogHeader>
 
         <RoomForm
+          ref={roomFormRef}
           roomSets={roomSets}
           roomTypes={roomTypes}
           onSubmit={formAction}
