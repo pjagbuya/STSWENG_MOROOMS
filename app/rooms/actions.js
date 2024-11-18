@@ -7,6 +7,15 @@ import { revalidatePath } from 'next/cache';
 const BUCKET_URL =
   'https://rcfzezkhwvgtwpqcyhac.supabase.co/storage/v1/object/public/Morooms-file';
 
+/**
+ * Adds a new room using form data.
+ *
+ * @async
+ * @function addRoomAction
+ * @param {Object} prevState - The previous state of the form (unused in current logic).
+ * @param {FormData} formData - The form data containing room details.
+ * @returns {Promise<Object>} Resolves to an object with status `success` or `error` and an optional error message.
+ */
 export async function addRoomAction(prevState, formData) {
   const supabase = createClient();
 
@@ -90,6 +99,14 @@ export async function addRoomAction(prevState, formData) {
   };
 }
 
+/**
+ * Deletes a room and its associated image by room ID.
+ *
+ * @async
+ * @function deleteRoomAction
+ * @param {number} id - The ID of the room to delete.
+ * @returns {Promise<Object>} Resolves to an object with status `success` or `error` and an optional error message.
+ */
 export async function deleteRoomAction(id) {
   const supabase = createClient();
 
@@ -105,7 +122,7 @@ export async function deleteRoomAction(id) {
     .remove([`room_images/${id}.${fileExtension}`]);
 
   if (imgDeleteError) {
-    console.error('Error deleting room image:', imgUploadError);
+    console.error('Error deleting room image:', imgDeleteError);
     return {
       status: 'error',
       error: imgDeleteError,
@@ -117,7 +134,7 @@ export async function deleteRoomAction(id) {
   });
 
   if (roomDeleteError) {
-    console.error('Error deleting room:', error);
+    console.error('Error deleting room:', roomDeleteError);
     return {
       status: 'error',
       error: roomDeleteError,
@@ -131,6 +148,17 @@ export async function deleteRoomAction(id) {
   };
 }
 
+/**
+ * Edits an existing room using form data and updates its image if provided.
+ * Empty form fields indicate that the existing values should be retained.
+ *
+ * @async
+ * @function editRoomAction
+ * @param {number} id - The ID of the room to edit.
+ * @param {Object} prevState - The previous state of the form (unused in current logic).
+ * @param {FormData} formData - The form data containing updated room details.
+ * @returns {Promise<Object>} Resolves to an object with status `success` or `error` and an optional error message.
+ */
 export async function editRoomAction(id, prevState, formData) {
   const supabase = createClient();
 
@@ -223,6 +251,22 @@ export async function editRoomAction(id, prevState, formData) {
   };
 }
 
+/**
+ * Filters rooms based on the provided filter criteria. Empty filter fields
+ * ignore the corresponding filter criteria.
+ *
+ * @async
+ * @function filterRooms
+ * @param {Object} filter - The filter criteria for rooms.
+ * @param {?string} filter.name - The name of the room to filter by.
+ * @param {?string} filter.date - The date range for filtering room availability.
+ * @param {?string} filter.startTime - The start time of the reservation range.
+ * @param {?string} filter.endTime - The end time of the reservation range.
+ * @param {?number} filter.roomSetId - The ID of the room set to filter by.
+ * @param {?number} filter.minCapacity - The minimum capacity of the room.
+ * @returns {Promise<Array<Object>>} Resolves to an array of filtered room objects or throws an error if the operation fails.
+ * @throws Will throw an error if the RPC call fails.
+ */
 export async function filterRooms(filter) {
   const supabase = createClient();
 
@@ -234,7 +278,7 @@ export async function filterRooms(filter) {
   });
 
   if (error) {
-    console.error('Error fetching room types:', error);
+    console.error('Error filtering rooms:', error);
     throw error;
   }
 
