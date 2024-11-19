@@ -14,7 +14,18 @@ import { useForm } from 'react-hook-form';
 export function AddPopupForm({ formSchema, onSubmit }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      proof: null,
+    },
   });
+
+  function onChange(key, e) {
+    const file = e.target.files?.[0];
+    console.log(file);
+    if (file) {
+      form.setValue(key, file, { shouldValidate: true }); // Update the form's state
+    }
+  }
 
   return (
     <Form {...form}>
@@ -32,7 +43,16 @@ export function AddPopupForm({ formSchema, onSubmit }) {
                 <FormItem>
                   <FormLabel className="font-bold">{key}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Type" {...field} />
+                    {value?.description?.toLowerCase() === 'image' ? (
+                      <input
+                        type="file"
+                        {...field}
+                        onChange={e => onChange(key, e)}
+                        value={undefined}
+                      />
+                    ) : (
+                      <Input placeholder="Type" {...field} />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>

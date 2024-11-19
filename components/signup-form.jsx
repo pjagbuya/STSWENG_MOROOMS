@@ -1,5 +1,10 @@
-import { signup } from '@/app/signup/action';
-import { Button } from '@/components/ui/button';
+'use client';
+
+import { AddPopupForm } from './popup_create_form';
+import { PopupForm } from './popup_form';
+import { signup, uploadFile } from '@/app/signup/action';
+import { singupSchema } from '@/app/signup/form_schema';
+import { userEditFormSchema } from '@/app/users/[user_id]/home/admin/users/form_schema';
 import {
   Card,
   CardContent,
@@ -7,8 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 
 export function Signup() {
@@ -21,7 +24,21 @@ export function Signup() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={signup}>
+        <AddPopupForm
+          onSubmit={(form, values) => {
+            async function handleSubmit() {
+              const formData = new FormData();
+              for (const key in values) {
+                console.log(key, values[key]);
+                formData.append(key, values[key]);
+              }
+              await signup(formData);
+            }
+            handleSubmit();
+          }}
+          formSchema={singupSchema}
+        />
+        {/* <form action={signup}>
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="first-name">First Name</Label>
@@ -87,7 +104,7 @@ export function Signup() {
               Login
             </Link>
           </div>
-        </form>
+        </form> */}
       </CardContent>
     </Card>
   );

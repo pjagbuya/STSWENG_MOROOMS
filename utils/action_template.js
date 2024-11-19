@@ -31,7 +31,9 @@ export async function callFunctionWithFormData(
     // redirect('/error');
   }
 
-  revalidatePath(url);
+  if (url) {
+    revalidatePath(url);
+  }
 }
 
 export async function callFunctionWithNoFormData(data, function_name, url) {

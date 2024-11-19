@@ -35,3 +35,12 @@ export function convertKeysToCamelCase(data) {
     return newObj;
   });
 }
+
+export function objectToFormData(obj) {
+  const formData = new FormData();
+  for (const key in obj) {
+    console.log(key, obj[key]);
+    formData.append(key, obj[key]);
+  }
+  return formData;
+}
