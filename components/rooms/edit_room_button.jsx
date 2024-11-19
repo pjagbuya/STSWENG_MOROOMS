@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Edit } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFormState } from 'react-dom';
 
 export default function EditRoomButton({
@@ -23,10 +23,30 @@ export default function EditRoomButton({
 }) {
   const roomFormRef = useRef();
 
+  const [roomImageFile, setRoomImageFile] = useState();
+
   const [state, formAction] = useFormState(
     editRoomAction.bind(null, room.id),
     null,
   );
+
+  useEffect(() => {
+    async function fetchRoomImageFile() {
+      if (!room || !room.image) {
+        return null;
+      }
+
+      const response = await (await fetch(room.image)).blob();
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(new File([response], room.id));
+
+      setRoomImageFile(dataTransfer.files);
+    }
+
+    if (open) {
+      fetchRoomImageFile();
+    }
+  }, [open, room]);
 
   useEffect(() => {
     const roomForm = roomFormRef.current;
@@ -58,7 +78,7 @@ export default function EditRoomButton({
 
         <RoomForm
           ref={roomFormRef}
-          values={room}
+          values={{ ...room, image_file: roomImageFile }}
           roomSets={roomSets}
           roomTypes={roomTypes}
           onSubmit={formAction}

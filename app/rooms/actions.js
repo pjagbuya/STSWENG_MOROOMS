@@ -194,6 +194,55 @@ export async function editRoomAction(id, prevState, formData) {
   const imageFile = formData.get('image_file');
 
   if (!imageFile || imageFile.size === 0) {
+    const { data } = await supabase.rpc('get_room_by_id', {
+      p_room_id: id,
+    });
+
+    const room_image = data[0].room_image;
+
+    if (!room_image) {
+      revalidatePath('/rooms');
+
+      return {
+        status: 'success',
+      };
+    }
+
+    const fileExtension = room_image.split('.').pop();
+
+    const { error: imgDeleteError } = await supabase.storage
+      .from('Morooms-file')
+      .remove([`room_images/${id}.${fileExtension}`]);
+
+    if (imgDeleteError) {
+      console.error('Error deleting room image:', imgDeleteError);
+      return {
+        status: 'error',
+        error: imgDeleteError,
+      };
+    }
+
+    const { error: roomImgClearError } = await supabase.rpc('edit_room', {
+      p_room_id: id,
+      p_new_image: '',
+    });
+
+    if (roomImgClearError) {
+      console.error('Error clearing room image:', roomImgClearError);
+      return {
+        status: 'error',
+        error: roomImgClearError,
+      };
+    }
+
+    revalidatePath('/rooms');
+
+    return {
+      status: 'success',
+    };
+  }
+
+  if (imageFile.name === id) {
     revalidatePath('/rooms');
 
     return {
@@ -231,16 +280,16 @@ export async function editRoomAction(id, prevState, formData) {
     };
   }
 
-  const { error: roomImgAddError } = await supabase.rpc('edit_room', {
+  const { error: roomImgEditError } = await supabase.rpc('edit_room', {
     p_room_id: id,
     p_new_image: `${BUCKET_URL}${imgUrl}`,
   });
 
-  if (roomImgAddError) {
-    console.error('Error setting room image:', roomImgAddError);
+  if (roomImgEditError) {
+    console.error('Error setting room image:', roomImgEditError);
     return {
       status: 'error',
-      error: roomImgAddError,
+      error: roomImgEditError,
     };
   }
 

@@ -16,8 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import FileInput from '@/components/util/file_input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 
 const RoomForm = forwardRef(function RoomForm(
@@ -31,10 +32,15 @@ const RoomForm = forwardRef(function RoomForm(
     defaultValues: {
       name: values?.name ?? '',
       details: values?.details ?? '',
+      image_file: values?.image_file ?? '',
       room_type_id: values?.room_type_id ?? '',
       room_set_id: values?.room_set_id ?? '',
     },
   });
+
+  useEffect(() => {
+    form.setValue('image_file', values?.image_file ?? '');
+  }, [form, values]);
 
   useImperativeHandle(ref, () => {
     return {
@@ -84,16 +90,16 @@ const RoomForm = forwardRef(function RoomForm(
         <FormField
           control={form.control}
           name="image_file"
-          render={({ field: { value, onChange, ...fieldProps } }) => (
+          render={({ field: { onChange, ...fieldProps } }) => (
             <FormItem>
               <FormLabel className="font-bold">Image</FormLabel>
               <FormControl>
-                <Input
+                <FileInput
                   {...fieldProps}
-                  type="file"
                   placeholder="Upload Image"
                   accept="image/*"
-                  onChange={e => onChange(e.target.files && e.target.files[0])}
+                  onChange={e => onChange(e.target.files)}
+                  onReset={() => form.setValue('image_file', null)}
                 />
               </FormControl>
               <FormMessage />
