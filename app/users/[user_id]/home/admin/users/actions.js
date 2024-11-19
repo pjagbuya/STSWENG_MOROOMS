@@ -153,3 +153,23 @@ export async function declineRoleRequest(roleRequestId, url) {
   );
   revalidatePath(url);
 }
+
+export async function getUsersWithProof() {
+  unstable_noStore();
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('select_all_users_and_proof');
+  if (error) {
+    console.error(error.message);
+  }
+
+  data.map(user => {
+    const { data: fileURL } = supabase.storage
+      .from('Morooms-file')
+      .getPublicUrl(`proof/${user.user_id}/${user.proof}`);
+    user.proofURL = fileURL.publicUrl;
+    return user;
+  });
+  console.log('data', data);
+
+  return convertKeysToCamelCase(data);
+}
