@@ -44,12 +44,20 @@ export function AddPopupForm({ formSchema, onSubmit }) {
                   <FormLabel className="font-bold">{key}</FormLabel>
                   <FormControl>
                     {value?.description?.toLowerCase() === 'image' ? (
-                      <input
-                        type="file"
-                        {...field}
-                        onChange={e => onChange(key, e)}
-                        value={undefined}
-                      />
+                      <label className="relative block rounded-md border-2 border-dashed border-gray-300 p-1">
+                        <input
+                          type="file"
+                          {...field}
+                          onChange={e => onChange(key, e)}
+                          value={undefined}
+                          className="sr-only h-32"
+                        />
+                        <div className="flex h-32 w-full flex-col items-center justify-center rounded-md bg-gray-100 p-2 text-center text-base text-gray-700 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                          {field.value?.name || 'Choose a file'}
+                        </div>
+                      </label>
+                    ) : value?.description?.toLowerCase() === 'password' ? (
+                      <Input placeholder="Type" type="password" {...field} />
                     ) : (
                       <Input placeholder="Type" {...field} />
                     )}
