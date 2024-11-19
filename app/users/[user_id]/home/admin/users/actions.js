@@ -10,7 +10,7 @@ import { revalidatePath, unstable_noStore } from 'next/cache';
 
 export async function updateUserInfo(userId, url, formData) {
   callFunctionWithFormData(userId, 'update_user', url, formData);
-  revalidatePath(url);
+  revalidatePath(url, 'page');
 }
 
 export async function deleteUser(id, url) {
@@ -19,6 +19,7 @@ export async function deleteUser(id, url) {
   if (!err) {
     await supabaseAdmin.auth.admin.deleteUser(id);
   }
+  revalidatePath(url, 'page');
 }
 
 export async function updateUserRole(userId, role, url) {
@@ -27,7 +28,7 @@ export async function updateUserRole(userId, role, url) {
     'update_user_role',
     url,
   );
-  revalidatePath(url);
+  revalidatePath(url, 'page');
 }
 
 export async function addRole(url, formData) {
@@ -38,6 +39,7 @@ export async function addRole(url, formData) {
     formData,
     null,
   );
+  revalidatePath(url, 'page');
 }
 
 export async function updateRole(userId, url, formData) {
@@ -48,6 +50,7 @@ export async function updateRole(userId, url, formData) {
     formData,
     'role_id',
   );
+  revalidatePath(url, 'page');
 }
 
 export async function deleteRole(id, url) {
@@ -56,6 +59,7 @@ export async function deleteRole(id, url) {
     'delete_role_and_permission',
     url,
   );
+  revalidatePath(url, 'page');
 }
 
 export async function getUsers() {
@@ -122,7 +126,7 @@ export async function updateUserApprovalType(userId, approveType, url) {
     'update_user_approval',
     url,
   );
-  revalidatePath(url);
+  revalidatePath(url, 'page');
 }
 
 export async function getRoleRequests() {
@@ -142,7 +146,7 @@ export async function approveRoleRequest(roleRequestId, url) {
     'approve_role_request',
     url,
   );
-  revalidatePath(url);
+  revalidatePath(url, 'page');
 }
 
 export async function declineRoleRequest(roleRequestId, url) {
@@ -151,7 +155,7 @@ export async function declineRoleRequest(roleRequestId, url) {
     'decline_role_request',
     url,
   );
-  revalidatePath(url);
+  revalidatePath(url, 'page');
 }
 
 export async function getUsersWithProof() {

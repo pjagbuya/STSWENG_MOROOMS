@@ -19,7 +19,7 @@ export function UpgradeRoleUserTable({ data }) {
     useState(false);
   const [openUserUpgradeDeclinePopup, setOpenUpgradeDeclinePopup] =
     useState(false);
-  const url = usePathname();
+  const url = '/users/[user_id]/home/admin/users';
 
   let finalColumns = addApprovalButton(
     upgradeUserRequestColumns,

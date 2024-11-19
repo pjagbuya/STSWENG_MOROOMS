@@ -17,7 +17,7 @@ function setPopup(row, setRowData, setOpenPopup) {
 export function VerifyUserTable({ data, approveTypes }) {
   const [rowData, setRowData] = useState(null);
   const [openUserApprovalPopup, setOpenUserApprovalPopup] = useState(false);
-  const url = usePathname();
+  const url = '/users/[user_id]/home/admin/users';
 
   let finalColumns = addCombobox(
     addLinkColumn(columns, 'proofURL', 'proof'),
