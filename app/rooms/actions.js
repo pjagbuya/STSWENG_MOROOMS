@@ -115,18 +115,21 @@ export async function deleteRoomAction(id) {
   });
 
   const room_image = data[0].room_image;
-  const fileExtension = room_image.split('.').pop();
 
-  const { error: imgDeleteError } = await supabase.storage
-    .from('Morooms-file')
-    .remove([`room_images/${id}.${fileExtension}`]);
+  if (room_image) {
+    const fileExtension = room_image.split('.').pop();
 
-  if (imgDeleteError) {
-    console.error('Error deleting room image:', imgDeleteError);
-    return {
-      status: 'error',
-      error: imgDeleteError,
-    };
+    const { error: imgDeleteError } = await supabase.storage
+      .from('Morooms-file')
+      .remove([`room_images/${id}.${fileExtension}`]);
+
+    if (imgDeleteError) {
+      console.error('Error deleting room image:', imgDeleteError);
+      return {
+        status: 'error',
+        error: imgDeleteError,
+      };
+    }
   }
 
   const { error: roomDeleteError } = await supabase.rpc('delete_room', {
