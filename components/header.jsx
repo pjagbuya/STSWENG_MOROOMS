@@ -47,15 +47,6 @@ export default async function Header() {
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </Link>
-
-            <Button
-              asChild
-              className="hover:brightness-110 active:brightness-75"
-            >
-              <Link href="/signup">
-                <Mail className="w-11 text-white" />
-              </Link>
-            </Button>
           </>
         ) : (
           <>
