@@ -16,5 +16,13 @@ export async function getCurrentUserInfo() {
     console.error(error.message);
   }
 
+  data.map(user => {
+    const { data: fileURL } = supabase.storage
+      .from('Morooms-file')
+      .getPublicUrl(`profile/${user.user_id}/${user.user_profilepic}`);
+    user.profileURL = fileURL.publicUrl;
+    return user;
+  });
+
   return convertKeysToCamelCase(data)[0];
 }
