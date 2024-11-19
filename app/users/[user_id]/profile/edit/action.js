@@ -62,13 +62,14 @@ export async function editProfile(formData) {
 
   const file = formData.get('userProfilepic');
   const path = user_signin_data.user.id;
-  console.log('file', file);
 
   formData.delete('email');
   formData.delete('password');
   formData.delete('userProfilepic');
   formData.append('user_id', user_signin_data.user.id);
-  formData.append('userProfilepic', file.name);
+  if (file && file != 'undefined') {
+    formData.append('userProfilepic', file.name);
+  }
   console.log('formData', formData);
 
   if (error) {
@@ -78,7 +79,7 @@ export async function editProfile(formData) {
 
   // create user info
   callFunctionWithFormData(null, 'edit_user_by_id', '/private', formData, null);
-  if (file) {
+  if (file && file != 'undefined') {
     uploadFile(file, path);
   }
 
