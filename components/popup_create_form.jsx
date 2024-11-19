@@ -11,12 +11,10 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-export function AddPopupForm({ formSchema, onSubmit }) {
+export function AddPopupForm({ formSchema, onSubmit, defaultValues }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      proof: null,
-    },
+    defaultValues: defaultValues || {},
   });
 
   function onChange(key, e) {

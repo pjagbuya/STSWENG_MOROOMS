@@ -4,7 +4,8 @@ import { AddPopupForm } from './popup_create_form';
 import { PopupForm } from './popup_form';
 import { signup, uploadFile } from '@/app/signup/action';
 import { singupSchema } from '@/app/signup/form_schema';
-import { userEditFormSchema } from '@/app/users/[user_id]/home/admin/users/form_schema';
+import { editProfile } from '@/app/users/[user_id]/profile/edit/action';
+import { editProfileSchema } from '@/app/users/[user_id]/profile/edit/form_schema';
 import {
   Card,
   CardContent,
@@ -14,7 +15,8 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 
-export function Signup() {
+export function Signup({ defaultValues, isEdit }) {
+  const finalSchema = isEdit ? editProfileSchema : singupSchema;
   return (
     <Card className="mx-auto w-[425px] max-w-lg">
       <CardHeader>
@@ -32,18 +34,25 @@ export function Signup() {
                 console.log(key, values[key]);
                 formData.append(key, values[key]);
               }
-              await signup(formData);
+              if (isEdit) {
+                await editProfile(formData);
+              } else {
+                await signup(formData);
+              }
             }
             handleSubmit();
           }}
-          formSchema={singupSchema}
+          formSchema={finalSchema}
+          defaultValues={defaultValues}
         />
-        <div className="mt-2 flex justify-center gap-2">
-          <p>Already have an account?</p>
-          <Link href="/login" className="text-blue-500 underline">
-            Login
-          </Link>
-        </div>
+        {!isEdit && (
+          <div className="mt-2 flex justify-center gap-2">
+            <p>Already have an account?</p>
+            <Link href="/login" className="text-blue-500 underline">
+              Login
+            </Link>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
