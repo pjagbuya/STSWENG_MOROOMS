@@ -21,7 +21,8 @@ export const editProfileSchema = z
       .min(1, { message: 'Password is required' })
       .min(8, { message: 'Password must be at least 8 characters' })
       .max(32, { message: 'Password must not exceed 32 characters' })
-      .optional(),
+      .optional()
+      .describe('Password'),
     userProfilepic: z
       .any()
       .refine(file => {

@@ -47,9 +47,12 @@ export async function editProfile(formData) {
     email: formData.get('email'),
   };
   const password = formData.get('password');
+  console.log('password', password);
   if (password && password != 'undefined') {
     data.password = password;
   }
+
+  console.log('data', data);
 
   const supabase = createClient();
 
@@ -62,6 +65,7 @@ export async function editProfile(formData) {
 
   const file = formData.get('userProfilepic');
   const path = user_signin_data.user.id;
+  console.log('file', file);
 
   formData.delete('email');
   formData.delete('password');
@@ -83,5 +87,5 @@ export async function editProfile(formData) {
     uploadFile(file, path);
   }
 
-  redirect('./');
+  // redirect('./');
 }
