@@ -1,6 +1,9 @@
 'use client';
 
-import { fetchReservationsWithRoomNames } from '@/app/reservations/action';
+import {
+  fetchReservationsWithRoomNames,
+  updateReservationStatus,
+} from '@/app/reservations/action';
 import {
   Select,
   SelectContent,
@@ -29,8 +32,6 @@ const getStatusColor = status => {
       return 'bg-red-200 text-red-800';
     case 'Pending':
       return 'bg-yellow-200 text-yellow-800';
-    case 'Waitlisted':
-      return 'bg-orange-200 text-orange-800';
     default:
       return 'bg-gray-200 text-gray-800';
   }
@@ -58,7 +59,6 @@ const StatusDropdown = ({ status, onStatusChange, isAdmin }) => {
         <SelectItem value="Approved">Approved</SelectItem>
         <SelectItem value="Canceled">Canceled</SelectItem>
         <SelectItem value="Pending">Pending</SelectItem>
-        <SelectItem value="Waitlisted">Waitlisted</SelectItem>
       </SelectContent>
     </Select>
   );
@@ -80,12 +80,23 @@ export default function ReservationTable({ userId, mode }) {
     if (userId) loadReservations();
   }, [userId]);
 
-  const handleStatusChange = (index, newStatus) => {
-    setReservations(prevReservations =>
-      prevReservations.map((reservation, i) =>
-        i === index ? { ...reservation, status: newStatus } : reservation,
-      ),
-    );
+  const handleStatusChange = async (index, newStatus) => {
+    try {
+      // Update the status in the Supabase database
+      const reservation = reservations[index];
+      console.log('reservation to update: ', reservation);
+      await updateReservationStatus(reservation.reservation_id, newStatus);
+
+      // Update the state to reflect the new status
+      setReservations(prevReservations =>
+        prevReservations.map((reservation, i) =>
+          i === index ? { ...reservation, status: newStatus } : reservation,
+        ),
+      );
+    } catch (error) {
+      console.error('Failed to update reservation status:', error);
+      // Optionally, you can add some user feedback or error handling
+    }
   };
 
   if (loading) return <div>Loading reservations...</div>;
@@ -144,7 +155,9 @@ export default function ReservationTable({ userId, mode }) {
                     ),
                   )}
                 </TableCell>
-                <TableCell>{reservation.reservationPurpose}</TableCell>
+                <TableCell className="max-w-[300px] whitespace-normal break-words">
+                  {reservation.reservationPurpose}
+                </TableCell>
                 <TableCell>
                   {reservation.endorsementLetter ? 'Yes' : 'No'}
                 </TableCell>

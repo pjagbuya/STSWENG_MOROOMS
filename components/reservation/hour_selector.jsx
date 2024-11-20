@@ -129,7 +129,14 @@ export default function HourSelector({
         {Array.from({ length: maxHour - minHour + 1 }, (_, i) => {
           const hour = minHour + i;
           const period = hour >= 12 ? 'PM' : 'AM';
-          const displayHour = hour > 12 ? hour - 12 : hour;
+          let displayHour;
+          if (hour === 0 || hour === 24) {
+            displayHour = 12;
+          } else if (hour > 12) {
+            displayHour = hour - 12;
+          } else {
+            displayHour = hour;
+          }
 
           const borderStyle =
             hour !== maxHour ? 'border-b border-gray-200' : '';

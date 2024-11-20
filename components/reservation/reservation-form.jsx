@@ -1,27 +1,21 @@
 'use client';
 
-import { get_labelled_room_hours, reserve } from '@/app/rooms/[roomId]/action';
-import HourSelector from '@/components/rooms/hour_selector';
+import {
+  get_labelled_room_hours,
+  get_min_max_room_hours,
+  reserve,
+} from '@/app/rooms/[roomId]/action';
+import HourSelector from '@/components/reservation/hour_selector';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function RoomReservationForm({ roomId }) {
-  // TEST DATA FOR HOUR STATES
-  // TODO: Change to actual data for available hours
-  const testhourStates = {
-    8: 'unavailable',
-    9: 'unavailable',
-    10: 'unavailable',
-    13: 'pending',
-    14: 'pending',
-    17: 'pending',
-    18: 'pending',
-    19: 'pending',
-  };
   const [formData, setFormData] = useState({
     selectedDate: null,
     selectedHours: null,
@@ -35,7 +29,7 @@ export default function RoomReservationForm({ roomId }) {
   const [errors, setErrors] = useState({});
   const [hourStates, setHourStates] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  console.log('form date: ', formData.selectedDate);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchHourStates() {
@@ -56,6 +50,18 @@ export default function RoomReservationForm({ roomId }) {
     fetchHourStates();
   }, [roomId, formData.selectedDate]);
 
+  const [minHour, setMinHour] = useState(0); // default value of 00:00 to 23:00
+  const [maxHour, setMaxHour] = useState(0);
+
+  useEffect(() => {
+    async function fetchHours() {
+      const time = await get_min_max_room_hours(roomId);
+      setMinHour(time.start);
+      setMaxHour(time.end);
+    }
+    fetchHours();
+  }, [roomId]);
+
   const handleFormChange = (field, value) => {
     setFormData(prevData => ({
       ...prevData,
@@ -72,12 +78,16 @@ export default function RoomReservationForm({ roomId }) {
       newErrors.selectedDate = 'Please select a date.';
     if (!formData.selectedHours || formData.selectedHours.length === 0)
       newErrors.selectedHours = 'Please select at least one hour.';
-    if (!formData.purpose)
+    if (!formData.purpose) {
       newErrors.purpose = 'Please enter a purpose for the reservation.';
+    } else if (formData.purpose.length > 100) {
+      newErrors.purpose = 'Should not exceed 100 characters';
+    }
     if (!formData.count || formData.count === 0)
       newErrors.count = 'Please enter number of participants.';
     //if (!formData.user_id) newErrors.user_id = 'User ID is required.';
-    //if (!formData.reservation_name) newErrors.reservation_name = 'Please enter a reservation name.';
+    if (!formData.reservation_name)
+      newErrors.reservation_name = 'Please enter a reservation name.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -86,9 +96,11 @@ export default function RoomReservationForm({ roomId }) {
   const handleFormSubmit = async e => {
     e.preventDefault();
     if (validateForm()) {
-      console.log('Sending data...');
-      console.log('form date sent...: ', formData);
       await reserve(formData);
+      toast({
+        description: `Reservation for ${formData.reservation_name} submitted successfully!`,
+      });
+      //redirect(`/rooms`)
     } else {
       console.log('Errors: ', errors);
     }
@@ -157,8 +169,8 @@ export default function RoomReservationForm({ roomId }) {
                     handleFormChange('selectedHours', hours)
                   }
                   initialHourStates={hourStates}
-                  minHour={7}
-                  maxHour={23}
+                  minHour={minHour}
+                  maxHour={maxHour}
                 />
                 {errors.selectedHours && (
                   <p className="text-red-500">{errors.selectedHours}</p>
@@ -168,6 +180,21 @@ export default function RoomReservationForm({ roomId }) {
           </div>
 
           <div className="flex flex-col justify-center gap-4 space-y-4 rounded-lg border px-4 py-5 shadow">
+            <div>
+              <Label className="mb-1 block font-medium">Reservation Name</Label>
+              <Input
+                type="text"
+                value={formData.reservation_name}
+                onChange={e =>
+                  handleFormChange('reservation_name', e.target.value)
+                }
+                placeholder="Event Expo Party 2024"
+                className="w-full rounded-md border p-2"
+              />
+              {errors.reservation_name && (
+                <p className="text-red-500">{errors.reservation_name}</p>
+              )}
+            </div>
             <div>
               <Label className="mb-1 block font-medium">
                 Reservation Purpose

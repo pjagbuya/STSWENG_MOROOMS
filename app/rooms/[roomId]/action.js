@@ -1,6 +1,10 @@
 'use server';
 
-import { convertRangeToNumbers, parseTZDateRanges } from '@/utils/date_utils';
+import {
+  convertRangeToNumbers,
+  getHourFromRange,
+  parseTZDateRanges,
+} from '@/utils/date_utils';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -62,7 +66,6 @@ export async function reserve(formData) {
   if (error) {
     console.error('Error creating reservation:', error.message);
     redirect('/error');
-    return;
   }
   console.log('Reservation created successfully');
   revalidatePath('/reservations');
@@ -76,6 +79,42 @@ const extractElements = ranges => {
     };
   });
 };
+
+export async function get_min_max_room_hours(room_id) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('get_room_by_id', {
+    p_room_id: room_id,
+  });
+
+  if (error) {
+    console.error('Error fetching room details:', error);
+    throw error;
+  }
+
+  const { room_type_min_reservation, room_type_max_reservation } = data[0];
+  console.log(room_type_min_reservation);
+  console.log(room_type_max_reservation);
+  const convertedTimes = getHourFromRange({
+    start: room_type_min_reservation,
+    end: room_type_max_reservation,
+  });
+
+  return convertedTimes;
+}
+
+export async function get_room_details(room_id) {
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('get_room_by_id', {
+    p_room_id: room_id,
+  });
+
+  if (error) {
+    console.error('Error fetching room details:', error);
+    throw error;
+  }
+
+  return data[0];
+}
 
 export async function get_labelled_room_hours(room_id, reservation_date) {
   const supabase = createClient();
@@ -92,21 +131,23 @@ export async function get_labelled_room_hours(room_id, reservation_date) {
     console.error('Error fetching reservation details:', error);
     throw error;
   }
-  console.log(data);
 
   // convert data into an array of times and statuses for that certain day
   const hourStates = {};
   data.forEach(item => {
     const dateRanges = parseTZDateRanges(item.reservation_time);
-    console.log('date Ranges: ', dateRanges);
 
     const numberRanges = dateRanges.map(range => convertRangeToNumbers(range));
-    console.log('number Ranges: ', numberRanges);
     const status = item.reservation_status;
 
     numberRanges.forEach(range => {
-      const startHour = parseInt(range.start, 10);
-      const endHour = parseInt(range.end, 10);
+      let startHour = parseInt(range.start, 10);
+      let endHour = parseInt(range.end, 10);
+
+      // If endHour is 0 (12 am the next day), set end hour to 24 (23rd box is included)
+      if (endHour === 0) {
+        endHour = 24;
+      }
 
       for (let i = startHour; i < endHour; i++) {
         // Iterate over each hour in the range
@@ -114,8 +155,6 @@ export async function get_labelled_room_hours(room_id, reservation_date) {
       }
     });
   });
-
-  console.log('hourStates: ', hourStates);
 
   return hourStates;
 }

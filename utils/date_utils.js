@@ -31,3 +31,18 @@ export const convertRangeToNumbers = time => {
     end: new Date(time.end).getHours().toString(), // Extract and format end hour
   };
 };
+
+// Converts ranges into the hour numbers
+// input for no date in input "time"
+export const getHourFromRange = time => {
+  const getUtcHours = timeString => {
+    // Create a Date object in UTC and return the hour part
+    const date = new Date(`1970-01-01T${timeString}Z`);
+    return date.getUTCHours(); // Use getUTCHours() to avoid local timezone interference
+  };
+
+  return {
+    start: getUtcHours(time.start),
+    end: getUtcHours(time.end),
+  };
+};
