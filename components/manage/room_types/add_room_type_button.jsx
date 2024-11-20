@@ -1,7 +1,7 @@
 'use client';
 
 import RoomTypeForm from './forms/room_type_form';
-import { addRoomTypeAction } from '@/app/manage/room_types/actions';
+import { addRoomType } from '@/app/manage/room_types/actions';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,7 +17,7 @@ export default function AddRoomTypeButton() {
   const [open, setOpen] = useState(false);
 
   async function handleSubmit(form, values) {
-    const err = await addRoomTypeAction(
+    const err = await addRoomType(
       values.name,
       values.details,
       values.capacity,

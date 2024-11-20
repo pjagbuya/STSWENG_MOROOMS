@@ -2,10 +2,7 @@
 
 import RoomSetDeletePopup from './room_set_delete_popup';
 import RoomSetEditPopup from './room_set_edit_popup';
-import {
-  deleteRoomSetAction,
-  editRoomSetAction,
-} from '@/app/manage/room_sets/actions';
+import { deleteRoomSet, editRoomSet } from '@/app/manage/room_sets/actions';
 import { addActionColumn } from '@/components/util/action_dropdown';
 import { DataTable } from '@/components/util/data_table';
 import { SortableHeader } from '@/components/util/sortable_header';
@@ -38,7 +35,7 @@ export default function RoomSetTable({ data }) {
   }
 
   async function handleDeleteContinue() {
-    await deleteRoomSetAction(row.original.id);
+    await deleteRoomSet(row.original.id);
     setRow(null);
   }
 
@@ -48,7 +45,7 @@ export default function RoomSetTable({ data }) {
   }
 
   async function handleEditContinue(row, form, values) {
-    const err = await editRoomSetAction(row.original.id, values.name);
+    const err = await editRoomSet(row.original.id, values.name);
 
     if (err) {
       form.setError('event_name', err);

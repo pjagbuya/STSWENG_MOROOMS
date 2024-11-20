@@ -2,6 +2,7 @@ import HeaderNavLink from './header_navlink';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { createClient } from '@/utils/supabase/server';
+import { isAdminServerSide } from '@/utils/utils';
 import { Mail } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -13,7 +14,7 @@ export default async function Header() {
   } = await supabase.auth.getUser();
 
   const isLoggedIn = user !== null;
-  const isAdmin = false;
+  const isAdmin = await isAdminServerSide();
 
   return (
     <header className="sticky top-0 flex items-center gap-8 bg-black px-4 py-2.5 drop-shadow-md">
@@ -25,11 +26,12 @@ export default async function Header() {
       <nav className="flex-1">
         <HeaderNavLink link="/">Home</HeaderNavLink>
         <HeaderNavLink link="/todo">Profile</HeaderNavLink>
-        <HeaderNavLink link="/todo">Reservations</HeaderNavLink>
+        <HeaderNavLink link="/rooms">
+          {isAdmin ? 'Reservations / Manage Rooms' : 'Reservations'}
+        </HeaderNavLink>
 
         {isAdmin && (
           <>
-            <HeaderNavLink link="/todo">Manage Rooms</HeaderNavLink>
             <HeaderNavLink link="/todo">Manage Reservations</HeaderNavLink>
             <HeaderNavLink link="/todo">Manage Users</HeaderNavLink>
           </>
@@ -45,15 +47,6 @@ export default async function Header() {
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </Link>
-
-            <Button
-              asChild
-              className="hover:brightness-110 active:brightness-75"
-            >
-              <Link href="/signup">
-                <Mail className="w-11 text-white" />
-              </Link>
-            </Button>
           </>
         ) : (
           <>

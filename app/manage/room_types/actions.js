@@ -3,6 +3,18 @@
 import { createClient } from '@/utils/supabase/client';
 import { revalidatePath } from 'next/cache';
 
+/**
+ * Adds a new room type with the provided details.
+ *
+ * @async
+ * @function addRoomType
+ * @param {string} name - The name of the room type.
+ * @param {string} details - Additional details or description of the room type.
+ * @param {number} capacity - The maximum capacity of the room type.
+ * @param {number} minReserveTime - The minimum reservation time (in minutes).
+ * @param {number} maxReserveTime - The maximum reservation time (in minutes).
+ * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
+ */
 export async function addRoomType(
   name,
   details,
@@ -24,27 +36,19 @@ export async function addRoomType(
     console.error('Error adding room type:', error);
     return error;
   }
-}
 
-export async function addRoomTypeAction(
-  name,
-  details,
-  capacity,
-  minReserveTime,
-  maxReserveTime,
-) {
-  const err = await addRoomType(
-    name,
-    details,
-    capacity,
-    minReserveTime,
-    maxReserveTime,
-  );
   revalidatePath('/manage/room_types');
   revalidatePath('/manage/rooms');
-  return err;
 }
 
+/**
+ * Deletes a room type by its ID.
+ *
+ * @async
+ * @function deleteRoomType
+ * @param {number} id - The ID of the room type to delete.
+ * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
+ */
 export async function deleteRoomType(id) {
   const supabase = createClient();
 
@@ -56,13 +60,23 @@ export async function deleteRoomType(id) {
     console.error('Error deleting room type:', error);
     return error;
   }
-}
 
-export async function deleteRoomTypeAction(id) {
-  await deleteRoomType(id);
   revalidatePath('/manage/room_types');
 }
 
+/**
+ * Edits an existing room type's details.
+ *
+ * @async
+ * @function editRoomType
+ * @param {number} id - The ID of the room type to edit.
+ * @param {string} name - The new name for the room type.
+ * @param {string} details - The new details or description for the room type.
+ * @param {number} capacity - The new capacity for the room type.
+ * @param {number} minReserveTime - The new minimum reservation time (in minutes).
+ * @param {number} maxReserveTime - The new maximum reservation time (in minutes).
+ * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
+ */
 export async function editRoomType(
   id,
   name,
@@ -86,28 +100,18 @@ export async function editRoomType(
     console.error('Error editing room type:', error);
     return error;
   }
-}
 
-export async function editRoomTypeAction(
-  id,
-  name,
-  details,
-  capacity,
-  minReserveTime,
-  maxReserveTime,
-) {
-  const err = await editRoomType(
-    id,
-    name,
-    details,
-    capacity,
-    minReserveTime,
-    maxReserveTime,
-  );
   revalidatePath('/manage/room_types');
-  return err;
 }
 
+/**
+ * Fetches all room types.
+ *
+ * @async
+ * @function fetchRoomTypes
+ * @returns {Promise<Array<Object>>} Resolves to an array of room type objects or throws an error if the operation fails.
+ * @throws Will throw an error if the RPC call fails.
+ */
 export async function fetchRoomTypes() {
   const supabase = createClient();
 

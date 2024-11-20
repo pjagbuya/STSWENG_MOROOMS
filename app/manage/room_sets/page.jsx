@@ -10,7 +10,7 @@ export default async function ManageRoomSetsPage() {
     <>
       <Header />
 
-      <main className="mb-1 px-8 py-4">
+      <main className="mb-1 px-8 py-6">
         <h2 className="mb-4 text-3xl font-semibold">Manage Room Sets</h2>
         <div className="mb-8 flex items-center gap-4">
           <AddRoomSetButton />

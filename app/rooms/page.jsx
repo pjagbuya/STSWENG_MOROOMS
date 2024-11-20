@@ -8,12 +8,15 @@ import SearchFilter from '@/components/rooms/search_filter';
 import { SetResult } from '@/components/rooms/set_result';
 import { Button } from '@/components/ui/button';
 import { get24HourTime, getDateString } from '@/utils/time';
+import { isAdminServerSide } from '@/utils/utils';
 import { Settings } from 'lucide-react';
 import { Layers } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default async function RoomSearchPage({ searchParams }) {
+  const isAdmin = await isAdminServerSide();
+
   const searchFilters = {
     name: searchParams.name,
     date: searchParams.date ?? getDateString(new Date()),
@@ -39,7 +42,7 @@ export default async function RoomSearchPage({ searchParams }) {
     <>
       <Header />
 
-      <main className="mb-1 px-8 py-4">
+      <main className="mb-1 px-8 py-6">
         <h2 className="mb-4 text-3xl font-semibold">Reserve a Room</h2>
 
         <div className="mb-8 flex items-center gap-4">
@@ -52,23 +55,24 @@ export default async function RoomSearchPage({ searchParams }) {
             />
           </div>
 
-          {/* Admin controls */}
-          <div className="flex gap-4">
-            <AddRoomButton />
+          {isAdmin && (
+            <div className="flex gap-4">
+              <AddRoomButton />
 
-            <Button asChild className="rounded-lg shadow-md">
-              <Link href="/manage/room_types">
-                <Settings className="mr-0.5" />
-                Manage Room Types
-              </Link>
-            </Button>
-            <Button asChild className="rounded-lg shadow-md">
-              <Link href="/manage/room_sets">
-                <Layers className="mr-0.5" />
-                Manage Room Sets
-              </Link>
-            </Button>
-          </div>
+              <Button asChild className="rounded-lg shadow-md">
+                <Link href="/manage/room_types">
+                  <Settings className="mr-0.5" />
+                  Manage Room Types
+                </Link>
+              </Button>
+              <Button asChild className="rounded-lg shadow-md">
+                <Link href="/manage/room_sets">
+                  <Layers className="mr-0.5" />
+                  Manage Room Sets
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className="space-y-8">
@@ -80,6 +84,7 @@ export default async function RoomSearchPage({ searchParams }) {
             rooms.map(({ set_id, set_name, rooms }) => (
               <SetResult
                 key={set_id}
+                isAdmin={isAdmin}
                 setName={set_name}
                 rooms={rooms.map(r => ({
                   ...r,

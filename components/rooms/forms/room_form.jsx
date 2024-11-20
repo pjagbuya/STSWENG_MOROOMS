@@ -1,3 +1,4 @@
+import { FORM_SCHEMA } from '@/app/rooms/form_schema';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -15,35 +16,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import FileInput from '@/components/util/file_input';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
-const FORM_SCHEMA = z.object({
-  name: z.string().min(2, {
-    message: 'Set name must be at least 2 characters.',
-  }),
-  details: z.string().optional(),
-  room_type_id: z.string().uuid(),
-  room_set_id: z.string().uuid(),
-});
+const RoomForm = forwardRef(function RoomForm(
+  { roomSets, roomTypes, values, onSubmit },
+  ref,
+) {
+  const formRef = useRef();
 
-export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
   const form = useForm({
     resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       name: values?.name ?? '',
       details: values?.details ?? '',
+      image_file: values?.image_file ?? '',
       room_type_id: values?.room_type_id ?? '',
       room_set_id: values?.room_set_id ?? '',
     },
   });
 
+  useEffect(() => {
+    form.setValue('image_file', values?.image_file ?? '');
+  }, [form, values]);
+
+  useImperativeHandle(ref, () => {
+    return {
+      get form() {
+        return form;
+      },
+    };
+  }, [form]);
+
   return (
     <Form {...form}>
       <form
+        ref={formRef}
         className="flex flex-col gap-4"
-        onSubmit={form.handleSubmit(values => onSubmit(form, values))}
+        onSubmit={form.handleSubmit(() =>
+          onSubmit(new FormData(formRef.current)),
+        )}
       >
         <FormField
           control={form.control}
@@ -75,12 +89,33 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
 
         <FormField
           control={form.control}
+          name="image_file"
+          render={({ field: { onChange, ...fieldProps } }) => (
+            <FormItem>
+              <FormLabel className="font-bold">Image</FormLabel>
+              <FormControl>
+                <FileInput
+                  {...fieldProps}
+                  placeholder="Upload Image"
+                  accept="image/*"
+                  onChange={e => onChange(e.target.files)}
+                  onReset={() => form.setValue('image_file', null)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="room_type_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="font-bold">Room Type</FormLabel>
               <FormControl>
                 <Select
+                  {...field}
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -110,6 +145,7 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
               <FormLabel className="font-bold">Room Set</FormLabel>
               <FormControl>
                 <Select
+                  {...field}
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
@@ -136,4 +172,6 @@ export default function RoomForm({ roomSets, roomTypes, values, onSubmit }) {
       </form>
     </Form>
   );
-}
+});
+
+export default RoomForm;

@@ -4,7 +4,7 @@ import RoomForm from './forms/room_form';
 import { fetchRoomSets } from '@/app/manage/room_sets/actions';
 import { fetchRoomTypes } from '@/app/manage/room_types/actions';
 import { addRoomAction } from '@/app/rooms/actions';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -18,14 +18,19 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useFormState } from 'react-dom';
 
 export default function AddRoomButton() {
+  const roomFormRef = useRef();
+
   const [roomSets, setRoomSets] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
-
   const [open, setOpen] = useState(false);
+
+  const [state, formAction] = useFormState(addRoomAction, null);
 
   useEffect(() => {
     async function fetchThings() {
@@ -39,48 +44,53 @@ export default function AddRoomButton() {
     fetchThings();
   }, []);
 
-  async function handleSubmit(form, values) {
-    const err = await addRoomAction(
-      values.name,
-      values.details,
-      values.room_type_id,
-      values.room_set_id,
-    );
+  useEffect(() => {
+    const roomForm = roomFormRef.current;
 
-    if (err) {
-      form.setError('name', err);
+    if (!state) {
       return;
     }
 
-    setOpen(false);
-  }
+    if (state.status === 'success') {
+      setOpen(false);
+    } else if (state.status === 'error') {
+      console.log('Error adding room:', state.error);
+      roomForm.form.setError('name', state.error); // Temporary hack
+    }
+  }, [state]);
+
+  const disabled = roomSets.length === 0 || roomTypes.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger
+        className=""
+        disabled={disabled}
+        onClick={() => setOpen(true)}
+      >
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger
+              asChild
+              className={cn(
+                buttonVariants({
+                  className:
+                    'rounded-lg shadow-md ' +
+                    (disabled ? ' bg-gray-400 hover:bg-gray-400' : ''),
+                }),
+              )}
+            >
               <div>
-                <Button
-                  className="rounded-lg shadow-md"
-                  disabled={roomSets.length === 0 || roomTypes.length === 0}
-                  onClick={() => setOpen(true)}
-                >
-                  <Plus className="mr-0.5" />
-                  Add Room
-                </Button>
+                <Plus className="mr-0.5" />
+                Add Room
               </div>
             </TooltipTrigger>
 
-            {roomSets.length === 0 ||
-              (roomTypes.length === 0 && (
-                <TooltipContent>
-                  <p>
-                    Add room types and room sets first before adding a room.
-                  </p>
-                </TooltipContent>
-              ))}
+            {disabled && (
+              <TooltipContent>
+                <p>Add room types and room sets first before adding a room.</p>
+              </TooltipContent>
+            )}
           </Tooltip>
         </TooltipProvider>
       </DialogTrigger>
@@ -91,9 +101,10 @@ export default function AddRoomButton() {
         </DialogHeader>
 
         <RoomForm
+          ref={roomFormRef}
           roomSets={roomSets}
           roomTypes={roomTypes}
-          onSubmit={handleSubmit}
+          onSubmit={formAction}
         />
       </DialogContent>
     </Dialog>

@@ -1,8 +1,16 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
+/**
+ * Adds a new room set using the provided name.
+ *
+ * @async
+ * @function addRoomSet
+ * @param {string} name - The name of the new room set.
+ * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
+ */
 export async function addRoomSet(name) {
   const supabase = createClient();
 
@@ -14,14 +22,18 @@ export async function addRoomSet(name) {
     console.error('Error adding room set:', error);
     return error;
   }
-}
 
-export async function addRoomSetAction(name, details) {
-  const err = await addRoomSet(name, details);
   revalidatePath('/manage/room_sets');
-  return err;
 }
 
+/**
+ * Deletes a room set by its ID.
+ *
+ * @async
+ * @function deleteRoomSet
+ * @param {number} id - The ID of the room set to delete.
+ * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
+ */
 export async function deleteRoomSet(id) {
   const supabase = createClient();
 
@@ -33,13 +45,19 @@ export async function deleteRoomSet(id) {
     console.error('Error deleting room set:', error);
     return error;
   }
-}
 
-export async function deleteRoomSetAction(id) {
-  await deleteRoomSet(id);
   revalidatePath('/manage/room_sets');
 }
 
+/**
+ * Edits a room set's name by its ID.
+ *
+ * @async
+ * @function editRoomSet
+ * @param {number} id - The ID of the room set to edit.
+ * @param {string} name - The new name for the room set.
+ * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
+ */
 export async function editRoomSet(id, name) {
   const supabase = createClient();
 
@@ -52,15 +70,19 @@ export async function editRoomSet(id, name) {
     console.error('Error editing room set:', error);
     return error;
   }
-}
 
-export async function editRoomSetAction(id, name) {
-  const err = await editRoomSet(id, name);
   revalidatePath('/manage/room_sets');
   revalidatePath('/manage/rooms');
-  return err;
 }
 
+/**
+ * Fetches all room sets.
+ *
+ * @async
+ * @function fetchRoomSets
+ * @returns {Promise<Array<Object>>} Resolves to an array of room set objects or throws an error if the operation fails.
+ * @throws Will throw an error if the RPC call fails.
+ */
 export async function fetchRoomSets() {
   const supabase = createClient();
 
