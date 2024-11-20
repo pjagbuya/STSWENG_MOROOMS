@@ -18,18 +18,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # - name: Build the app
-      #   run: npm run build
-
-      # - name: Start the app w/ credentials
-      #   run: npm start &
-      #   env:
-      #     NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      #     NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      #   continue-on-error: false
+      - name: Build the app
+        run: npm run build
 
       - name: Start the app w/ credentials
-        run: npm run dev &
+        run: npm start &
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
