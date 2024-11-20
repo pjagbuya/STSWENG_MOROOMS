@@ -27,7 +27,7 @@ export default function RoomReservationForm({ roomId }) {
     selectedHours: null,
     purpose: '',
     count: 0,
-    user_id: null, // TODO: add userID however its gotten
+    user_id: 'bb794c03-711a-41dd-be9a-9b80b3d068fd', // TODO: add userID however its gotten
     reservation_name: '',
     room_id: roomId,
     endorsementLetter: null,

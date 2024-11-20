@@ -1,5 +1,5 @@
 import Header from '@/components/header';
-import RoomReservationForm from '@/components/reservation-form';
+import RoomReservationForm from '@/components/reservation/reservation-form';
 import Image from 'next/image';
 
 export default function RoomReservationPage({ params }) {

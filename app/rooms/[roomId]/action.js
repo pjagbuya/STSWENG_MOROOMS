@@ -1,5 +1,6 @@
 'use server';
 
+import { convertRangeToNumbers, parseTZDateRanges } from '@/utils/date_utils';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -63,11 +64,7 @@ export async function reserve(formData) {
     redirect('/error');
     return;
   }
-
-  // Reservation created successfully
   console.log('Reservation created successfully');
-
-  // Redirect
   revalidatePath('/reservations');
 }
 
@@ -97,20 +94,29 @@ export async function get_labelled_room_hours(room_id, reservation_date) {
   }
   console.log(data);
 
-  // Initialize hourStates with all hours as 'available'
+  // convert data into an array of times and statuses for that certain day
   const hourStates = {};
-  for (let i = 0; i < 24; i++) {
-    hourStates[i] = 'available';
+  data.forEach(item => {
+    const dateRanges = parseTZDateRanges(item.reservation_time);
+    console.log('date Ranges: ', dateRanges);
 
-    // TODO: DELETE AFTER
-    if (i % 3 === 0) {
-      hourStates[i] = 'unavailable';
-    } else if (i % 4 === 0) {
-      hourStates[i] = 'pending';
-    }
-  }
+    const numberRanges = dateRanges.map(range => convertRangeToNumbers(range));
+    console.log('number Ranges: ', numberRanges);
+    const status = item.reservation_status;
 
-  //console.log(hourStates)
+    numberRanges.forEach(range => {
+      const startHour = parseInt(range.start, 10);
+      const endHour = parseInt(range.end, 10);
+
+      for (let i = startHour; i < endHour; i++) {
+        // Iterate over each hour in the range
+        hourStates[i] = status.toLowerCase(); // Label the hour with the status
+      }
+    });
+  });
+
+  console.log('hourStates: ', hourStates);
+
   return hourStates;
 }
 

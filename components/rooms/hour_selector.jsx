@@ -107,7 +107,7 @@ export default function HourSelector({
         return isSelected ? 'bg-green-500' : 'bg-green-200';
       case 'pending':
         return isSelected ? 'bg-yellow-500' : 'bg-yellow-200';
-      case 'unavailable':
+      case 'approved': // BECAUSE if a reservation is labelled "approved" it is unavailable
         return 'bg-red-500 cursor-not-allowed';
       default:
         return 'bg-slate-700';

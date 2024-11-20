@@ -1,4 +1,4 @@
-import ReservationTable from '@/components/reservation_table';
+import ReservationTable from '@/components/reservation/reservation_table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
