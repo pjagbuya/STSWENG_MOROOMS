@@ -1,4 +1,5 @@
-import { getUserInfo, updateUserInfo } from './action';
+import { updateUserInfo } from '../../actions';
+import { getUserInfo } from '@/app/users/[user_id]/profile/edit/action';
 import { SignupEditForm } from '@/components/signup-edit-form';
 import Image from 'next/image';
 
