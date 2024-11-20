@@ -1,7 +1,7 @@
 import { reservationColumns, roomColumns } from './columns';
-import { DataTable } from '@/components/data-table';
 import RoomList from '@/components/room-list';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { DataTable } from '@/components/util/data_table';
 
 async function getRoomData() {
   return [
