@@ -10,7 +10,6 @@ import { addActionColumn } from '@/components/util/action_dropdown';
 import { addCombobox } from '@/components/util/combobox_columns';
 import { DataTable } from '@/components/util/data_table';
 import { objectToFormData } from '@/utils/server_utils';
-import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 function setPopup(row, setRowData, setOpenPopup) {
@@ -23,7 +22,7 @@ export function UserTable({ data, roles }) {
   const [openRoleChangePopup, setOpenRoleChangePopup] = useState(false);
   const [openEditPopup, setOpenEditPopup] = useState(false);
   const [openDeletePopup, setOpenDeletePopup] = useState(false);
-  const url = usePathname();
+  const url = '/users/[user_id]/home/admin/users';
 
   let finalColumns = addCombobox(
     addActionColumn(
@@ -37,7 +36,7 @@ export function UserTable({ data, roles }) {
       },
     ),
     roles,
-    (roleIndex, index) => {
+    (index, roleIndex) => {
       setRowData({ index, roleIndex });
       setOpenRoleChangePopup(true);
     },
@@ -61,12 +60,10 @@ export function UserTable({ data, roles }) {
             );
             setRowData(null);
             setOpenRoleChangePopup(false);
+            console.log(url);
           };
 
           action();
-        }}
-        onOpenChange={v => {
-          // setOpenDeleteDialog(v);
         }}
       />
       <EditPopup
@@ -75,9 +72,6 @@ export function UserTable({ data, roles }) {
         row={rowData}
         open={openEditPopup}
         onEdit={async (row, form, values) => {
-          console.log('row', row);
-          console.log('form', form);
-          console.log('values', values);
           await updateUserInfo(row.userId, url, await objectToFormData(values));
           setRowData(null);
           setOpenEditPopup(false);

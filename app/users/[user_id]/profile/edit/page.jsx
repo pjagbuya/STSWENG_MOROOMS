@@ -1,16 +1,10 @@
-import { getUserInfo, updateUserInfo } from './action';
-import { SignupEditForm } from '@/components/signup-edit-form';
+import { getUserInfo } from './action';
+import { Signup } from '@/components/signup-form';
 import Image from 'next/image';
 
-export default async function Page({ params }) {
-  const { user_id: userId } = params;
-  const {
-    user_firstname: userFirstName,
-    user_lastname: userLastName,
-    user_school_id: userSchoolId,
-  } = (await getUserInfo(userId))[0];
-
-  const formAction = updateUserInfo.bind(null, userId);
+export default async function EditProfilePage() {
+  const userInfo = await getUserInfo();
+  delete userInfo.userId;
   return (
     <div className="flex h-screen w-full items-center justify-center px-4">
       <Image
@@ -19,12 +13,7 @@ export default async function Page({ params }) {
         layout="fill"
         className="absolute -z-10 opacity-50"
       />
-      <SignupEditForm
-        formAction={formAction}
-        userFirstName={userFirstName}
-        userLastName={userLastName}
-        userSchoolId={userSchoolId}
-      />
+      <Signup defaultValues={userInfo} isEdit={true} />
     </div>
   );
 }

@@ -1,14 +1,8 @@
 'use client';
 
-import {
-  addRole,
-  deleteRole,
-  deleteUser,
-  updateRole,
-  updateUserInfo,
-} from './actions';
+import { addRole, deleteRole, updateRole } from './actions';
 import { roleColumns } from './columns';
-import { roleFormSchema, userEditFormSchema } from './form_schema';
+import { roleFormSchema } from './form_schema';
 import { AddPopup } from '@/components/add_popup';
 import { DeletePopup } from '@/components/delete_popup';
 import EditPopup from '@/components/edit_popup';
@@ -16,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { addActionColumn } from '@/components/util/action_dropdown';
 import { DataTable } from '@/components/util/data_table';
 import { objectToFormData } from '@/utils/server_utils';
-import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 function setPopup(row, setRowData, setOpenPopup) {
@@ -29,8 +22,7 @@ export function RoleTable({ data }) {
   const [openEditPopup, setOpenEditPopup] = useState(false);
   const [openDeletePopup, setOpenDeletePopup] = useState(false);
   const [openAddPopup, setOpenAddPopup] = useState(false);
-  const url = usePathname();
-  console.log('role data', data);
+  const url = '/users/[user_id]/home/admin/users';
 
   let finalColumns = addActionColumn(
     roleColumns,
@@ -38,7 +30,6 @@ export function RoleTable({ data }) {
       setPopup(row.original, setRowData, setOpenDeletePopup);
     },
     row => {
-      console.log('what:', row.original);
       setPopup(row.original, setRowData, setOpenEditPopup);
     },
   );

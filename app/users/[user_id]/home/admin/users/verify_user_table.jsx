@@ -2,6 +2,7 @@
 
 import { updateUserApprovalType } from './actions';
 import { columns } from './columns';
+import { addLinkColumn } from '@/components/link_column';
 import { UserRoleChangePopup } from '@/components/user_role_change_popup';
 import { addCombobox } from '@/components/util/combobox_columns';
 import { DataTable } from '@/components/util/data_table';
@@ -16,16 +17,10 @@ function setPopup(row, setRowData, setOpenPopup) {
 export function VerifyUserTable({ data, approveTypes }) {
   const [rowData, setRowData] = useState(null);
   const [openUserApprovalPopup, setOpenUserApprovalPopup] = useState(false);
-  const url = usePathname();
-  // const approveTypeData = data.map(item => {
-  //   return {
-  //     id: item.userId,
-  //     value: item.isApproved,
-  //   };
-  // });
+  const url = '/users/[user_id]/home/admin/users';
 
   let finalColumns = addCombobox(
-    columns,
+    addLinkColumn(columns, 'proofURL', 'proof'),
     approveTypes,
     (index, approveTypeIndex) => {
       setRowData({ index, approveTypeIndex });

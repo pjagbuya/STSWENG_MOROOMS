@@ -4,6 +4,7 @@ import {
   getRoles,
   getRolesWithPermission,
   getUsers,
+  getUsersWithProof,
 } from './actions';
 import { RoleTable } from './role_table';
 import { UpgradeRoleUserTable } from './upgrade_role_user_table';
@@ -18,8 +19,7 @@ const Management = async () => {
   const rolesWithPermission = await getRolesWithPermission();
   const approveTypes = await getApproveTypes();
   const roleRequests = await getRoleRequests();
-
-  console.log('role requests', roleRequests);
+  const usersWithProof = await getUsersWithProof();
 
   return (
     <div className="flex w-full flex-col gap-2 p-8">
@@ -42,7 +42,7 @@ const Management = async () => {
           <RoleTable data={rolesWithPermission} roles={roles} />
         </TabsContent>
         <TabsContent value="verify_user">
-          <VerifyUserTable data={users} approveTypes={approveTypes} />
+          <VerifyUserTable data={usersWithProof} approveTypes={approveTypes} />
         </TabsContent>
         <TabsContent value="role_request">
           <UpgradeRoleUserTable data={roleRequests} />
