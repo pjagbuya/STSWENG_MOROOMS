@@ -1,0 +1,38 @@
+name: Cypress E2E Tests
+
+on: [push, pull_request]
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build the app
+        run: npm run build
+
+      - name: Start the app w/ credentials
+        run: npm start &
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        continue-on-error: false
+
+      - name: Wait for the app to respond
+        run: npx wait-on http://localhost:3000 --timeout 60000
+
+      # - name: Verify app health
+      #   run: curl -v http://localhost:3000
+
+      - name: Run Cypress tests
+        run: npx cypress run
