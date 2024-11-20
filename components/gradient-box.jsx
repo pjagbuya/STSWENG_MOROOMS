@@ -3,7 +3,7 @@ import React from 'react';
 export default function GradientBox({ gradient, title, body }) {
   return (
     <div
-      className="flex w-[320px] flex-col items-center justify-center rounded-md px-8"
+      className="flex h-full w-[320px] flex-col items-center justify-center rounded-md px-8"
       style={{ backgroundImage: gradient }}
     >
       <div className="flex flex-col gap-1">

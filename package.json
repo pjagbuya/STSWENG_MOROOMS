@@ -39,7 +39,7 @@
     "react": "^18",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
-    "react-hook-form": "^7.53.1",
+    "react-hook-form": "^7.53.2",
     "styled-components": "^6.1.13",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
@@ -53,6 +53,8 @@
     "@types/node": "^22.9.0",
     "@types/phoenix": "^1.6.5",
     "@types/react": "18.3.12",
+    "cypress": "^13.16.0",
+    "cypress-file-upload": "^5.0.8",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
     "eslint-config-prettier": "^9.1.0",
@@ -63,7 +65,8 @@
     "postcss": "^8",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "wait-on": "^7.0.0"
   },
   "husky": {
     "hooks": {
