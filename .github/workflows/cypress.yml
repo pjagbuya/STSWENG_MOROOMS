@@ -18,14 +18,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build the app
-        run: npm run build
+      # - name: Build the app
+      #   run: npm run build
+
+      # - name: Start the app w/ credentials
+      #   run: npm start &
+      #   env:
+      #     NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      #     NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      #   continue-on-error: false
 
       - name: Start the app w/ credentials
-        run: npm start &
+        run: npm run dev &
         env:
-          NEXT_PUBLIC_SUPABASE_URL: https://rcfzezkhwvgtwpqcyhac.supabase.co
-          NEXT_PUBLIC_SUPABASE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZnplemtod3ZndHdwcWN5aGFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODQ0NDc5MCwiZXhwIjoyMDQ0MDIwNzkwfQ.QjUng71fLp0a27aNvz-vP4yqXXmtTQfA61OMg4kU5iU
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
         continue-on-error: false
 
       - name: Wait for the app to respond
