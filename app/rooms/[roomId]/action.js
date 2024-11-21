@@ -92,8 +92,6 @@ export async function get_min_max_room_hours(room_id) {
   }
 
   const { room_type_min_reservation, room_type_max_reservation } = data[0];
-  console.log(room_type_min_reservation);
-  console.log(room_type_max_reservation);
   const convertedTimes = getHourFromRange({
     start: room_type_min_reservation,
     end: room_type_max_reservation,
@@ -118,9 +116,7 @@ export async function get_room_details(room_id) {
 
 export async function get_labelled_room_hours(room_id, reservation_date) {
   const supabase = createClient();
-  console.log('inputted date: ', reservation_date);
   const formattedDate = reservation_date.toISOString();
-  console.log('formatted date:', formattedDate);
 
   const { data, error } = await supabase.rpc('get_unavailable_reservations', {
     p_room_id: room_id,

@@ -15,7 +15,11 @@ export default async function RoomReservationPage({ params }) {
       <main className="px-8 py-4">
         {/* Room Details */}
         <RoomDetails roomDetails={roomDetails} />
-        <RoomReservationForm roomId={roomId} />
+        <RoomReservationForm
+          roomId={roomId}
+          userID={'bb794c03-711a-41dd-be9a-9b80b3d068fd'}
+        />
+        {/* TODO: CHANGE USERID HOWEVER ITS GOTTEN */}
       </main>
     </>
   );

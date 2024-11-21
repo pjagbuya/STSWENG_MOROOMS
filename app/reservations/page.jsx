@@ -24,7 +24,7 @@ export default function ReservationCardList() {
             <div className="space-y-4 rounded-lg bg-white p-8 shadow-md">
               <ReservationTable
                 userId={'bb794c03-711a-41dd-be9a-9b80b3d068fd'}
-                mode={'admin'}
+                mode={'user'}
               />{' '}
               {/*TODO: add userID and if mode is admin or user*/}
             </div>

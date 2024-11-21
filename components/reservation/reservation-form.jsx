@@ -15,13 +15,13 @@ import { useToast } from '@/hooks/use-toast';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function RoomReservationForm({ roomId }) {
+export default function RoomReservationForm({ roomId, userID }) {
   const [formData, setFormData] = useState({
     selectedDate: null,
     selectedHours: null,
     purpose: '',
     count: 0,
-    user_id: 'bb794c03-711a-41dd-be9a-9b80b3d068fd', // TODO: add userID however its gotten
+    user_id: userID,
     reservation_name: '',
     room_id: roomId,
     endorsementLetter: null,
