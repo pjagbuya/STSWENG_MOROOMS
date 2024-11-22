@@ -1,5 +1,6 @@
 'use client';
 
+import FileInput from '../util/file_input';
 import {
   get_labelled_room_hours,
   get_min_max_room_hours,
@@ -13,9 +14,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function RoomReservationForm({ roomId, userID }) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     selectedDate: null,
     selectedHours: null,
@@ -96,11 +99,20 @@ export default function RoomReservationForm({ roomId, userID }) {
   const handleFormSubmit = async e => {
     e.preventDefault();
     if (validateForm()) {
-      await reserve(formData);
-      toast({
-        description: `Reservation for ${formData.reservation_name} submitted successfully!`,
-      });
-      //redirect(`/rooms`)
+      try {
+        await reserve(formData);
+        toast({
+          description: `Reservation for ${formData.reservation_name} submitted successfully!`,
+        });
+        router.push('/rooms'); // Redirect to the /rooms page
+      } catch (error) {
+        console.error('Error submitting reservation:', error);
+        toast({
+          description: 'Failed to submit reservation. Please try again.',
+          variant: 'error',
+        });
+        router.push('/error');
+      }
     } else {
       console.log('Errors: ', errors);
     }
@@ -118,6 +130,8 @@ export default function RoomReservationForm({ roomId, userID }) {
     });
     setErrors({});
   };
+
+  console.log('Date selected: ', formData.selectedDate);
 
   return (
     <>
@@ -223,8 +237,9 @@ export default function RoomReservationForm({ roomId, userID }) {
               <Label className="mb-1 block font-medium">
                 Endorsement Letter (Optional)
               </Label>
-              <Input
-                type="file"
+              <FileInput
+                placeholder={'Upload Endorsement Letter'}
+                accept="application/pdf,image/*"
                 className="w-full rounded-md border p-2"
                 onChange={e =>
                   handleFormChange('endorsementLetter', e.target.files[0])

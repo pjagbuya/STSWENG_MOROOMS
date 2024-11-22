@@ -46,3 +46,34 @@ export const getHourFromRange = time => {
     end: getUtcHours(time.end),
   };
 };
+
+export const toTZMultiRange = (date, hours) => {
+  // Convert the date to a base date at midnight
+  const baseDate = new Date(date);
+  baseDate.setUTCHours(0, 0, 0, 0);
+
+  // Helper function to format date and time as "YYYY-MM-DD HH:MM:SS"
+  const formatDateTime = dateObj => {
+    const year = dateObj.getUTCFullYear();
+    const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getUTCDate()).padStart(2, '0');
+    const hours = String(dateObj.getUTCHours()).padStart(2, '0');
+    const minutes = String(dateObj.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(dateObj.getUTCSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+
+  // Generate each time range based on the selected hours
+  const ranges = hours.map(hour => {
+    const startTime = new Date(baseDate);
+    startTime.setUTCHours(hour);
+
+    const endTime = new Date(baseDate);
+    endTime.setUTCHours(hour + 1);
+
+    // Format the range in the expected format
+    return `["${formatDateTime(startTime)}","${formatDateTime(endTime)}")`;
+  });
+
+  return `{${ranges.join(', ')}}`;
+};
