@@ -12,46 +12,55 @@ import { redirect } from 'next/navigation';
 
 export async function reserve(formData) {
   const supabase = createClient();
-  // let endorsementLetterUrl = null;
-
-  // if (formData.endorsementLetter) {
-  //   const file = formData.endorsementLetter;
-  //   const fileName = `${formData.user_id}-${Date.now()}-${file.name}`;
-
-  //   const { data, error: uploadError } = await supabase.storage
-  //     .from('endorsement-letters') // Replace with your actual storage bucket name
-  //     .upload(fileName, file);
-
-  //   if (uploadError) {
-  //     console.error('Error uploading endorsement letter:', uploadError.message);
-  //     return;
-  //   }
-
-  //   // Get the public URL of the uploaded file
-  //   const { data: urlData } = supabase.storage
-  //     .from('endorsement-letters')
-  //     .getPublicUrl(fileName);
-
-  //   endorsementLetterUrl = urlData.publicUrl;
-  // }
 
   console.log('form data in reserve: ', formData); // BUG: FORM DATA DATE RECEIVED IS A DAY OFF??????????
-  // function to convert the hour data & date data into the proper tzmultirange format
 
-  const formattedDate = toTZMultiRange(
-    formData.selectedDate,
-    formData.selectedHours,
-  );
+  const selectedDate = new Date(formData.get('selectedDate'));
+  const selectedHours = JSON.parse(formData.get('selectedHours')); // Parse the hours from JSON string
+
+  // function to convert the hour data & date data into the proper tzmultirange format
+  const formattedDate = toTZMultiRange(selectedDate, selectedHours);
+
+  let endorsementLetterUrl = null;
+
+  // Check if an endorsement letter was uploaded
+  const endorsementLetter = formData.get('endorsementLetter');
+  if (endorsementLetter && endorsementLetter.size > 0) {
+    const fileName = `${formData.get('user_id')}_${Date.now()}_${endorsementLetter.name}`;
+    const { data, error: uploadError } = await supabase.storage
+      .from('Morooms-file/endorsement_files')
+      .upload(fileName, endorsementLetter);
+
+    if (uploadError) {
+      console.error('Error uploading file:', uploadError);
+      throw new Error('Failed to upload endorsement letter');
+    }
+
+    // Get the public URL of the uploaded file
+    const {
+      data: { publicUrl },
+      error: urlError,
+    } = supabase.storage
+      .from('Morooms-file/endorsement_files')
+      .getPublicUrl(fileName);
+
+    if (urlError) {
+      console.error('Error getting public URL:', urlError);
+      throw new Error('Failed to get public URL for endorsement letter');
+    }
+
+    endorsementLetterUrl = publicUrl;
+  }
 
   const { error } = await supabase.rpc('create_reservation', {
     p_reservation_time: formattedDate, // TSMULTIRANGE type (range of time stamps)
-    p_reservation_name: formData.reservation_name, // VARCHAR
-    p_reservation_purpose: formData.purpose, // VARCHAR
+    p_reservation_name: formData.get('reservation_name'), // VARCHAR
+    p_reservation_purpose: formData.get('purpose'), // VARCHAR
     p_reservation_status: 'Pending', // custom ENUM type
-    p_reservation_count: formData.count, // INT
-    p_reservation_user_id: formData.user_id, // UUID
-    p_room_id: formData.room_id, // UUID
-    p_endorsement_letter_url: formData.endorsementLetterUrl, // Add the file URL to the reservation
+    p_reservation_count: formData.get('count'), // INT
+    p_reservation_user_id: formData.get('user_id'), // UUID
+    p_room_id: formData.get('room_id'), // UUID
+    p_reservation_letter: endorsementLetterUrl, // Add the file URL to the reservation
   });
 
   if (error) {

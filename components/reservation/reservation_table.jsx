@@ -170,7 +170,18 @@ export default function ReservationTable({ userId, mode }) {
                     {reservation.reservationPurpose}
                   </TableCell>
                   <TableCell>
-                    {reservation.endorsementLetter ? 'Yes' : 'No'}
+                    {reservation.reservation_letter ? (
+                      <a
+                        href={reservation.reservation_letter}
+                        className="text-blue-500 underline hover:text-blue-700"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View File
+                      </a>
+                    ) : (
+                      'None'
+                    )}
                   </TableCell>
                 </TableRow>
               );

@@ -17,18 +17,21 @@ import { redirect } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+// function logFormData(formData) {
+//   console.log('FormData contents:');
+//   for (let [key, value] of formData.entries()) {
+//     if (value instanceof File) {
+//       console.log(key, ':', value.name, '(File)');
+//     } else {
+//       console.log(key, ':', value);
+//     }
+//   }
+// }
+
 export default function RoomReservationForm({ roomId, userID }) {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    selectedDate: null,
-    selectedHours: null,
-    purpose: '',
-    count: 0,
-    user_id: userID,
-    reservation_name: '',
-    room_id: roomId,
-    endorsementLetter: null,
-  });
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedHours, setSelectedHours] = useState(null);
   const [errors, setErrors] = useState({});
   const [hourStates, setHourStates] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +43,7 @@ export default function RoomReservationForm({ roomId, userID }) {
       try {
         const data = await get_labelled_room_hours(
           roomId,
-          formData.selectedDate || new Date(),
+          selectedDate || new Date(),
         );
         setHourStates(data);
       } catch (error) {
@@ -51,9 +54,9 @@ export default function RoomReservationForm({ roomId, userID }) {
     }
 
     fetchHourStates();
-  }, [roomId, formData.selectedDate]);
+  }, [roomId, selectedDate]);
 
-  const [minHour, setMinHour] = useState(0); // default value of 00:00 to 23:00
+  const [minHour, setMinHour] = useState(0);
   const [maxHour, setMaxHour] = useState(0);
 
   useEffect(() => {
@@ -74,22 +77,20 @@ export default function RoomReservationForm({ roomId, userID }) {
   };
 
   // Function for form validation
-  const validateForm = () => {
+  const validateForm = formData => {
     const newErrors = {};
 
-    if (!formData.selectedDate)
-      newErrors.selectedDate = 'Please select a date.';
-    if (!formData.selectedHours || formData.selectedHours.length === 0)
+    if (!selectedDate) newErrors.selectedDate = 'Please select a date.';
+    if (!selectedHours || selectedHours.length === 0)
       newErrors.selectedHours = 'Please select at least one hour.';
-    if (!formData.purpose) {
+    if (!formData.get('purpose')) {
       newErrors.purpose = 'Please enter a purpose for the reservation.';
-    } else if (formData.purpose.length > 100) {
+    } else if (formData.get('purpose').length > 100) {
       newErrors.purpose = 'Should not exceed 100 characters';
     }
-    if (!formData.count || formData.count === 0)
+    if (!formData.get('count') || formData.get('count') === '0')
       newErrors.count = 'Please enter number of participants.';
-    //if (!formData.user_id) newErrors.user_id = 'User ID is required.';
-    if (!formData.reservation_name)
+    if (!formData.get('reservation_name'))
       newErrors.reservation_name = 'Please enter a reservation name.';
 
     setErrors(newErrors);
@@ -98,11 +99,21 @@ export default function RoomReservationForm({ roomId, userID }) {
 
   const handleFormSubmit = async e => {
     e.preventDefault();
-    if (validateForm()) {
+    const formData = new FormData(e.target);
+    formData.append('user_id', userID);
+    formData.append('room_id', roomId);
+    formData.append(
+      'selectedDate',
+      selectedDate ? selectedDate.toISOString() : '',
+    );
+    formData.append('selectedHours', JSON.stringify(selectedHours));
+
+    logFormData(formData);
+    if (validateForm(formData)) {
       try {
         await reserve(formData);
         toast({
-          description: `Reservation for ${formData.reservation_name} submitted successfully!`,
+          description: `Reservation for ${formData.get('reservation_name')} submitted successfully!`,
         });
         router.push('/rooms'); // Redirect to the /rooms page
       } catch (error) {
@@ -120,29 +131,23 @@ export default function RoomReservationForm({ roomId, userID }) {
 
   // Reset input fields
   const handleReset = () => {
-    setFormData({
-      selectedDate: null,
-      selectedHours: null,
-      purpose: '',
-      count: 0,
-      reservation_name: '',
-      endorsementLetter: null,
-    });
+    setSelectedDate(null);
+    setSelectedHours(null);
     setErrors({});
+    // Reset form fields
+    document.getElementById('reservationForm').reset();
   };
-
-  console.log('Date selected: ', formData.selectedDate);
 
   return (
     <>
-      <form onSubmit={handleFormSubmit}>
+      <form id="reservationForm" onSubmit={handleFormSubmit}>
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
           <div className="grid grid-cols-2 items-stretch justify-center gap-8">
             <div className="flex flex-col gap-4">
               <Calendar
                 mode="single"
-                selected={formData.selectedDate}
-                onSelect={date => handleFormChange('selectedDate', date)}
+                selected={selectedDate}
+                onSelect={setSelectedDate}
                 className="flex justify-center rounded-md border"
               />
               {errors.selectedDate && (
@@ -178,10 +183,8 @@ export default function RoomReservationForm({ roomId, userID }) {
               <div>
                 <Label>Select Hours</Label>
                 <HourSelector
-                  selectedDay={formData.selectedDate || new Date()}
-                  onSelectionChange={hours =>
-                    handleFormChange('selectedHours', hours)
-                  }
+                  selectedDay={selectedDate || new Date()}
+                  onSelectionChange={setSelectedHours}
                   initialHourStates={hourStates}
                   minHour={minHour}
                   maxHour={maxHour}
@@ -198,10 +201,7 @@ export default function RoomReservationForm({ roomId, userID }) {
               <Label className="mb-1 block font-medium">Reservation Name</Label>
               <Input
                 type="text"
-                value={formData.reservation_name}
-                onChange={e =>
-                  handleFormChange('reservation_name', e.target.value)
-                }
+                name="reservation_name"
                 placeholder="Event Expo Party 2024"
                 className="w-full rounded-md border p-2"
               />
@@ -214,8 +214,7 @@ export default function RoomReservationForm({ roomId, userID }) {
                 Reservation Purpose
               </Label>
               <Textarea
-                value={formData.purpose}
-                onChange={e => handleFormChange('purpose', e.target.value)}
+                name="purpose"
                 placeholder="Tell us why you want to reserve this room"
                 className="min-h-48 w-full rounded-md border p-2"
               />
@@ -225,12 +224,7 @@ export default function RoomReservationForm({ roomId, userID }) {
             </div>
             <div>
               <Label>Reservation Count</Label>
-              <Input
-                value={formData.count}
-                className="w-1/2"
-                onChange={e => handleFormChange('count', e.target.value)}
-                type="number"
-              ></Input>
+              <Input name="count" className="w-1/2" type="number" />
               {errors.count && <p className="text-red-500">{errors.count}</p>}
             </div>
             <div>
@@ -238,12 +232,10 @@ export default function RoomReservationForm({ roomId, userID }) {
                 Endorsement Letter (Optional)
               </Label>
               <FileInput
+                name="endorsementLetter"
                 placeholder={'Upload Endorsement Letter'}
                 accept="application/pdf,image/*"
                 className="w-full rounded-md border p-2"
-                onChange={e =>
-                  handleFormChange('endorsementLetter', e.target.files[0])
-                }
               />
             </div>
 

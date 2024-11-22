@@ -28,7 +28,7 @@ export default function HourSelector({
   });
 
   const toggleHourSelection = hour => {
-    if (hourStates[hour] === 'unavailable') return;
+    if (hourStates[hour] === 'approved') return;
 
     setSelectedHours(prev => {
       if (prev.includes(hour)) {
@@ -40,7 +40,7 @@ export default function HourSelector({
   };
 
   const handleMouseDown = hour => {
-    if (hourStates[hour] === 'unavailable') return;
+    if (hourStates[hour] === 'approved') return;
 
     setIsDragging(true);
     setDragStart(hour);

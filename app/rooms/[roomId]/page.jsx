@@ -7,7 +7,6 @@ import Image from 'next/image';
 export default async function RoomReservationPage({ params }) {
   const { roomId } = params;
   const roomDetails = await get_room_details(roomId);
-  console.log('roomDetails:', roomDetails);
   return (
     <>
       <Header />
