@@ -1,4 +1,4 @@
-// Parser for TZDateRanges
+// Parser for TZDateRanges which converts [start, end) formats to an array of {start, end}
 // returns an array of dateRanges
 export const parseTZDateRanges = ranges => {
   // Replace mismatched brackets and parentheses to conform to [ and ) format
@@ -23,8 +23,9 @@ export const parseTZDateRanges = ranges => {
   return parsedSets;
 };
 
-// Converts ranges into the hour numbers
+// Converts full date ranges {start, end} into the hour numbers of {start, end}
 // returns an object containing a start and end digit
+// input has date and time
 export const convertRangeToNumbers = time => {
   return {
     start: new Date(time.start).getHours().toString(), // Extract and format start hour
@@ -32,8 +33,8 @@ export const convertRangeToNumbers = time => {
   };
 };
 
-// Converts ranges into the hour numbers
-// input for no date in input "time"
+// Converts time ranges {start, end} into the hour numbers {start, end}
+// input has no date and only time
 export const getHourFromRange = time => {
   const getUtcHours = timeString => {
     // Create a Date object in UTC and return the hour part
@@ -47,6 +48,7 @@ export const getHourFromRange = time => {
   };
 };
 
+// converts number arrays to tzmultirange (mainly used to convert hourSelector number output arrays)
 export const toTZMultiRange = (date, hours) => {
   // Convert the date to a base date at midnight
   const baseDate = new Date(date);
@@ -77,3 +79,23 @@ export const toTZMultiRange = (date, hours) => {
 
   return `{${ranges.join(', ')}}`;
 };
+
+// converts {start, end} ranges into an array of numbers
+export function flattenScheduleRanges(ranges) {
+  let flatSchedule = [];
+
+  ranges.forEach(range => {
+    const { start, end } = range;
+
+    // Convert 'start' and 'end' to numbers
+    const startTime = parseInt(start, 10);
+    const endTime = parseInt(end, 10);
+
+    // Add each hour from start to end to the flat schedule
+    for (let hour = startTime; hour < endTime; hour++) {
+      flatSchedule.push(hour);
+    }
+  });
+
+  return flatSchedule;
+}

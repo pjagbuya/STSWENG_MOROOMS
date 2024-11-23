@@ -1,11 +1,11 @@
 'use client';
 
-import DaySelector from './room_schedule_day_input';
-import { get_min_max_room_hours } from '@/app/room_schedule/action';
+import DaySelector from '../day_input';
+import { get_min_max_room_hours } from '@/app/rooms/[roomId]/room_schedule/action';
 import {
   fetchRoomSchedule,
   updateRoomSchedule,
-} from '@/app/room_schedule/action';
+} from '@/app/rooms/[roomId]/room_schedule/action';
 import HourSelector from '@/components/reservation/hour_selector';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -29,7 +29,7 @@ function logFormData(formData) {
   }
 }
 
-export default function RoomReservationForm({ roomId, userID }) {
+export default function RoomScheduleInput({ roomId, userID }) {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedHours, setSelectedHours] = useState(null);
@@ -114,14 +114,14 @@ export default function RoomReservationForm({ roomId, userID }) {
       toast({
         description: `Reservation for ${formData.get('reservation_name')} submitted successfully!`,
       });
-      //router.push('/rooms'); // Redirect to the /rooms page
+      router.push('/rooms'); // Redirect to the /rooms page
     } catch (error) {
       console.error('Error submitting roomSchedule:', error);
       toast({
         description: 'Failed to submit roomSchedule. Please try again.',
         variant: 'error',
       });
-      //router.push('/error');
+      router.push('/error');
     }
   };
 
@@ -211,7 +211,7 @@ export default function RoomReservationForm({ roomId, userID }) {
               </Button>
               <div className="space-x-2">
                 <Button type="submit" className="rounded-md px-4 py-2">
-                  Confirm Reservation
+                  Update Room Schedule
                 </Button>
                 <Button
                   type="button"

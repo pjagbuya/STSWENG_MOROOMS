@@ -5,7 +5,7 @@ import RoomDetails from '@/components/reservation/reservation_room_details';
 import RoomScheduleInput from '@/components/rooms/room_schedule_input';
 import Image from 'next/image';
 
-export default async function RoomReservationPage({ params: { roomId } }) {
+export default async function RoomSchedulePage({ params: { roomId } }) {
   const userInfo = await getCurrentUserInfo();
   const roomDetails = await get_room_details(roomId);
 
