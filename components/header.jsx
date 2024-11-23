@@ -1,5 +1,6 @@
 import HeaderNavLink from './header_navlink';
 import { Button } from './ui/button';
+import { getCurrentUserInfo } from '@/app/users/[user_id]/profile/action';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { createClient } from '@/utils/supabase/server';
 import { isAdminServerSide } from '@/utils/utils';
@@ -15,6 +16,8 @@ export default async function Header() {
 
   const isLoggedIn = user !== null;
   const isAdmin = await isAdminServerSide();
+
+  const userInfo = await getCurrentUserInfo();
 
   return (
     <header className="sticky top-0 flex items-center gap-8 bg-black px-4 py-2.5 drop-shadow-md">
@@ -43,7 +46,7 @@ export default async function Header() {
           <>
             <Link href="/profile">
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarImage src={userInfo.profileURL} />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </Link>
