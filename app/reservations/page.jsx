@@ -1,13 +1,18 @@
+import { getCurrentUserInfo } from '@/app/users/[user_id]/profile/action';
 import Header from '@/components/header';
 import ReservationTable from '@/components/reservation/reservation_table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { isAdminServerSide } from '@/utils/utils';
 import Image from 'next/image';
 import React from 'react';
 
-export default function ReservationCardList() {
+export default async function ReservationCardList() {
+  const userInfo = await getCurrentUserInfo();
+  const isAdmin = await isAdminServerSide();
+
   return (
     <>
       <Header />
@@ -23,10 +28,9 @@ export default function ReservationCardList() {
           <ScrollArea className="h-[calc(100vh-120px)]">
             <div className="space-y-4 rounded-lg bg-white p-8 shadow-md">
               <ReservationTable
-                userId={'bb794c03-711a-41dd-be9a-9b80b3d068fd'}
-                mode={'user'}
-              />{' '}
-              {/*TODO: add userID and if mode is admin or user*/}
+                userId={userInfo.userId}
+                mode={isAdmin ? 'admin' : 'user'}
+              />
             </div>
           </ScrollArea>
         </div>
