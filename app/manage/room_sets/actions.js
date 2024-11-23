@@ -77,7 +77,7 @@ export async function editRoomSet(id, name) {
 
 /**
  * Fetches all room sets.
- *
+ *N
  * @async
  * @function fetchRoomSets
  * @returns {Promise<Array<Object>>} Resolves to an array of room set objects or throws an error if the operation fails.
