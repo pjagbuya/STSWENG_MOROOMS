@@ -16,7 +16,7 @@ export default async function Header() {
   const isAdmin = false;
 
   return (
-    <header className="sticky top-0 flex items-center gap-8 bg-black px-4 py-2.5 drop-shadow-md">
+    <header className="sticky top-0 z-50 flex items-center gap-8 bg-black px-4 py-2.5 drop-shadow-md">
       <div className="flex items-center gap-3 text-white">
         <Image src="/logo.png" width={50} height={50} alt="MoRooms Logo" />
         <h1 className="select-none text-2xl font-bold">MoRooms</h1>
