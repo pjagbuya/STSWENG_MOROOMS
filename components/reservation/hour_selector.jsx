@@ -11,24 +11,48 @@ export default function HourSelector({
   maxHour,
   onSelectionChange = () => {},
   initialHourStates = {},
+  mode,
 }) {
   const [hourStates, setHourStates] = useState(initialHourStates);
   const [selectedHours, setSelectedHours] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(null);
   const [isSelecting, setIsSelecting] = useState(true);
+  const isRoomSchedule = mode === 'room_schedule';
 
-  const dayOfTheWeek = selectedDay.toLocaleDateString('en-US', {
-    weekday: 'short',
-  });
-  const fullDate = selectedDay.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  let dayOfTheWeek;
+  let fullDate;
+
+  if (isRoomSchedule) {
+    // sets a day display for room schedules
+    const dayStrings = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    const dayNumber =
+      typeof selectedDay === 'number'
+        ? selectedDay
+        : new Date(selectedDay).getDay(); // Ensure compatibility
+    dayOfTheWeek = dayStrings[dayNumber % 7] || 'Invalid Day'; // Prevent out-of-bound errors
+  } else {
+    // sets a date display for reservations
+    dayOfTheWeek = selectedDay.toLocaleDateString('en-US', {
+      weekday: 'short',
+    });
+    fullDate = selectedDay.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
 
   const toggleHourSelection = hour => {
-    if (hourStates[hour] === 'approved') return;
+    if (!isRoomSchedule && hourStates[hour] === 'approved') return;
 
     setSelectedHours(prev => {
       if (prev.includes(hour)) {
@@ -40,7 +64,7 @@ export default function HourSelector({
   };
 
   const handleMouseDown = hour => {
-    if (hourStates[hour] === 'approved') return;
+    if (!isRoomSchedule && hourStates[hour] === 'approved') return;
 
     setIsDragging(true);
     setDragStart(hour);
@@ -71,7 +95,7 @@ export default function HourSelector({
         let newSelection = [...prev];
         affectedHours.forEach(h => {
           // only allows for hours that arent labelled as "unavailable" to be selected
-          if (hourStates[h] !== 'unavailable') {
+          if (isRoomSchedule || hourStates[h] !== 'unavailable') {
             if (isSelecting && !newSelection.includes(h)) {
               newSelection.push(h);
             } else if (!isSelecting && newSelection.includes(h)) {
@@ -102,13 +126,23 @@ export default function HourSelector({
     const isSelected = selectedHours.includes(hour);
     const state = hourStates[hour] || 'available'; // assumes available unless stated
 
+    if (isRoomSchedule) {
+      if (state === 'approved') {
+        return isSelected ? 'bg-green-500' : 'bg-red-200';
+      } else {
+        return isSelected ? 'bg-red-500' : 'bg-green-200';
+      }
+    }
+
     switch (state) {
       case 'available':
         return isSelected ? 'bg-green-500' : 'bg-green-200';
       case 'pending':
         return isSelected ? 'bg-yellow-500' : 'bg-yellow-200';
       case 'approved': // BECAUSE if a reservation is labelled "approved" it is unavailable
-        return 'bg-red-500 cursor-not-allowed';
+        return isSelected && isRoomSchedule
+          ? 'bg-red-500'
+          : 'bg-red-500 cursor-not-allowed';
       default:
         return 'bg-slate-700';
     }
@@ -118,11 +152,17 @@ export default function HourSelector({
     <div
       className={`rounded-lg border p-4 text-muted-foreground shadow ${noSelectClass}`}
     >
-      <div className="mb-4 flex justify-between">
-        <p>GMT+08</p>
-        <p>
-          {dayOfTheWeek} | <span>{fullDate}</span>
-        </p>
+      <div className="mb-4">
+        {isRoomSchedule ? (
+          <p className="text-center">{dayOfTheWeek} Schedule</p>
+        ) : (
+          <div className="flex justify-between">
+            <p>GMT+08</p>
+            <p>
+              {dayOfTheWeek} | <span>{fullDate}</span>
+            </p>
+          </div>
+        )}
       </div>
 
       <div>

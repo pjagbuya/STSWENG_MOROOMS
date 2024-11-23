@@ -14,12 +14,12 @@ export default function RoomDetails({ roomDetails }) {
       </div>
 
       <div className="flex-1 bg-red-100">
-        <Image
+        <img
           className="overflow-none h-full w-full object-cover"
-          src="/test_image.png"
-          alt="Room Image"
-          width={600}
-          height={250}
+          src={roomDetails.room_image || '/test_image.png'}
+          alt={`${roomDetails.room_name} Image`}
+          width="600"
+          height="250"
         />
       </div>
     </div>

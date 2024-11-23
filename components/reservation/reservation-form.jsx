@@ -68,14 +68,6 @@ export default function RoomReservationForm({ roomId, userID }) {
     fetchHours();
   }, [roomId]);
 
-  const handleFormChange = (field, value) => {
-    setFormData(prevData => ({
-      ...prevData,
-      [field]: value,
-    }));
-    setErrors(prevErrors => ({ ...prevErrors, [field]: '' }));
-  };
-
   // Function for form validation
   const validateForm = formData => {
     const newErrors = {};
@@ -108,7 +100,6 @@ export default function RoomReservationForm({ roomId, userID }) {
     );
     formData.append('selectedHours', JSON.stringify(selectedHours));
 
-    logFormData(formData);
     if (validateForm(formData)) {
       try {
         await reserve(formData);
@@ -188,6 +179,7 @@ export default function RoomReservationForm({ roomId, userID }) {
                   initialHourStates={hourStates}
                   minHour={minHour}
                   maxHour={maxHour}
+                  mode={'reserve'}
                 />
                 {errors.selectedHours && (
                   <p className="text-red-500">{errors.selectedHours}</p>
