@@ -36,6 +36,7 @@ export function PopupForm({ formSchema, values, onSubmit }) {
                 <FormField
                   control={form.control}
                   name={val}
+                  key={val}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="font-bold">{val}</FormLabel>
