@@ -28,15 +28,21 @@ export default async function Header() {
 
       <nav className="flex-1">
         <HeaderNavLink link="/">Home</HeaderNavLink>
-        <HeaderNavLink link="/todo">Profile</HeaderNavLink>
+        <HeaderNavLink link={`/users/${userInfo.userId}/profile`}>
+          Profile
+        </HeaderNavLink>
         <HeaderNavLink link="/rooms">
           {isAdmin ? 'Reservations / Manage Rooms' : 'Reservations'}
         </HeaderNavLink>
 
         {isAdmin && (
           <>
-            <HeaderNavLink link="/todo">Manage Reservations</HeaderNavLink>
-            <HeaderNavLink link="/todo">Manage Users</HeaderNavLink>
+            <HeaderNavLink link="/manage/reservations">
+              Manage Reservations
+            </HeaderNavLink>
+            <HeaderNavLink link={`/users/${userInfo.userId}/home/admin/users`}>
+              Manage Users
+            </HeaderNavLink>
           </>
         )}
       </nav>
@@ -44,7 +50,7 @@ export default async function Header() {
       <div className="flex gap-3">
         {isLoggedIn ? (
           <>
-            <Link href="/profile">
+            <Link href={`/users/${userInfo.userId}/profile`}>
               <Avatar>
                 <AvatarImage src={userInfo.profileURL} />
                 <AvatarFallback>CN</AvatarFallback>

@@ -4,12 +4,12 @@ import GradientBox from '@/components/gradient-box';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/server';
-import { IsAdminServerSide } from '@/utils/utils';
+import { isAdminServerSide } from '@/utils/utils';
 import { ExternalLink, MailOpen, Mails, MapPin, Phone } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function ProfilePage() {
-  const isAdmin = await IsAdminServerSide();
+  const isAdmin = await isAdminServerSide();
   const supabase = createClient();
   const {
     data: { user },

@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import React from 'react';
 
-export default function ReservationCardList() {
+export default function ReservationCardList({ params: { user_id } }) {
   return (
     <>
       <Header />
@@ -22,10 +22,7 @@ export default function ReservationCardList() {
           <h1 className="mb-5 text-2xl font-bold">Reservation Management</h1>
           <ScrollArea className="h-[calc(100vh-120px)]">
             <div className="space-y-4 rounded-lg bg-white p-8 shadow-md">
-              <ReservationTable
-                userId={'bb794c03-711a-41dd-be9a-9b80b3d068fd'}
-                mode={'admin'}
-              />{' '}
+              <ReservationTable userId={user_id} mode={'admin'} />{' '}
               {/*TODO: add userID and if mode is admin or user*/}
             </div>
           </ScrollArea>
