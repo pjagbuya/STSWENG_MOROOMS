@@ -11,18 +11,18 @@ import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-export async function updateRoomSchedule(formData) {
+export async function updatePersonalSchedule(formData) {
   const supabase = createClient();
+  const userId = formData.get('user_id');
   const selectedDay = formData.get('selectedDay');
   const selectedHours = JSON.parse(formData.get('selectedHours'));
-  const roomId = formData.get('room_id');
 
   console.log('form data in room_schedule: ', formData);
 
   try {
     // Step 1: Fetch the current schedule from the database for the specified day and room
-    const { data, error } = await supabase.rpc('get_room_schedule_by_day', {
-      p_room_id: roomId,
+    const { data, error } = await supabase.rpc('get_personal_schedule_by_day', {
+      p_user_id: userId,
       p_day_number: selectedDay,
     });
 
@@ -30,6 +30,8 @@ export async function updateRoomSchedule(formData) {
       console.error('Error fetching current schedule:', error);
       return;
     }
+
+    console.log('personal schedule data: ', data);
 
     let updatedSchedule;
 
@@ -130,9 +132,9 @@ export async function updateRoomSchedule(formData) {
 
     // Send the data to the database to update the schedule
     const { data: updateData, error: updateError } = await supabase.rpc(
-      'update_room_schedule_by_day',
+      'update_personal_schedule_by_day',
       {
-        p_room_id: roomId,
+        p_user_id: userId,
         p_day_number: selectedDay,
         p_new_schedule_time: updatedScheduleTSMultiRange,
       },
@@ -182,16 +184,16 @@ export async function get_room_details(room_id) {
   return data[0];
 }
 
-export async function fetchRoomSchedule(roomId, dayNumber) {
+export async function fetchPersonalSchedule(userId, dayNumber) {
   const supabase = createClient();
 
-  const { data, error } = await supabase.rpc('get_room_schedule_by_day', {
-    p_room_id: roomId,
+  const { data, error } = await supabase.rpc('get_personal_schedule_by_day', {
+    p_user_id: userId,
     p_day_number: dayNumber,
   });
 
   if (error) {
-    console.error('Error fetching room schedule:', error);
+    console.error('Error fetching personal schedule:', error);
     throw error;
   }
 

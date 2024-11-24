@@ -1,11 +1,10 @@
 'use client';
 
-import DaySelector from '../day_input';
-import { get_min_max_room_hours } from '@/app/rooms/[roomId]/room_schedule/action';
+import DaySelector from './day_input';
 import {
-  fetchRoomSchedule,
-  updateRoomSchedule,
-} from '@/app/rooms/[roomId]/room_schedule/action';
+  fetchPersonalSchedule,
+  updatePersonalSchedule,
+} from '@/app/personal_schedule/action';
 import HourSelector from '@/components/reservation/hour_selector';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -29,7 +28,7 @@ function logFormData(formData) {
   }
 }
 
-export default function RoomScheduleInput({ roomId, userID }) {
+export default function PersonalScheduleForm({ userID }) {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedHours, setSelectedHours] = useState(null);
@@ -41,26 +40,17 @@ export default function RoomScheduleInput({ roomId, userID }) {
   const { toast } = useToast();
 
   const [minHour, setMinHour] = useState(0);
-  const [maxHour, setMaxHour] = useState(0);
-
-  useEffect(() => {
-    async function fetchHours() {
-      const time = await get_min_max_room_hours(roomId);
-      setMinHour(time.start);
-      setMaxHour(time.end);
-      setIsLoading(false);
-    }
-    fetchHours();
-  }, [roomId]);
+  const [maxHour, setMaxHour] = useState(23);
 
   useEffect(() => {
     async function updateHourStates() {
       try {
         setIsLoading(true);
-        setHourStates({}); // reset hour states if any during new fetch
+        setHourStates({}); // Reset hour states if any during new fetch
 
         // Fetch the unavailable time ranges for the selected room and day
-        const tzMultirange = await fetchRoomSchedule(roomId, selectedDay);
+        const tzMultirange = await fetchPersonalSchedule(userID, selectedDay);
+        console.log('tzMultirange: ', tzMultirange);
 
         let newHourStates = {};
         if (!tzMultirange || tzMultirange.length === 0) {
@@ -103,7 +93,7 @@ export default function RoomScheduleInput({ roomId, userID }) {
     if (selectedDay !== null && minHour !== null && maxHour !== null) {
       updateHourStates();
     }
-  }, [roomId, selectedDay, minHour, maxHour]);
+  }, [userID, selectedDay, minHour, maxHour]);
 
   const handleDaySelect = day => {
     setSelectedDay(day); // Update the selected day state
@@ -114,21 +104,20 @@ export default function RoomScheduleInput({ roomId, userID }) {
     e.preventDefault();
     const formData = new FormData(e.target);
     formData.append('user_id', userID);
-    formData.append('room_id', roomId);
     formData.append('selectedDay', selectedDay);
     formData.append('selectedHours', JSON.stringify(selectedHours));
 
     logFormData(formData);
     try {
-      await updateRoomSchedule(formData);
+      await updatePersonalSchedule(formData);
       toast({
-        description: `Reservation for ${formData.get('reservation_name')} submitted successfully!`,
+        description: `Personal Schedule for ${formData.get('user_id')} submitted successfully!`,
       });
-      router.push('/rooms'); // Redirect to the /rooms page
+      router.push('/'); // Redirect to the home page
     } catch (error) {
-      console.error('Error submitting roomSchedule:', error);
+      console.error('Error submitting PersonalSchedule:', error);
       toast({
-        description: 'Failed to submit roomSchedule. Please try again.',
+        description: 'Failed to submit PersonalSchedule. Please try again.',
         variant: 'error',
       });
       router.push('/error');
@@ -182,7 +171,7 @@ export default function RoomScheduleInput({ roomId, userID }) {
             <div className="flex justify-between">
               <div className="space-x-2">
                 <Button type="submit" className="rounded-md px-4 py-2">
-                  Update Room Schedule
+                  Update Personal Schedule
                 </Button>
                 <Button
                   type="button"
