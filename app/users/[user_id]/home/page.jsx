@@ -1,4 +1,5 @@
 import { reservationColumns, roomColumns } from './columns';
+import Header from '@/components/header';
 import RoomList from '@/components/room-list';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { DataTable } from '@/components/util/data_table';
@@ -186,25 +187,27 @@ export default async function DemoPage() {
   const reservationData = await getReservationData();
 
   return (
-    <div className="flex h-screen justify-between gap-8 px-12">
-      <div className="flex h-full w-full flex-col gap-2">
-        <h1 className="text-3xl font-bold">Recommended Rooms</h1>
-        <h3 className="text-base font-light">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-          laoreet, metus nec.
-        </h3>
-        <ScrollArea className="h-[80vh] w-full rounded-md border p-4">
-          <RoomList roomsData={roomData} />
-        </ScrollArea>
-      </div>
+    <div>
+      <div className="flex h-screen justify-between gap-8 px-12">
+        <div className="flex h-full w-full flex-col gap-2">
+          <h1 className="text-3xl font-bold">Recommended Rooms</h1>
+          <h3 className="text-base font-light">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+            laoreet, metus nec.
+          </h3>
+          <ScrollArea className="h-[80vh] w-full rounded-md border p-4">
+            <RoomList roomsData={roomData} />
+          </ScrollArea>
+        </div>
 
-      <div className="flex w-full flex-col gap-2">
-        <h1 className="text-3xl font-bold">Reservation Rooms</h1>
-        <h3 className="text-base font-light">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-          laoreet, metus nec.
-        </h3>
-        <DataTable columns={reservationColumns} data={reservationData} />
+        <div className="flex w-full flex-col gap-2">
+          <h1 className="text-3xl font-bold">Reservation Rooms</h1>
+          <h3 className="text-base font-light">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+            laoreet, metus nec.
+          </h3>
+          <DataTable columns={reservationColumns} data={reservationData} />
+        </div>
       </div>
     </div>
   );

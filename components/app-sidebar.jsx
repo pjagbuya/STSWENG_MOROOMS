@@ -17,7 +17,7 @@ function LinkAccess(userRole, item, userId) {
     return (
       <SidebarMenuItem key={item.title}>
         <SidebarMenuButton asChild>
-          <Link href={`users/${userId}${item.url}`}>
+          <Link href={`/users/${userId}/${item.url}`}>
             <item.icon />
             <span>{item.title}</span>
           </Link>
@@ -29,6 +29,12 @@ function LinkAccess(userRole, item, userId) {
 
 // Menu items.
 const items = [
+  {
+    title: 'Home',
+    url: '/home',
+    icon: Home,
+    access: 'All',
+  },
   {
     title: 'Home',
     url: '/home',
