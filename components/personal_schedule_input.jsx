@@ -4,7 +4,7 @@ import DaySelector from './day_input';
 import {
   fetchPersonalSchedule,
   updatePersonalSchedule,
-} from '@/app/personal_schedule/action';
+} from '@/app/users/[user_id]/profile/personal_schedule/action';
 import HourSelector from '@/components/reservation/hour_selector';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -113,7 +113,7 @@ export default function PersonalScheduleForm({ userID }) {
       toast({
         description: `Personal Schedule for ${formData.get('user_id')} submitted successfully!`,
       });
-      router.push('/'); // Redirect to the home page
+      router.push(`/users/${userID}/profile`); // Redirect to the home page
     } catch (error) {
       console.error('Error submitting PersonalSchedule:', error);
       toast({

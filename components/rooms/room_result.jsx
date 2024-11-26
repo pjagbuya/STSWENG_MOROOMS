@@ -4,6 +4,7 @@ import DeleteRoomButton from './delete_room_button';
 import EditRoomButton from './edit_room_button';
 import { RoomStatus } from './room_status';
 import { deleteRoomAction } from '@/app/rooms/actions';
+import { Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -49,6 +50,12 @@ export function RoomResult({ isAdmin, room, roomSets, roomTypes }) {
             // onEdit={formAction}
             onOpenChange={setOpenEditDialog}
           />
+          <Link
+            className="shadcn-button rounded-full p-2 shadow-md hover:bg-gray-800 hover:bg-opacity-80"
+            href={`/rooms/${room.id}/room_schedule`}
+          >
+            <Calendar className="h-5 w-5 text-gray-300" />
+          </Link>
           <DeleteRoomButton
             open={openDeleteDialog}
             onCancel={handleDeleteCancel}

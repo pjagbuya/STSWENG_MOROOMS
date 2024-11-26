@@ -106,14 +106,14 @@ export default function RoomReservationForm({ roomId, userID }) {
         toast({
           description: `Reservation for ${formData.get('reservation_name')} submitted successfully!`,
         });
-        router.push('/rooms'); // Redirect to the /rooms page
+        //router.push('/rooms'); // Redirect to the /rooms page
       } catch (error) {
         console.error('Error submitting reservation:', error);
         toast({
           description: 'Failed to submit reservation. Please try again.',
           variant: 'error',
         });
-        router.push('/error');
+        //router.push('/error');
       }
     } else {
       console.log('Errors: ', errors);

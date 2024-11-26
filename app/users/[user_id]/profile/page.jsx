@@ -119,6 +119,13 @@ function AdminHomePageLower() {
           body={'Click here to manage reservations.'}
         />
       </Link>
+      <Link className="h-full" href={'./profile/personal_schedule'}>
+        <GradientBox
+          gradient={gradientOne}
+          title={'Adjust Personal Schedule'}
+          body={'Click here to manage personal schedule.'}
+        />
+      </Link>
       <Link className="h-full" href={'./home/admin/users'}>
         <GradientBox
           gradient={gradientThree}

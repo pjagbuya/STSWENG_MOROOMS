@@ -13,9 +13,10 @@ import { redirect } from 'next/navigation';
 export async function reserve(formData) {
   const supabase = createClient();
 
-  console.log('form data in reserve: ', formData); // BUG: FORM DATA DATE RECEIVED IS A DAY OFF??????????
+  console.log('form data in reserve: ', formData); // BUG: FORM DATA DATE RECEIVED IS A DAY BEHIND?????????? (click nov 23 on calendar, receive nov 22)
 
   const selectedDate = new Date(formData.get('selectedDate'));
+  console.log('selected date: ', selectedDate);
   const selectedHours = JSON.parse(formData.get('selectedHours')); // Parse the hours from JSON string
 
   // function to convert the hour data & date data into the proper tzmultirange format
@@ -52,6 +53,8 @@ export async function reserve(formData) {
     endorsementLetterUrl = publicUrl;
   }
 
+  const currentDate = new Date().toISOString();
+
   const { error } = await supabase.rpc('create_reservation', {
     p_reservation_time: formattedDate, // TSMULTIRANGE type (range of time stamps)
     p_reservation_name: formData.get('reservation_name'), // VARCHAR
@@ -61,6 +64,7 @@ export async function reserve(formData) {
     p_reservation_user_id: formData.get('user_id'), // UUID
     p_room_id: formData.get('room_id'), // UUID
     p_reservation_letter: endorsementLetterUrl, // Add the file URL to the reservation
+    p_reservation_request_date: currentDate, // Pass current date and time
   });
 
   if (error) {
@@ -142,6 +146,51 @@ export async function get_labelled_room_hours(room_id, reservation_date) {
       }
     });
   });
+
+  // Determine the day number from the reservation date
+  const dayNumber = (reservation_date.getDay() + 6) % 7;
+  // NOTE: current implementation in the db for room schedules is monday = 0, sunday = 6
+  // hence the weird preprocessing
+
+  // Fetch room schedule by day
+  const { data: scheduleData, error: scheduleError } = await supabase.rpc(
+    'get_room_schedule_by_day',
+    {
+      p_room_id: room_id,
+      p_day_number: dayNumber,
+    },
+  );
+
+  if (scheduleError) {
+    console.error('Error fetching room schedule:', scheduleError);
+    throw scheduleError;
+  }
+
+  console.log('room schedule: ', scheduleData);
+
+  if (scheduleData) {
+    // Parse the schedule ranges and map them to "approved" statuses
+    const scheduleRanges = parseTZDateRanges(scheduleData);
+
+    const numberRanges = scheduleRanges.map(range =>
+      convertRangeToNumbers(range),
+    );
+    numberRanges.forEach(range => {
+      let startHour = parseInt(range.start, 10);
+      let endHour = parseInt(range.end, 10);
+
+      if (endHour === 0) {
+        endHour = 24; // Adjust for 12 AM being the next day
+      }
+
+      for (let i = startHour; i < endHour; i++) {
+        // Only set the hour to 'approved' if it hasn't been labeled already
+        if (!hourStates[i]) {
+          hourStates[i] = 'approved';
+        }
+      }
+    });
+  }
 
   return hourStates;
 }

@@ -75,7 +75,17 @@ export default function ReservationTable({ userId, mode }) {
     const loadReservations = async () => {
       setLoading(true);
       const data = await fetchReservationsWithRoomNames(userId);
-      setReservations(data);
+
+      // Filter out reservations with dates that have already passed
+      const filteredData = data.filter(reservation => {
+        const ranges = reservation.reservationTime
+          ? parseTZDateRanges(reservation.reservationTime)
+          : [];
+        // Check if any end date in the ranges is in the future
+        return ranges.some(({ end }) => new Date(end) >= new Date());
+      });
+
+      setReservations(filteredData);
       setLoading(false);
     };
 
@@ -145,14 +155,12 @@ export default function ReservationTable({ userId, mode }) {
                     />
                   </TableCell>
                   <TableCell>
-                    {parseTZDateRanges(reservation.reservationTime).map(
-                      ({ start, end }, i) => (
-                        <div key={i} className="text-sm">
-                          {new Date(start).toLocaleString()} -{' '}
-                          {new Date(end).toLocaleString()}
-                        </div>
-                      ),
-                    )}
+                    {new Date(
+                      reservation.reservation_request_date,
+                    ).toLocaleString('en-US', {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                    })}
                   </TableCell>
                   <TableCell>{reservation.roomName}</TableCell>
                   <TableCell>{reservation.reservationCount}</TableCell>
