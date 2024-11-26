@@ -1,3 +1,4 @@
+import { Combobox } from './role-combobox';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -56,6 +57,13 @@ export function AddPopupForm({ formSchema, onSubmit, defaultValues }) {
                       </label>
                     ) : value?.description?.toLowerCase() === 'password' ? (
                       <Input placeholder="Type" type="password" {...field} />
+                    ) : value?.description?.toLowerCase() === 'dropdown' ? (
+                      <Combobox
+                        className="w-full"
+                        data={['user', 'admin']}
+                        currentValue={'admin'}
+                        // onSelect={}
+                      />
                     ) : (
                       <Input placeholder="Type" {...field} />
                     )}
