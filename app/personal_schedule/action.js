@@ -263,6 +263,33 @@ export async function get_user_personal_schedules(userID) {
   return schedulesWithRoomNames;
 }
 
+export async function edit_personal_schedule(
+  id,
+  name,
+  room_id,
+  day,
+  start_time,
+  end_time,
+) {
+  const supabase = createClient();
+
+  const { error } = await supabase.rpc('edit_personal_schedule', {
+    p_schedule_id: id,
+    p_new_name: name,
+    p_new_room_id: room_id,
+    p_new_day: day,
+    p_new_start_time: start_time,
+    p_new_end_time: end_time,
+  });
+
+  if (error) {
+    console.error('Error editing room type:', error);
+    return error;
+  }
+
+  revalidatePath('/manage/room_types');
+}
+
 export async function get_all_rooms() {
   const supabase = createClient();
   const { data, error } = await supabase.rpc('get_all_rooms');

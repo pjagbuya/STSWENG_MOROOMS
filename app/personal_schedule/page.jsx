@@ -12,8 +12,6 @@ export default async function ManagePersonalSchedulePage() {
   const personal_schedule_list = await get_user_personal_schedules(userID);
   const rooms_list = await get_all_rooms();
 
-  console.log('personal schedule list: ', personal_schedule_list);
-
   return (
     <>
       <Header />
@@ -27,7 +25,10 @@ export default async function ManagePersonalSchedulePage() {
           <AddPersonalScheduleButton rooms={rooms_list} userID={userID} />
         </div>
 
-        <PersonalScheduleTable data={personal_schedule_list} />
+        <PersonalScheduleTable
+          data={personal_schedule_list}
+          rooms={rooms_list}
+        />
       </main>
     </>
   );

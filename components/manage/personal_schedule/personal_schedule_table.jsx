@@ -1,8 +1,9 @@
 'use client';
 
-import RoomTypeDeletePopup from '../room_types/room_type_delete_popup';
-import RoomTypeEditPopup from '../room_types/room_type_edit_popup';
+import PersonalScheduleDeletePopup from './personal_schedule_delete_popup';
+import PersonalScheduleEditPopup from './personal_schedule_edit_popup';
 import { deleteRoomType, editRoomType } from '@/app/manage/room_types/actions';
+import { edit_personal_schedule } from '@/app/personal_schedule/action';
 import { addActionColumn } from '@/components/util/action_dropdown';
 import { DataTable } from '@/components/util/data_table';
 import { SortableHeader } from '@/components/util/sortable_header';
@@ -40,7 +41,7 @@ const COLUMNS = [
   },
 ];
 
-export default function PersonalScheduleTable({ data }) {
+export default function PersonalScheduleTable({ data, rooms }) {
   const [row, setRow] = useState(null);
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -68,10 +69,11 @@ export default function PersonalScheduleTable({ data }) {
   }
 
   async function handleEditContinue(row, form, values) {
-    console.log(values);
+    console.log('stuff to edit: ', values);
+    console.log('row data: ', row);
 
-    const err = await editRoomType(
-      row.original.id,
+    const err = await edit_personal_schedule(
+      row.original.personal_schedule_id,
       values.name,
       values.room_id,
       values.day,
@@ -92,7 +94,7 @@ export default function PersonalScheduleTable({ data }) {
     <>
       <DataTable columns={finalColumns} data={data} />
 
-      <RoomTypeDeletePopup
+      <PersonalScheduleDeletePopup
         open={openDeleteDialog}
         onCancel={() => {
           setRow(null);
@@ -108,7 +110,7 @@ export default function PersonalScheduleTable({ data }) {
         }}
       />
 
-      <RoomTypeEditPopup
+      <PersonalScheduleEditPopup
         row={row}
         open={openEditDialog}
         onEdit={handleEditContinue}
@@ -119,6 +121,7 @@ export default function PersonalScheduleTable({ data }) {
             setRow(null);
           }
         }}
+        rooms={rooms}
       />
     </>
   );

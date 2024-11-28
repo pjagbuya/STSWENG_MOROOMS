@@ -6,17 +6,24 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-export default function RoomTypeEditPopup({ row, open, onEdit, onOpenChange }) {
+export default function PersonalScheduleEditPopup({
+  row,
+  open,
+  onEdit,
+  onOpenChange,
+  rooms,
+}) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Room Type</DialogTitle>
+          <DialogTitle>Edit Personal Schedule</DialogTitle>
         </DialogHeader>
 
         <PersonalScheduleForm
           values={row?.original}
           onSubmit={(form, values) => onEdit(row, form, values)}
+          rooms={rooms}
         />
       </DialogContent>
     </Dialog>
