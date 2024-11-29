@@ -229,7 +229,6 @@ export async function create_personal_schedule(
   }
 
   revalidatePath('/personal_schedule');
-  // revalidatePath('/manage/rooms');
   // TODO: CHANGE LATER ON
 }
 
@@ -287,7 +286,24 @@ export async function edit_personal_schedule(
     return error;
   }
 
-  revalidatePath('/manage/room_types');
+  revalidatePath('/personal_schedule');
+  // TODO: CHANGE LATER ON
+}
+
+export async function delete_personal_Schedule(id) {
+  const supabase = createClient();
+
+  const { error } = await supabase.rpc('delete_personal_schedule', {
+    p_personal_schedule_id: id,
+  });
+
+  if (error) {
+    console.error('Error deleting personal Schedule type:', error);
+    return error;
+  }
+
+  revalidatePath('/personal_schedule');
+  // TODO: CHANGE LATER ON
 }
 
 export async function get_all_rooms() {

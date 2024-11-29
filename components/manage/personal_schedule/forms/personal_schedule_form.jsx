@@ -1,4 +1,4 @@
-import { FORM_SCHEMA } from '@/app/personal_schedule/form_schema';
+import { FORM_SCHEMA } from '@/app/users/[user_id]/profile/personal_schedule/form_schema';
 import { Button } from '@/components/ui/button';
 import {
   Form,

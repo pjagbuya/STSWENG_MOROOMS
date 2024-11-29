@@ -2,8 +2,10 @@
 
 import PersonalScheduleDeletePopup from './personal_schedule_delete_popup';
 import PersonalScheduleEditPopup from './personal_schedule_edit_popup';
-import { deleteRoomType, editRoomType } from '@/app/manage/room_types/actions';
-import { edit_personal_schedule } from '@/app/personal_schedule/action';
+import {
+  delete_personal_Schedule,
+  edit_personal_schedule,
+} from '@/app/users/[user_id]/profile/personal_schedule/action';
 import { addActionColumn } from '@/components/util/action_dropdown';
 import { DataTable } from '@/components/util/data_table';
 import { SortableHeader } from '@/components/util/sortable_header';
@@ -19,11 +21,15 @@ const COLUMNS = [
   },
   {
     accessorKey: 'room_name',
-    header: 'Room Name',
+    header: ({ column }) => (
+      <SortableHeader column={column}>Room Name</SortableHeader>
+    ),
   },
   {
     accessorKey: 'day',
-    header: 'Day',
+    header: ({ column }) => (
+      <SortableHeader column={column}>Day</SortableHeader>
+    ),
   },
   {
     accessorKey: 'start_time',
@@ -59,7 +65,7 @@ export default function PersonalScheduleTable({ data, rooms }) {
   }
 
   async function handleDeleteContinue() {
-    await deleteRoomType(row.original.id);
+    await delete_personal_Schedule(row.original.personal_schedule_id);
     setRow(null);
   }
 

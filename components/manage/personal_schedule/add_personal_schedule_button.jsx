@@ -1,7 +1,7 @@
 'use client';
 
 import PersonalScheduleForm from './forms/personal_schedule_form';
-import { create_personal_schedule } from '@/app/personal_schedule/action';
+import { create_personal_schedule } from '@/app/users/[user_id]/profile/personal_schedule/action';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

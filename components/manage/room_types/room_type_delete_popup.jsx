@@ -21,8 +21,8 @@ export default function RoomTypeDeletePopup({
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
           <AlertDialogDescription>
-            Deleting this room type will also delete all associated rooms of the
-            type to delete.
+            Deleting this room type will permanently remove this schedule from
+            your list.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
