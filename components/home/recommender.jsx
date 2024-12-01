@@ -9,9 +9,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { get_all_details } from '@/lib/get_all_details';
 import { get24HourTime, getDateString } from '@/utils/time';
 
-export default async function Recommender() {
+export default async function Recommender({ userID }) {
   const roomSets = await fetchRoomSets();
   const roomTypes = await fetchRoomTypes();
 

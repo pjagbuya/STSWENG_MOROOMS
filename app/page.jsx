@@ -1,10 +1,16 @@
+import { getCurrentUserInfo } from '@/app/users/[user_id]/profile/action';
 import Header from '@/components/header';
 import Recommender from '@/components/home/recommender';
 import ReservationTable from '@/components/reservation/reservation_table';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { get_all_details } from '@/lib/get_all_details';
 import Image from 'next/image';
 
-export default function Home() {
+export default async function Home() {
+  const userInfo = await getCurrentUserInfo();
+  const details = await get_all_details(userInfo.userId);
+  console.log('frotnend details:', details);
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header className="relative z-20" />
@@ -41,7 +47,7 @@ export default function Home() {
           {/* Content */}
           <div className="w-full bg-white p-8 shadow-md">
             <h2 className="mb-5 text-4xl font-bold">Recommended Rooms</h2>
-            <Recommender />
+            <Recommender userID={userInfo.userId} />
           </div>
           <div className="mt-8">
             <h2 className="p-8 text-4xl font-bold text-white">
@@ -50,10 +56,7 @@ export default function Home() {
             <div className="container mx-auto space-y-8 px-4 py-8">
               <div className="rounded-lg bg-white p-8 shadow-md">
                 <ScrollArea className="h-[calc(100vh-300px)]">
-                  <ReservationTable
-                    userId={'bb794c03-711a-41dd-be9a-9b80b3d068fd'}
-                    mode={'user'}
-                  />
+                  <ReservationTable userId={userInfo.userId} mode={'user'} />
                   {/* TODO: add userID and if mode is admin or user */}
                 </ScrollArea>
               </div>
