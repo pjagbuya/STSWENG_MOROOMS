@@ -208,7 +208,10 @@ export default function HourSelector({
       </div>
       <div>
         <Separator className="my-4" />
-        <i>Click and Drag to select a time</i>
+        <i>Click and Drag to select a time</i> <br />
+        <i>
+          Each interval selected is the labelled hour until :59 of that hour
+        </i>
       </div>
     </div>
   );

@@ -166,8 +166,6 @@ export async function get_labelled_room_hours(room_id, reservation_date) {
     throw scheduleError;
   }
 
-  console.log('room schedule: ', scheduleData);
-
   if (scheduleData) {
     // Parse the schedule ranges and map them to "approved" statuses
     const scheduleRanges = parseTZDateRanges(scheduleData);

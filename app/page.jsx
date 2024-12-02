@@ -8,8 +8,6 @@ import Image from 'next/image';
 
 export default async function Home() {
   const userInfo = await getCurrentUserInfo();
-  const details = await get_all_details(userInfo.userId);
-  console.log('frotnend details:', details);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -46,7 +44,14 @@ export default async function Home() {
           </div>
           {/* Content */}
           <div className="w-full bg-white p-8 shadow-md">
-            <h2 className="mb-5 text-4xl font-bold">Recommended Rooms</h2>
+            <div className="mb-5">
+              <h2 className="mb-1 text-4xl font-bold">
+                Recommended Reservations
+              </h2>
+              <i className="mb-1">
+                Based on your personal schedule and available reservation times
+              </i>
+            </div>
             <Recommender userID={userInfo.userId} />
           </div>
           <div className="mt-8">

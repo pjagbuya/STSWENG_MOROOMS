@@ -229,7 +229,6 @@ export async function create_personal_schedule(
   }
 
   revalidatePath('/personal_schedule');
-  // TODO: CHANGE LATER ON
 }
 
 export async function get_user_personal_schedules(userID) {
@@ -287,7 +286,6 @@ export async function edit_personal_schedule(
   }
 
   revalidatePath('/personal_schedule');
-  // TODO: CHANGE LATER ON
 }
 
 export async function delete_personal_Schedule(id) {
@@ -303,7 +301,6 @@ export async function delete_personal_Schedule(id) {
   }
 
   revalidatePath('/personal_schedule');
-  // TODO: CHANGE LATER ON
 }
 
 export async function get_all_rooms() {

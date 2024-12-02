@@ -3,7 +3,7 @@
 import {
   fetchReservationsWithRoomNames,
   updateReservationStatus,
-} from '@/app/reservations/action';
+} from '@/app/manage/reservations/action';
 import {
   Select,
   SelectContent,
@@ -21,6 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { parseTZDateRanges } from '@/utils/date_utils';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 
 // Helper function to determine what color the certain status should be
@@ -198,6 +199,11 @@ export default function ReservationTable({ userId, mode }) {
             <TableRow>
               <TableCell colSpan={7} className="text-center text-gray-500">
                 <h2 className="p-6 text-3xl font-bold">No Reservations Made</h2>
+                <Link href="/rooms">
+                  <button className="mt-4 rounded-lg bg-blue-500 px-6 py-2 font-semibold text-white transition-colors hover:bg-blue-600">
+                    Make a new reservation
+                  </button>
+                </Link>
               </TableCell>
             </TableRow>
           )}
