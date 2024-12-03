@@ -1,10 +1,10 @@
 import HeaderNavLink from './header_navlink';
+import SignOutButton from './signout_btn';
 import { Button } from './ui/button';
 import { getCurrentUserInfo } from '@/app/users/[user_id]/profile/action';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { createClient } from '@/utils/supabase/server';
 import { isAdminServerSide } from '@/utils/utils';
-import { Mail } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -56,6 +56,8 @@ export default async function Header() {
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </Link>
+
+            <SignOutButton />
           </>
         ) : (
           <>
