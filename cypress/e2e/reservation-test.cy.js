@@ -15,7 +15,6 @@ describe('Reservation / Manage Room tests', () => {
       cy.get('input[name="password"]').type(passwordValid);
       cy.wait(1000);
       cy.get('button[type="submit"]').click();
-      cy.url().should('include', '/');
       cy.wait(1000);
     });
 
@@ -23,6 +22,7 @@ describe('Reservation / Manage Room tests', () => {
   });
 
   it('Should display a grid with room cards', () => {
+    cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
     cy.contains('Reserve a Room').should('be.visible');
     //checks for grid
@@ -35,6 +35,7 @@ describe('Reservation / Manage Room tests', () => {
   });
 
   it('Can search a room', () => {
+    cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
     cy.contains('Reserve a Room').should('be.visible');
     cy.get('input').type(searchTerm).should('have.value', searchTerm);
@@ -49,6 +50,7 @@ describe('Reservation / Manage Room tests', () => {
   });
 
   it('Can reserve a room', () => {
+    cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
     cy.contains('Reserve a Room').should('be.visible');
 
