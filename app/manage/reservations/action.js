@@ -83,9 +83,6 @@ export const fetchReservationsWithRoomNames = async userId => {
 };
 
 export async function updateReservationStatus(reservationId, status) {
-  console.log('id: ', reservationId);
-  console.log('status: ', status);
-  // Call the PostgreSQL function you defined
   const { data, error } = await supabase.rpc('update_reservation_status', {
     p_reservation_id: reservationId,
     p_reservation_status: status,
@@ -93,6 +90,19 @@ export async function updateReservationStatus(reservationId, status) {
 
   if (error) {
     console.error('Error updating reservation status:', error);
+    return { error };
+  }
+
+  return { data };
+}
+
+export async function deleteReservation(reservationId) {
+  const { data, error } = await supabase.rpc('delete_reservation', {
+    p_reservation_id: reservationId,
+  });
+
+  if (error) {
+    console.error('Error deleting reservation:', error);
     return { error };
   }
 

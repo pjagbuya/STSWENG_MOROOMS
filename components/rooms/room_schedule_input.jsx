@@ -71,8 +71,10 @@ export default function RoomScheduleInput({ roomId, userID }) {
         } else {
           // Parse the raw TZ multirange data into start and end times
           const unavailableRanges = parseTZDateRanges(tzMultirange);
+          console.log('unavailableRanges: ', unavailableRanges);
           // Convert each range to numbers representing hours
           const hourRanges = unavailableRanges.map(convertRangeToNumbers);
+          console.log('hour ranges: ', hourRanges);
 
           // Initialize `hourStates` with 'available' for all hours
           for (let hour = minHour; hour <= maxHour; hour++) {
@@ -119,6 +121,21 @@ export default function RoomScheduleInput({ roomId, userID }) {
     formData.append('selectedHours', JSON.stringify(selectedHours));
 
     logFormData(formData);
+
+    // Form validation
+    const newErrors = {};
+    if (selectedDay === null || selectedDay === undefined) {
+      newErrors.selectedDay = 'Please select a day.';
+    }
+    if (!selectedHours || selectedHours.length === 0) {
+      newErrors.selectedHours = 'Please select at least one hour.';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors); // Display validation errors
+      return;
+    }
+
     try {
       await updateRoomSchedule(formData);
       toast({
@@ -133,6 +150,10 @@ export default function RoomScheduleInput({ roomId, userID }) {
       });
       router.push('/error');
     }
+  };
+
+  const handleCancel = () => {
+    router.back();
   };
 
   return (
@@ -157,8 +178,14 @@ export default function RoomScheduleInput({ roomId, userID }) {
                 </ul>
               </div>
               <DaySelector onDaySelect={handleDaySelect} />
+              {errors.selectedDay && (
+                <p className="text-red-500">{errors.selectedDay}</p>
+              )}
             </div>
             <div>
+              {errors.selectedHours && (
+                <p className="text-red-500">{errors.selectedHours}</p>
+              )}
               <Label>Select Hours to toggle availability</Label>
               {minHour !== null &&
               maxHour !== null &&
@@ -188,6 +215,7 @@ export default function RoomScheduleInput({ roomId, userID }) {
                   type="button"
                   variant="outline"
                   className="rounded-md px-4 py-2"
+                  onClick={handleCancel}
                 >
                   Cancel
                 </Button>

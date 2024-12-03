@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  deleteReservation,
   fetchReservationsWithRoomNames,
   updateReservationStatus,
 } from '@/app/manage/reservations/action';
@@ -71,6 +72,30 @@ export default function ReservationTable({ userId, mode }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const isAdmin = mode === 'admin';
+
+  const handleDeleteReservation = async reservationId => {
+    if (!confirm('Are you sure you want to delete this reservation?')) return;
+
+    try {
+      const { error } = await deleteReservation(reservationId);
+
+      if (error) {
+        console.error('Error deleting reservation:', error);
+        alert('Failed to delete reservation.');
+      } else {
+        // Remove the reservation from the state
+        setReservations(prevReservations =>
+          prevReservations.filter(
+            reservation => reservation.reservation_id !== reservationId,
+          ),
+        );
+        alert('Reservation deleted successfully.');
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      alert('An unexpected error occurred.');
+    }
+  };
 
   useEffect(() => {
     const loadReservations = async () => {
@@ -191,6 +216,16 @@ export default function ReservationTable({ userId, mode }) {
                     ) : (
                       'None'
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <button
+                      onClick={() =>
+                        handleDeleteReservation(reservation.reservation_id)
+                      }
+                      className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
                   </TableCell>
                 </TableRow>
               );

@@ -156,6 +156,10 @@ export default function RoomReservationForm({ roomId, userID }) {
     document.getElementById('reservationForm').reset();
   };
 
+  const handleCancel = () => {
+    router.back();
+  };
+
   return (
     <>
       <form id="reservationForm" onSubmit={handleFormSubmit}>
@@ -281,6 +285,7 @@ export default function RoomReservationForm({ roomId, userID }) {
                   type="button"
                   variant="outline"
                   className="rounded-md px-4 py-2"
+                  onClick={handleCancel}
                 >
                   Cancel
                 </Button>

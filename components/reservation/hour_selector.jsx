@@ -114,7 +114,9 @@ export default function HourSelector({
   useEffect(() => {
     // Initialize selectedHours with initialSelectedHours when the component mounts
     if (initialSelectedHours !== null) {
-      setSelectedHours(initialSelectedHours);
+      if (initialSelectedHours.length != 0) {
+        setSelectedHours(initialSelectedHours);
+      }
     }
   }, [initialSelectedHours]);
 
