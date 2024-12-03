@@ -24,6 +24,7 @@ describe('Reservation / Manage Room tests', () => {
   it('Should display a grid with room cards', () => {
     cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
+    cy.wait(1000);
     cy.contains('Reserve a Room').should('be.visible');
     //checks for grid
     cy.get('.grid').should('be.visible').and('have.css', 'display', 'grid');
@@ -37,6 +38,7 @@ describe('Reservation / Manage Room tests', () => {
   it('Can search a room', () => {
     cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
+    cy.wait(1000);
     cy.contains('Reserve a Room').should('be.visible');
     cy.get('input').type(searchTerm).should('have.value', searchTerm);
     cy.get('button[type="submit"]').click();
@@ -52,6 +54,7 @@ describe('Reservation / Manage Room tests', () => {
   it('Can reserve a room', () => {
     cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
+    cy.wait(1000);
     cy.contains('Reserve a Room').should('be.visible');
 
     cy.wait(1000);

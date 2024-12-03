@@ -1,4 +1,4 @@
-name: Pipeline
+name: Cypress
 
 on: [push, pull_request]
 
