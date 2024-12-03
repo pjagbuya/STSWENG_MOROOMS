@@ -27,7 +27,7 @@ describe('Login page tests', () => {
     cy.get('input[name="password"]').type(passwordInvalid);
     cy.get('button[type="submit"]').click();
 
-    //assert
+    //asserts
     cy.url().should('include', '/error');
   });
 });
