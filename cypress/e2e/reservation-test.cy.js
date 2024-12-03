@@ -1,8 +1,8 @@
 describe('Reservation / Manage Room tests', () => {
   const emailValid = 'test@gmail.com';
   const passwordValid = 'testuser';
-  const searchTerm = "Joaquin's Room";
-  const searchRoom = "Joaquin's Room Test";
+  const searchTerm = 'Function';
+  const searchRoom = 'Function Room A';
   const reservationName = 'This is a test event name';
   const purpose = 'This is a test purpose for which we will be using the room.';
   const count = 6;
@@ -81,7 +81,7 @@ describe('Reservation / Manage Room tests', () => {
 
   //   it('The reservation can be deleted', () => {
   //     cy.contains('a', 'Manage Reservations').click();
-  //     cy.contains("Joaquin's Room Test").should('be.visible');
-  //     cy.contains("Joaquin's Room Test").should('be.visible');
+  //     cy.contains(searchRoom).should('be.visible');
+  //     cy.contains(searchRoom).should('be.visible');
   //   });
 });
