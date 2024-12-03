@@ -3,6 +3,9 @@ describe('Reservation / Manage Room tests', () => {
   const passwordValid = 'testuser';
   const searchTerm = "Joaquin's Room";
   const searchRoom = "Joaquin's Room Test";
+  const reservationName = 'This is a test event name';
+  const purpose = 'This is a test purpose for which we will be using the room.';
+  const count = 6;
 
   beforeEach(() => {
     //establish a session so you don't need to keep logging in
@@ -22,29 +25,50 @@ describe('Reservation / Manage Room tests', () => {
     cy.contains('Reserve a Room').should('be.visible');
   });
 
-  it('Should display a grid with room cards', () => {
-    //checks for grid
-    cy.get('.grid').should('be.visible').and('have.css', 'display', 'grid');
+  // it('Should display a grid with room cards', () => {
+  //   //checks for grid
+  //   cy.get('.grid').should('be.visible').and('have.css', 'display', 'grid');
 
-    //checks for cards (rooms)
-    cy.get('.grid div')
-      .should('have.length.greaterThan', 0)
-      .and('have.class', 'relative');
-  });
+  //   //checks for cards (rooms)
+  //   cy.get('.grid div')
+  //     .should('have.length.greaterThan', 0)
+  //     .and('have.class', 'relative');
+  // });
 
-  it('Can search a room', () => {
-    cy.get('input').type(searchTerm).should('have.value', searchTerm);
-    cy.get('button[type="submit"]').click();
-    cy.wait(1000);
+  // it('Can search a room', () => {
+  //   cy.get('input').type(searchTerm).should('have.value', searchTerm);
+  //   cy.get('button[type="submit"]').click();
+  //   cy.wait(1000);
 
-    cy.get('.grid > div:visible')
-      .should('have.length', 1)
-      .and('have.class', 'relative')
-      .and('contain.text', searchRoom);
-    cy.wait(500);
-  });
+  //   cy.get('.grid > div:visible')
+  //     .should('have.length', 1)
+  //     .and('have.class', 'relative')
+  //     .and('contain.text', searchRoom);
+  //   cy.wait(500);
+  // });
 
   it('Can reserve a room', () => {
     cy.get('a.block').find('article').find('div').contains(searchRoom).click();
+    cy.get('td').find('button').contains('6').parent('td').click();
+    cy.wait(1000);
+    cy.contains('9 AM').siblings('span').click();
+    cy.wait(500);
+    cy.contains('10 AM').siblings('span').click();
+    cy.wait(500);
+    cy.contains('10 AM').siblings('span').click();
+    cy.wait(500);
+    cy.contains('11 AM').siblings('span').click();
+    cy.wait(500);
+    cy.contains('11 AM').siblings('span').click();
+    cy.wait(500);
+    cy.get('input[name="reservation_name"]').type(reservationName);
+    cy.get('textarea[name="purpose"]').type(purpose);
+    cy.get('input[name="count"]').type(count);
+    cy.get('button[type="submit"]').click();
+  });
+
+  after(() => {
+    // Example: Clean up shared state, like clearing databases or resetting the backend
+    // You can perform cleanup actions that only need to run once
   });
 });

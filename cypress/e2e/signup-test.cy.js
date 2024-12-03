@@ -22,8 +22,8 @@ describe('Signup page tests', () => {
     cy.get('input[name="proof"]').attachFile('testimage.png');
     cy.get('input[name="userFirstname"]').type(fnameNew);
     cy.get('input[name="userLastname"]').type(lnameNew);
-    // cy.get('button[type="submit"]').click();
-
-    // work on this when sign up is fixed
+    cy.get('button[type="submit"]').click();
+    cy.wait(1000);
+    cy.contains('Application pending').should('be.visible');
   });
 });
