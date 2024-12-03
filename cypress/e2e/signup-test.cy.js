@@ -1,4 +1,4 @@
-describe('Load login page', () => {
+describe('Signup page tests', () => {
   const emailNew = 'thisismyemail@gmail.com';
   const passwordNew = 'thisismypassword';
   const fnameNew = 'Firstname';
@@ -10,6 +10,7 @@ describe('Load login page', () => {
 
   it('Tests login link', () => {
     cy.contains('Login').click();
+
     //assert
     cy.url().should('include', '/login');
     cy.contains('Login').should('be.visible');
@@ -22,6 +23,7 @@ describe('Load login page', () => {
     cy.get('input[name="userFirstname"]').type(fnameNew);
     cy.get('input[name="userLastname"]').type(lnameNew);
     // cy.get('button[type="submit"]').click();
-    //assert
+
+    // work on this when sign up is fixed
   });
 });
