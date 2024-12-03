@@ -20,7 +20,7 @@ export default async function ProfilePage() {
   return (
     <div>
       <Header />
-      <div className="flex h-screen w-full flex-col justify-center gap-10 px-64 py-24">
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-10 px-64 py-24">
         <div className="flex h-[300px] w-full items-center justify-between py-6">
           <div className="flex w-full gap-5">
             <Avatar className="h-[211px] w-[211px]">
