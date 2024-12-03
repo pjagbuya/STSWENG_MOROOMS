@@ -24,8 +24,11 @@ jobs:
       - name: Start the app w/ credentials
         run: npm start &
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          # NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          # NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: https://rcfzezkhwvgtwpqcyhac.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZnplemtod3ZndHdwcWN5aGFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0NDQ3OTAsImV4cCI6MjA0NDAyMDc5MH0.6twoLk7Sct_QbG7uLhnwM_jhFAk907YCpEAlK5R6f04
+          NEXT_SERVICE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZnplemtod3ZndHdwcWN5aGFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODQ0NDc5MCwiZXhwIjoyMDQ0MDIwNzkwfQ.QjUng71fLp0a27aNvz-vP4yqXXmtTQfA61OMg4kU5iU
         continue-on-error: false
 
       - name: Wait for the app to respond
