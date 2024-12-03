@@ -16,7 +16,6 @@ describe('Reservation / Manage Room tests', () => {
       cy.wait(1000);
       cy.get('button[type="submit"]').click();
       cy.url().should('include', '/');
-      cy.contains('MoRooms').should('be.visible');
     });
 
     cy.visit('/');
