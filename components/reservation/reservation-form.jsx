@@ -31,9 +31,9 @@ import { useEffect, useState } from 'react';
 export default function RoomReservationForm({ roomId, userID }) {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedHours, setSelectedHours] = useState(null);
+  const [selectedHours, setSelectedHours] = useState(null); // handles hours that are selected by the user
   const [errors, setErrors] = useState({});
-  const [hourStates, setHourStates] = useState({});
+  const [hourStates, setHourStates] = useState({}); // handles hours based on the reservation information and toggles hour clickability
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -42,10 +42,6 @@ export default function RoomReservationForm({ roomId, userID }) {
   const date = searchParams.get('date');
   const startTime = searchParams.get('startTime');
   const endTime = searchParams.get('endTime');
-  console.log('date: ', date);
-  console.log('startTime: ', startTime);
-  console.log('endTime: ', endTime);
-  console.log('Selected hours: ', selectedHours);
 
   useEffect(() => {
     // Initialize selectedDate and selectedHours
@@ -70,11 +66,12 @@ export default function RoomReservationForm({ roomId, userID }) {
     async function fetchHourStates() {
       setIsLoading(true);
       try {
-        const sd = new Date(selectedDate);
-        sd.setHours(sd.getHours() + 24);
         // setSelectedDate(sd)
 
-        const data = await get_labelled_room_hours(roomId, sd || new Date());
+        const data = await get_labelled_room_hours(
+          roomId,
+          selectedDate || new Date(),
+        );
         setHourStates(data);
       } catch (error) {
         console.error('Error fetching hour states:', error);
@@ -159,8 +156,6 @@ export default function RoomReservationForm({ roomId, userID }) {
     document.getElementById('reservationForm').reset();
   };
 
-  console.log('selected date: ', selectedDate);
-
   return (
     <>
       <form id="reservationForm" onSubmit={handleFormSubmit}>
@@ -207,9 +202,13 @@ export default function RoomReservationForm({ roomId, userID }) {
             ) : (
               <div>
                 <Label>Select Hours</Label>
+                {/*onSelectionChange = handles hours clicked by user */}
+                {/*initialSelectedHours = handles hours inputted from autofill like from the reco system */}
+                {/*initialHourStates = handles hours based on reservation information and toggles hour clickability */}
                 <HourSelector
                   selectedDay={selectedDate || new Date()}
                   onSelectionChange={setSelectedHours}
+                  initialSelectedHours={selectedHours}
                   initialHourStates={hourStates}
                   minHour={minHour}
                   maxHour={maxHour}

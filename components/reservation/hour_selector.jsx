@@ -10,7 +10,8 @@ export default function HourSelector({
   minHour,
   maxHour,
   onSelectionChange = () => {},
-  initialHourStates = {},
+  initialSelectedHours = [],
+  initialHourStates = [],
   mode,
 }) {
   const [hourStates, setHourStates] = useState(initialHourStates);
@@ -51,6 +52,7 @@ export default function HourSelector({
     });
   }
 
+  // for handling hours selected by the user clicking and dragging
   const toggleHourSelection = hour => {
     if (!isRoomSchedule && hourStates[hour] === 'approved') return;
 
@@ -107,6 +109,14 @@ export default function HourSelector({
       });
     }
   };
+
+  // for handling hours selected by autofill
+  useEffect(() => {
+    // Initialize selectedHours with initialSelectedHours when the component mounts
+    if (initialSelectedHours !== null) {
+      setSelectedHours(initialSelectedHours);
+    }
+  }, [initialSelectedHours]);
 
   useEffect(() => {
     const handleGlobalMouseUp = () => {
