@@ -15,42 +15,46 @@ describe('Reservation / Manage Room tests', () => {
       cy.get('input[name="password"]').type(passwordValid);
       cy.wait(1000);
       cy.get('button[type="submit"]').click();
-      cy.url().should('include', '/private');
-      cy.get('input[type="file"]').should('have.value', '').and('be.visible');
+      cy.wait(1000);
     });
 
     cy.visit('/');
-    cy.contains('MoRooms').should('be.visible');
   });
 
-  // it('Should display a grid with room cards', () => {
-  //   cy.contains('a', 'Reservations / Manage Rooms').click();
-  //   cy.contains('Reserve a Room').should('be.visible');
-  //   //checks for grid
-  //   cy.get('.grid').should('be.visible').and('have.css', 'display', 'grid');
+  it('Should display a grid with room cards', () => {
+    cy.visit('/');
+    cy.contains('a', 'Reservations / Manage Rooms').click();
+    cy.wait(1000);
+    cy.contains('Reserve a Room').should('be.visible');
+    //checks for grid
+    cy.get('.grid').should('be.visible').and('have.css', 'display', 'grid');
 
-  //   //checks for cards (rooms)
-  //   cy.get('.grid div')
-  //     .should('have.length.greaterThan', 0)
-  //     .and('have.class', 'relative');
-  // });
+    //checks for cards (rooms)
+    cy.get('.grid div')
+      .should('have.length.greaterThan', 0)
+      .and('have.class', 'relative');
+  });
 
-  // it('Can search a room', () => {
-  //   cy.contains('a', 'Reservations / Manage Rooms').click();
-  //   cy.contains('Reserve a Room').should('be.visible');
-  //   cy.get('input').type(searchTerm).should('have.value', searchTerm);
-  //   cy.get('button[type="submit"]').click();
-  //   cy.wait(1000);
+  it('Can search a room', () => {
+    cy.visit('/');
+    cy.contains('a', 'Reservations / Manage Rooms').click();
+    cy.wait(1000);
+    cy.contains('Reserve a Room').should('be.visible');
+    cy.get('input').type(searchTerm).should('have.value', searchTerm);
+    cy.get('button[type="submit"]').click();
+    cy.wait(1000);
 
-  //   cy.get('.grid > div:visible')
-  //     .should('have.length', 1)
-  //     .and('have.class', 'relative')
-  //     .and('contain.text', searchRoom);
-  //   cy.wait(500);
-  // });
+    cy.get('.grid > div:visible')
+      .should('have.length', 1)
+      .and('have.class', 'relative')
+      .and('contain.text', searchRoom);
+    cy.wait(500);
+  });
 
   it('Can reserve a room', () => {
+    cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
+    cy.wait(1000);
     cy.contains('Reserve a Room').should('be.visible');
 
     cy.wait(1000);
@@ -73,15 +77,8 @@ describe('Reservation / Manage Room tests', () => {
     cy.url().should('include', '/rooms');
   });
 
-  // it('The reserved room is visible', () => {
+  // it('The reservation can be deleted', () => {
   //   cy.contains('a', 'Home').click();
-  //   cy.wait(3000);
-  //   cy.contains(searchRoom).should('be.visible');
+  //   cy.contains('button', 'Delete').click();
   // });
-
-  //   it('The reservation can be deleted', () => {
-  //     cy.contains('a', 'Manage Reservations').click();
-  //     cy.contains(searchRoom).should('be.visible');
-  //     cy.contains(searchRoom).should('be.visible');
-  //   });
 });

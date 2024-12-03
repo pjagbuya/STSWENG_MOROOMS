@@ -21,8 +21,8 @@ export default async function ProfilePage() {
     <div>
       <Header />
       <div className="flex h-screen w-full flex-col items-center justify-center gap-10 px-64 py-24">
-        <div className="flex h-[300px] w-full items-center justify-between py-6">
-          <div className="flex w-full gap-5">
+        <div className="flex h-[300px] w-full items-center justify-between gap-6 py-6">
+          <div className="flex w-full gap-5 rounded-3xl border-8 border-slate-400 bg-slate-200 p-6">
             <Avatar className="h-[211px] w-[211px]">
               <AvatarImage src={userInfo.profileURL} />
               <AvatarFallback>CN</AvatarFallback>
@@ -78,7 +78,7 @@ function UserHomePageLower() {
     'linear-gradient(to bottom, #74DB4E 0%, #4696A2 40%, #4E3ABA 100%)';
 
   return (
-    <div className="flex h-[350px] justify-between">
+    <div className="flex h-[350px] w-full justify-between gap-6">
       <div className="h-full">
         <ProfileCalender />
       </div>
@@ -109,7 +109,7 @@ function AdminHomePageLower() {
     'linear-gradient(to bottom, #F4B9FF 0%, #7146A2 40%, #4E3ABA 100%)';
 
   return (
-    <div className="flex h-[350px] justify-between">
+    <div className="flex h-[350px] justify-between gap-6">
       <Link className="h-full" href={'/rooms'}>
         <GradientBox
           gradient={gradientTwo}

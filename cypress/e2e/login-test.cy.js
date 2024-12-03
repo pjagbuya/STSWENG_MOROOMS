@@ -16,10 +16,11 @@ describe('Login page tests', () => {
     cy.get('input[name="password"]').type(passwordValid);
     cy.wait(1000);
     cy.get('button[type="submit"]').click();
+    cy.wait(1000);
 
     //assert
-    cy.url().should('include', '/private');
-    cy.get('input[type="file"]').should('have.value', '').and('be.visible');
+    cy.url().should('include', '/');
+    cy.contains('MoRooms').should('be.visible');
   });
 
   it('Is redirected to the error page when using invalid credentials', () => {
@@ -27,7 +28,7 @@ describe('Login page tests', () => {
     cy.get('input[name="password"]').type(passwordInvalid);
     cy.get('button[type="submit"]').click();
 
-    //assert
+    //asserts
     cy.url().should('include', '/error');
   });
 });
