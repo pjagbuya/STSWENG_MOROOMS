@@ -26,6 +26,12 @@ export function AddPopupForm({ formSchema, onSubmit, defaultValues }) {
     }
   }
 
+  function camelCaseToTitleCase(str) {
+    return str
+      .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space before capital letters
+      .replace(/^./, char => char.toUpperCase()); // Capitalize the first letter
+  }
+
   return (
     <Form {...form}>
       <form
@@ -40,7 +46,9 @@ export function AddPopupForm({ formSchema, onSubmit, defaultValues }) {
               key={key}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-bold">{key}</FormLabel>
+                  <FormLabel className="font-bold">
+                    {camelCaseToTitleCase(key)}
+                  </FormLabel>
                   <FormControl>
                     {value?.description?.toLowerCase() === 'image' ? (
                       <label className="relative block rounded-md border-2 border-dashed border-gray-300 p-1">
@@ -56,7 +64,11 @@ export function AddPopupForm({ formSchema, onSubmit, defaultValues }) {
                         </div>
                       </label>
                     ) : value?.description?.toLowerCase() === 'password' ? (
-                      <Input placeholder="Type" type="password" {...field} />
+                      <Input
+                        placeholder="Enter Password"
+                        type="password"
+                        {...field}
+                      />
                     ) : value?.description?.toLowerCase() === 'dropdown' ? (
                       <Combobox
                         className="w-full"
@@ -65,7 +77,10 @@ export function AddPopupForm({ formSchema, onSubmit, defaultValues }) {
                         // onSelect={}
                       />
                     ) : (
-                      <Input placeholder="Type" {...field} />
+                      <Input
+                        placeholder={'Enter ' + camelCaseToTitleCase(key)}
+                        {...field}
+                      />
                     )}
                   </FormControl>
                   <FormMessage />
