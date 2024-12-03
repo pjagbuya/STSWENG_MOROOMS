@@ -29,7 +29,10 @@ export const parseTZDateRanges = ranges => {
 export const convertRangeToNumbers = time => {
   return {
     start: new Date(time.start).getHours().toString(), // Extract and format start hour
-    end: new Date(time.end).getHours().toString(), // Extract and format end hour
+    end:
+      new Date(time.end).getHours() === 0
+        ? '24'
+        : new Date(time.end).getHours().toString(), // If end is 0, return 24
   };
 };
 
@@ -91,9 +94,22 @@ export function flattenScheduleRanges(ranges) {
     const startTime = parseInt(start, 10);
     const endTime = parseInt(end, 10);
 
-    // Add each hour from start to end to the flat schedule
-    for (let hour = startTime; hour < endTime; hour++) {
-      flatSchedule.push(hour);
+    if (endTime === 0) {
+      // Handle the wrap-around case: endTime is at midnight of the next day
+      for (let hour = startTime; hour < 24; hour++) {
+        flatSchedule.push(hour);
+      }
+      for (let hour = 0; hour < endTime; hour++) {
+        flatSchedule.push(hour);
+      }
+    } else if (endTime > startTime) {
+      // Normal case: within the same day
+      for (let hour = startTime; hour < endTime; hour++) {
+        flatSchedule.push(hour);
+      }
+    } else {
+      // Handle invalid ranges (if endTime < startTime and not 0)
+      console.warn(`Invalid time range: start=${start}, end=${end}`);
     }
   });
 

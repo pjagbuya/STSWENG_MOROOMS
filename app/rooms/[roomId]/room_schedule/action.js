@@ -46,20 +46,16 @@ export async function updateRoomSchedule(formData) {
     } else {
       // Step 2: Fetch and convert the existing schedule into number ranges
       const existingSchedule = parseTZDateRanges(data);
-      console.log('existing schedule: ', existingSchedule);
       const existingScheduleRanges = existingSchedule.map(range =>
         convertRangeToNumbers(range),
       );
-      console.log('existing schedule numbers: ', existingScheduleRanges);
 
       // Step 3: Convert the selected hours to a number range
       const TZSelectedHours = toTZMultiRange(new Date(), selectedHours);
-      console.log('selected hours formatted: ', TZSelectedHours);
       const parsedTZSelectedHours = parseTZDateRanges(TZSelectedHours);
       const selectedHoursRanges = parsedTZSelectedHours.map(range =>
         convertRangeToNumbers(range),
       );
-      console.log('selected hours range: ', selectedHoursRanges);
 
       // Step 4: Compare the existingScheduleRanges with selectedHoursRanges and adjust the schedule
       updatedSchedule = [];
@@ -71,7 +67,6 @@ export async function updateRoomSchedule(formData) {
         // For each selected range, adjust the splitRanges to remove overlaps
         selectedHoursRanges.forEach(selectedRange => {
           const newSplitRanges = [];
-
           splitRanges.forEach(splitRange => {
             if (
               Number(selectedRange.start) >= Number(splitRange.end) || // No overlap (selectedRange is after splitRange)
@@ -112,7 +107,6 @@ export async function updateRoomSchedule(formData) {
           ) {
             isCovered = true; // The selectedRange is completely covered
           }
-          console.log(isCovered);
         });
         // If it's not covered, add it
         if (!isCovered) {

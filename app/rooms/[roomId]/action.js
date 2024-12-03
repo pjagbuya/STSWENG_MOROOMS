@@ -110,7 +110,10 @@ export async function get_room_details(room_id) {
   return data[0];
 }
 
-export async function get_labelled_room_hours(room_id, reservation_date) {
+export async function get_labelled_room_hours(room_id, _reservation_date) {
+  const reservation_date = new Date(_reservation_date);
+  reservation_date.setHours(reservation_date.getHours() + 24);
+
   const supabase = createClient();
   const formattedDate = reservation_date.toISOString();
 

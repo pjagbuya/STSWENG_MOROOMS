@@ -56,13 +56,12 @@ export default async function Home() {
           </div>
           <div className="mt-8">
             <h2 className="p-8 text-4xl font-bold text-white">
-              Reservations for the Week
+              Your reservations for the Week
             </h2>
             <div className="container mx-auto space-y-8 px-4 py-8">
               <div className="rounded-lg bg-white p-8 shadow-md">
                 <ScrollArea className="h-[calc(100vh-300px)]">
                   <ReservationTable userId={userInfo.userId} mode={'user'} />
-                  {/* TODO: add userID and if mode is admin or user */}
                 </ScrollArea>
               </div>
             </div>
