@@ -1,5 +1,6 @@
 import HeaderNavLink from './header_navlink';
 import { Button } from './ui/button';
+import { getCurrentUserInfo } from '@/app/users/[user_id]/profile/action';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { createClient } from '@/utils/supabase/server';
 import { isAdminServerSide } from '@/utils/utils';
@@ -16,8 +17,10 @@ export default async function Header() {
   const isLoggedIn = user !== null;
   const isAdmin = await isAdminServerSide();
 
+  const userInfo = await getCurrentUserInfo();
+
   return (
-    <header className="sticky top-0 flex items-center gap-8 bg-black px-4 py-2.5 drop-shadow-md">
+    <header className="sticky top-0 z-50 flex items-center gap-8 bg-black px-4 py-2.5 drop-shadow-md">
       <div className="flex items-center gap-3 text-white">
         <Image src="/logo.png" width={50} height={50} alt="MoRooms Logo" />
         <h1 className="select-none text-2xl font-bold">MoRooms</h1>
@@ -25,15 +28,21 @@ export default async function Header() {
 
       <nav className="flex-1">
         <HeaderNavLink link="/">Home</HeaderNavLink>
-        <HeaderNavLink link="/todo">Profile</HeaderNavLink>
+        <HeaderNavLink link={`/users/${userInfo.userId}/profile`}>
+          Profile
+        </HeaderNavLink>
         <HeaderNavLink link="/rooms">
           {isAdmin ? 'Reservations / Manage Rooms' : 'Reservations'}
         </HeaderNavLink>
 
         {isAdmin && (
           <>
-            <HeaderNavLink link="/todo">Manage Reservations</HeaderNavLink>
-            <HeaderNavLink link="/todo">Manage Users</HeaderNavLink>
+            <HeaderNavLink link="/manage/reservations">
+              Manage Reservations
+            </HeaderNavLink>
+            <HeaderNavLink link={`/users/${userInfo.userId}/home/admin/users`}>
+              Manage Users
+            </HeaderNavLink>
           </>
         )}
       </nav>
@@ -41,9 +50,9 @@ export default async function Header() {
       <div className="flex gap-3">
         {isLoggedIn ? (
           <>
-            <Link href="/profile">
+            <Link href={`/users/${userInfo.userId}/profile`}>
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarImage src={userInfo.profileURL} />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </Link>

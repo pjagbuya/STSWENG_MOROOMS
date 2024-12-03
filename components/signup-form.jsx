@@ -1,5 +1,11 @@
-import { signup } from '@/app/signup/action';
-import { Button } from '@/components/ui/button';
+'use client';
+
+import { AddPopupForm } from './popup_create_form';
+import { PopupForm } from './popup_form';
+import { signup, uploadFile } from '@/app/signup/action';
+import { singupSchema } from '@/app/signup/form_schema';
+import { editProfile } from '@/app/users/[user_id]/profile/edit/action';
+import { editProfileSchema } from '@/app/users/[user_id]/profile/edit/form_schema';
 import {
   Card,
   CardContent,
@@ -7,11 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 
-export function Signup() {
+export function Signup({ defaultValues, isEdit }) {
+  const finalSchema = isEdit ? editProfileSchema : singupSchema;
   return (
     <Card className="mx-auto w-[425px] max-w-lg">
       <CardHeader>
@@ -21,73 +26,33 @@ export function Signup() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={signup}>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="first-name">First Name</Label>
-              <Input
-                name="user_first_name"
-                id="first-name"
-                type="text"
-                placeholder="John"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="last-name">Last Name</Label>
-              <Input
-                name="user_last_name"
-                id="last-name"
-                type="text"
-                placeholder="Doe"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="school-id">School ID</Label>
-              <Input
-                name="user_school_id"
-                id="school-id"
-                type="text"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                name="user_email"
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-              </div>
-              <Input
-                name="user_password"
-                id="password"
-                type="password"
-                placeholder="********"
-                required
-              />
-            </div>
-          </div>
-          <div className="flex gap-2 pt-4">
-            <Button type="submit" className="w-full">
-              Signup
-            </Button>
-          </div>
-          <div className="mt-4 text-center text-sm">
-            Already have an account?{' '}
-            <Link href="/login" className="underline">
+        <AddPopupForm
+          onSubmit={(form, values) => {
+            async function handleSubmit() {
+              const formData = new FormData();
+              for (const key in values) {
+                console.log(key, values[key]);
+                formData.append(key, values[key]);
+              }
+              if (isEdit) {
+                await editProfile(formData);
+              } else {
+                await signup(formData);
+              }
+            }
+            handleSubmit();
+          }}
+          formSchema={finalSchema}
+          defaultValues={defaultValues}
+        />
+        {!isEdit && (
+          <div className="mt-2 flex justify-center gap-2">
+            <p>Already have an account?</p>
+            <Link href="/login" className="text-blue-500 underline">
               Login
             </Link>
           </div>
-        </form>
+        )}
       </CardContent>
     </Card>
   );

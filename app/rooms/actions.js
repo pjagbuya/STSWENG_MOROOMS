@@ -336,3 +336,18 @@ export async function filterRooms(filter) {
 
   return data;
 }
+
+export async function getRoomByID(roomID) {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc('get_room_by_id', {
+    p_room_id: roomID,
+  });
+
+  if (error) {
+    console.error('Error fetching room:', error);
+    throw error;
+  }
+
+  return data[0];
+}

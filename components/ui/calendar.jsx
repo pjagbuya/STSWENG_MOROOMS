@@ -3,12 +3,28 @@
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 import * as React from 'react';
 import { DayPicker } from 'react-day-picker';
 
-function Calendar({ className, classNames, showOutsideDays = true, ...props }) {
+function Calendar({
+  className,
+  classNames,
+  showOutsideDays = true,
+  onDateSelect,
+  ...props
+}) {
+  const [selected, setSelected] = useState(undefined);
+
+  const handleDateSelect = date => {
+    setSelected(date);
+    onDateSelect(date);
+  };
+
   return (
     <DayPicker
+      selected={selected}
+      onSelect={handleDateSelect}
       showOutsideDays={showOutsideDays}
       className={cn('p-3', className)}
       classNames={{
