@@ -67,6 +67,12 @@ describe('Reservation / Manage Room tests', () => {
     cy.get('button[type="submit"]').click();
   });
 
+  it('Can reserve a room', () => {
+    cy.contains('a', 'Manage Reservations').click();
+    cy.contains("Joaquin's Room Test").should('be.visible');
+    cy.contains("Joaquin's Room Test").should('be.visible');
+  });
+
   after(() => {
     // Example: Clean up shared state, like clearing databases or resetting the backend
     // You can perform cleanup actions that only need to run once
