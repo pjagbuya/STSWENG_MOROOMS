@@ -21,7 +21,8 @@ export const singupSchema = z
       .string()
       .min(1, { message: 'Password is required' })
       .min(8, { message: 'Password must be at least 8 characters' })
-      .max(32, { message: 'Password must not exceed 32 characters' }),
+      .max(32, { message: 'Password must not exceed 32 characters' })
+      .describe('password'),
     proof: z
       .any()
       .refine(file => {
