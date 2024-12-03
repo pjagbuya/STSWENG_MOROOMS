@@ -1,4 +1,4 @@
-describe('Load login page', () => {
+describe('Login page tests', () => {
   const emailValid = 'test@gmail.com';
   const passwordValid = 'testuser';
   const passwordInvalid = 'thispasswordiswrong';
@@ -14,16 +14,19 @@ describe('Load login page', () => {
   it('Logs in successfully with valid credentials', () => {
     cy.get('input[name="email"]').type(emailValid);
     cy.get('input[name="password"]').type(passwordValid);
+    cy.wait(1000);
     cy.get('button[type="submit"]').click();
+
     //assert
     cy.url().should('include', '/private');
-    cy.contains('Hello').should('be.visible');
+    cy.get('input[type="file"]').should('have.value', '').and('be.visible');
   });
 
   it('Is redirected to the error page when using invalid credentials', () => {
     cy.get('input[name="email"]').type(emailValid);
     cy.get('input[name="password"]').type(passwordInvalid);
     cy.get('button[type="submit"]').click();
+
     //assert
     cy.url().should('include', '/error');
   });
