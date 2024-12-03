@@ -1,4 +1,4 @@
-name: Cypress E2E Tests
+name: Pipeline
 
 on: [push, pull_request]
 
