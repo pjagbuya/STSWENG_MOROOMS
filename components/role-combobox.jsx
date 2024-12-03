@@ -18,7 +18,10 @@ import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import * as React from 'react';
 
-export const Combobox = ({ data, currentValue, onSelect }, ref) => {
+export const Combobox = (
+  { className = '', data, currentValue, onSelect },
+  ref,
+) => {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -28,7 +31,7 @@ export const Combobox = ({ data, currentValue, onSelect }, ref) => {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className={'w-[200px] justify-between ' + className}
         >
           {currentValue || 'Select Value...'}
           <ChevronsUpDown className="opacity-50" />

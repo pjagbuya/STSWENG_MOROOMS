@@ -14,14 +14,16 @@ export function UserRoleChangePopup({
   onCancel,
   onAction,
   onOpenChange,
+  title,
+  body,
 }) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Approve User</AlertDialogTitle>
+          <AlertDialogTitle>{title || 'Approve User'} </AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to approve this user?
+            {body || 'Are you sure you want to approve this user?'}
           </AlertDialogDescription>
         </AlertDialogHeader>
 

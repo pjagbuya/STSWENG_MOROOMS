@@ -16,7 +16,7 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
   const userInfo = await getCurrentUserInfo();
-  console.log('userInfo', userInfo);
+
   return (
     <div>
       <Header />
@@ -59,7 +59,12 @@ export default async function ProfilePage() {
                 </span>
               </div>
             </div>
-            <Button className="w-full">Edit Profile</Button>
+            <Button asChild className="w-full">
+              <Link href={'./profile/edit'}>Edit Profile</Link>
+            </Button>
+            <Button asChild className="w-full">
+              <Link href={'./profile/rolerequest'}>Request Role Upgrade</Link>
+            </Button>
           </div>
         </div>
         {isAdmin ? <AdminHomePageLower /> : <UserHomePageLower />}
@@ -79,7 +84,7 @@ function UserHomePageLower() {
       </div>
       <Link className="h-full" href={'/rooms'}>
         <div
-          className="flex w-[320px] flex-col items-center justify-center rounded-md"
+          className="flex h-full w-[320px] flex-col items-center justify-center rounded-md"
           style={{ backgroundImage: verticalGradient }}
         >
           <div className="flex flex-col gap-1">
