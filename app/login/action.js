@@ -22,5 +22,5 @@ export async function login(formData) {
   }
 
   revalidatePath('/', 'layout');
-  redirect('/private');
+  redirect('/');
 }
