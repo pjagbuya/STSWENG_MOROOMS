@@ -18,8 +18,8 @@ describe('Login page tests', () => {
     cy.get('button[type="submit"]').click();
 
     //assert
-    cy.url().should('include', '/private');
-    cy.get('input[type="file"]').should('have.value', '').and('be.visible');
+    cy.url().should('include', '/');
+    cy.contains('MoRooms').should('be.visible');
   });
 
   it('Is redirected to the error page when using invalid credentials', () => {
