@@ -1,14 +1,19 @@
-import { jest } from "@jest/globals";
-import { addRoomSet, deleteRoomSet, editRoomSet, fetchRoomSets } from "./actions.js";
+import {
+  addRoomSet,
+  deleteRoomSet,
+  editRoomSet,
+  fetchRoomSets,
+} from './actions.js';
+import { jest } from '@jest/globals';
 
-jest.unstable_mockModule("../src/actions.js", () => ({
-    addRoomSet: jest.fn(),
-    deleteRoomSet: jest.fn(),
-    editRoomSet: jest.fn(),
-    fetchRoomSets: jest.fn()
+jest.unstable_mockModule('../src/actions.js', () => ({
+  addRoomSet: jest.fn(),
+  deleteRoomSet: jest.fn(),
+  editRoomSet: jest.fn(),
+  fetchRoomSets: jest.fn(),
 }));
 
-const { addRoomSet, deleteRoomSet, editRoomSet, fetchRoomSet } = await import("../src/actions.js");
+//const { addRoomSet, deleteRoomSet, editRoomSet, fetchRoomSet } = await import("../src/actions.js");
 
 beforeEach(() => {
   addRoomSet.mockClear();
@@ -17,10 +22,10 @@ beforeEach(() => {
   fetchRoomSets.mockClear();
 });
 
-test("Create a room set.", async () => {
+test('Create a room set.', async () => {
   const project = {
-    alias: "cli",
-    path: "C:\\Users\\Clyde\\OneDrive\\Documents\\front-end-masters-course\\node-v3\\my-cli",
+    alias: 'cli',
+    path: 'C:\\Users\\Clyde\\OneDrive\\Documents\\front-end-masters-course\\node-v3\\my-cli',
   };
 
   insertProject.mockResolvedValue(project);
@@ -30,19 +35,19 @@ test("Create a room set.", async () => {
   expect(result.path).toEqual(project.path);
 });
 
-test("Show all projects.", async () => {
+test('Show all projects.', async () => {
   const projects = [
     {
-      alias: "cli",
-      path: "C:\\Users\\Clyde\\OneDrive\\Documents\\front-end-masters-course\\node-v3\\my-cli",
+      alias: 'cli',
+      path: 'C:\\Users\\Clyde\\OneDrive\\Documents\\front-end-masters-course\\node-v3\\my-cli',
     },
     {
-      alias: "pli",
-      path: "C:\\Users\\Clyde\\OneDrive\\Documents\\front-end-masters-course\\node-v3\\my-cli",
+      alias: 'pli',
+      path: 'C:\\Users\\Clyde\\OneDrive\\Documents\\front-end-masters-course\\node-v3\\my-cli',
     },
     {
-      alias: "tli",
-      path: "C:\\Users\\Clyde\\OneDrive\\Documents\\front-end-masters-course\\node-v3\\my-cli",
+      alias: 'tli',
+      path: 'C:\\Users\\Clyde\\OneDrive\\Documents\\front-end-masters-course\\node-v3\\my-cli',
     },
   ];
 

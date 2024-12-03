@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { redirect } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 // function logFormData(formData) {
@@ -37,14 +37,44 @@ export default function RoomReservationForm({ roomId, userID }) {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  const searchParams = useSearchParams();
+
+  const date = searchParams.get('date');
+  const startTime = searchParams.get('startTime');
+  const endTime = searchParams.get('endTime');
+  console.log('date: ', date);
+  console.log('startTime: ', startTime);
+  console.log('endTime: ', endTime);
+  console.log('Selected hours: ', selectedHours);
+
+  useEffect(() => {
+    // Initialize selectedDate and selectedHours
+    if (date) {
+      const parsedDate = new Date(date);
+      if (!isNaN(parsedDate)) {
+        setSelectedDate(parsedDate);
+      }
+    }
+    if (startTime && endTime) {
+      const start = parseInt(startTime, 10);
+      const end = parseInt(endTime, 10);
+      if (!isNaN(start) && !isNaN(end) && start <= end) {
+        setSelectedHours(
+          Array.from({ length: end - start + 1 }, (_, i) => start + i),
+        );
+      }
+    }
+  }, [date, startTime, endTime]);
+
   useEffect(() => {
     async function fetchHourStates() {
       setIsLoading(true);
       try {
-        const data = await get_labelled_room_hours(
-          roomId,
-          selectedDate || new Date(),
-        );
+        const sd = new Date(selectedDate);
+        sd.setHours(sd.getHours() + 24);
+        // setSelectedDate(sd)
+
+        const data = await get_labelled_room_hours(roomId, sd || new Date());
         setHourStates(data);
       } catch (error) {
         console.error('Error fetching hour states:', error);
@@ -129,6 +159,8 @@ export default function RoomReservationForm({ roomId, userID }) {
     document.getElementById('reservationForm').reset();
   };
 
+  console.log('selected date: ', selectedDate);
+
   return (
     <>
       <form id="reservationForm" onSubmit={handleFormSubmit}>
@@ -138,7 +170,9 @@ export default function RoomReservationForm({ roomId, userID }) {
               <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={setSelectedDate}
+                onSelect={v => {
+                  setSelectedDate(v);
+                }}
                 className="flex justify-center rounded-md border"
               />
               {errors.selectedDate && (

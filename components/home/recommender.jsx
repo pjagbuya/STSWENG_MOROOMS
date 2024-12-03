@@ -20,7 +20,6 @@ export default async function Recommender({ userID }) {
   const details = await get_all_details(userID);
   console.log('frontend details:', details);
 
-  // TODO: Change to proper function
   const roomDetailsPromises = details.map(async detail => {
     const roomData = await getRoomByID(detail.room);
     return {
@@ -54,7 +53,14 @@ export default async function Recommender({ userID }) {
               <CarouselItem key={index} className="min-w-40">
                 <div className="p-1">
                   <Link
-                    href={`/rooms/${room.roomData.room_id}`}
+                    href={{
+                      pathname: `/rooms/${room.roomData.room_id}`,
+                      query: {
+                        date: room.date,
+                        startTime: room.startTime,
+                        endTime: room.endTime,
+                      },
+                    }}
                     className="block"
                   >
                     <Card>

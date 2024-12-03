@@ -16,6 +16,7 @@ export async function reserve(formData) {
   console.log('form data in reserve: ', formData); // BUG: FORM DATA DATE RECEIVED IS A DAY BEHIND?????????? (click nov 23 on calendar, receive nov 22)
 
   const selectedDate = new Date(formData.get('selectedDate'));
+  selectedDate.setHours(selectedDate.getHours() + 24);
   console.log('selected date: ', selectedDate);
   const selectedHours = JSON.parse(formData.get('selectedHours')); // Parse the hours from JSON string
 
