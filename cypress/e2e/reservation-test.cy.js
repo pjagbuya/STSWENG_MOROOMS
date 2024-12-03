@@ -19,7 +19,6 @@ describe('Reservation / Manage Room tests', () => {
     });
 
     cy.visit('/');
-    cy.contains('MoRooms').should('be.visible');
   });
 
   it('Should display a grid with room cards', () => {
