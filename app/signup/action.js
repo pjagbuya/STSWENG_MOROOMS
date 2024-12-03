@@ -44,5 +44,5 @@ export async function signup(formData) {
   callFunctionWithFormData(null, 'create_user', '/private', formData, null);
   uploadFile(file, path);
 
-  redirect('/rooms');
+  redirect('/');
 }
