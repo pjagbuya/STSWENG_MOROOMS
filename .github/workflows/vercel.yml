@@ -1,13 +1,15 @@
-name: Cypress
-
-on: [push, pull_request]
+name: Deploy to Vercel on Main Merge
+on:
+  push:
+    branches:
+      - main # Trigger only on pushes to the main branch
 
 jobs:
-  e2e-tests:
+  deploy:
+    name: Deploy to Vercel
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out the code
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js
@@ -18,6 +20,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
       - name: Build the app
         run: npm run build
         env:
@@ -25,19 +30,10 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZnplemtod3ZndHdwcWN5aGFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0NDQ3OTAsImV4cCI6MjA0NDAyMDc5MH0.6twoLk7Sct_QbG7uLhnwM_jhFAk907YCpEAlK5R6f04
           NEXT_SERVICE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZnplemtod3ZndHdwcWN5aGFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODQ0NDc5MCwiZXhwIjoyMDQ0MDIwNzkwfQ.QjUng71fLp0a27aNvz-vP4yqXXmtTQfA61OMg4kU5iU
 
-      - name: Start the app w/ credentials
-        run: npm start &
+      - name: Deploy to Vercel
         env:
+          VERCEL_TOKEN: sCx5hgQeCPEzdDgos7ekZJ9Z
           NEXT_PUBLIC_SUPABASE_URL: https://rcfzezkhwvgtwpqcyhac.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZnplemtod3ZndHdwcWN5aGFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjg0NDQ3OTAsImV4cCI6MjA0NDAyMDc5MH0.6twoLk7Sct_QbG7uLhnwM_jhFAk907YCpEAlK5R6f04
           NEXT_SERVICE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZnplemtod3ZndHdwcWN5aGFjIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODQ0NDc5MCwiZXhwIjoyMDQ0MDIwNzkwfQ.QjUng71fLp0a27aNvz-vP4yqXXmtTQfA61OMg4kU5iU
-        continue-on-error: false
-
-      - name: Wait for the app to respond
-        run: npx wait-on http://localhost:3000 --timeout 60000
-
-      # - name: Verify app health
-      #   run: curl -v http://localhost:3000
-
-      - name: Run Cypress tests
-        run: npx cypress run
+        run: vercel --prod
