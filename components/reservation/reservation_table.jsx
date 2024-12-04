@@ -165,6 +165,7 @@ export default function ReservationTable({ userId, mode }) {
         <TableBody>
           {paginatedReservations.length > 0 ? (
             paginatedReservations.map((reservation, index) => {
+              const originalIndex = reservations.indexOf(reservation);
               const ranges = reservation.reservationTime
                 ? parseTZDateRanges(reservation.reservationTime)
                 : [];
@@ -175,7 +176,7 @@ export default function ReservationTable({ userId, mode }) {
                     <StatusDropdown
                       status={reservation.status}
                       onStatusChange={newStatus =>
-                        handleStatusChange(index, newStatus)
+                        handleStatusChange(originalIndex, newStatus)
                       }
                       isAdmin={isAdmin}
                     />
