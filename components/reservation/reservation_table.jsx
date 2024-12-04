@@ -100,7 +100,7 @@ export default function ReservationTable({ userId, mode }) {
   useEffect(() => {
     const loadReservations = async () => {
       setLoading(true);
-      const data = await fetchReservationsWithRoomNames(userId);
+      const data = await fetchReservationsWithRoomNames(userId, isAdmin);
 
       // Filter out reservations with dates that have already passed
       const filteredData = data.filter(reservation => {
