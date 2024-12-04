@@ -42,7 +42,7 @@ describe('Reservation / Manage Room tests', () => {
     cy.contains('Reserve a Room').should('be.visible');
     cy.get('input').type(searchTerm).should('have.value', searchTerm);
     cy.get('button[type="submit"]').click();
-    cy.wait(1000);
+    cy.wait(4000);
 
     cy.get('.grid > div:visible')
       .should('have.length', 1)

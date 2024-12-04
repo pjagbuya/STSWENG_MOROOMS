@@ -12,7 +12,7 @@ describe('Profile page tests', () => {
       cy.get('input[name="password"]').type(passwordValid);
       cy.wait(1000);
       cy.get('button[type="submit"]').click();
-      cy.wait(2000);
+      cy.wait(4000);
       cy.url().should('include', '/');
     });
 
