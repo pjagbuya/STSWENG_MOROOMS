@@ -16,7 +16,7 @@ describe('Login page tests', () => {
     cy.get('input[name="password"]').type(passwordValid);
     cy.wait(1000);
     cy.get('button[type="submit"]').click();
-    cy.wait(1000);
+    cy.wait(4000);
 
     //assert
     cy.url().should('include', '/');

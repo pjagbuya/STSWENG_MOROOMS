@@ -40,9 +40,6 @@ export function LoginForm() {
               <Input name="password" id="password" type="password" required />
             </div>
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" className="w-full">
-                Forgot Password?
-              </Button>
               <Button type="submit" className="w-full">
                 Login
               </Button>

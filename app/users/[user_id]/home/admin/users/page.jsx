@@ -23,7 +23,7 @@ const Management = async () => {
 
   return (
     <div className="flex w-full flex-col gap-2 p-8">
-      <h1 className="text-3xl font-bold">Manage Users</h1>
+      <h1 className="text-3xl font-bold">User Management</h1>
       <Tabs defaultValue="users" className="w-full">
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
