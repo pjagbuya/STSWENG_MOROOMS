@@ -87,5 +87,5 @@ export async function editProfile(formData) {
     uploadFile(file, path);
   }
 
-  // redirect('./');
+  redirect('./');
 }
