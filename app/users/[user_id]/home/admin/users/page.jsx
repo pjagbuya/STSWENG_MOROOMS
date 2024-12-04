@@ -23,11 +23,7 @@ const Management = async () => {
 
   return (
     <div className="flex w-full flex-col gap-2 p-8">
-      <h1 className="text-3xl font-bold">Reservation Rooms</h1>
-      <h3 className="text-base font-light">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
-        laoreet, metus nec.
-      </h3>
+      <h1 className="text-3xl font-bold">User Management</h1>
       <Tabs defaultValue="users" className="w-full">
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
