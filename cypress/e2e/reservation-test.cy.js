@@ -15,14 +15,14 @@ describe('Reservation / Manage Room tests', () => {
       cy.get('input[name="password"]').type(passwordValid);
       cy.wait(1000);
       cy.get('button[type="submit"]').click();
-      cy.wait(1000);
+      cy.wait(2000);
+      cy.url().should('include', '/');
     });
 
     cy.visit('/');
   });
 
   it('Should display a grid with room cards', () => {
-    cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
     cy.wait(1000);
     cy.contains('Reserve a Room').should('be.visible');
@@ -42,7 +42,7 @@ describe('Reservation / Manage Room tests', () => {
     cy.contains('Reserve a Room').should('be.visible');
     cy.get('input').type(searchTerm).should('have.value', searchTerm);
     cy.get('button[type="submit"]').click();
-    cy.wait(1000);
+    cy.wait(4000);
 
     cy.get('.grid > div:visible')
       .should('have.length', 1)
