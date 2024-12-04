@@ -1,4 +1,5 @@
 import './globals.css';
+import Header from '@/components/header';
 import localFont from 'next/font/local';
 
 const geistSans = localFont({
