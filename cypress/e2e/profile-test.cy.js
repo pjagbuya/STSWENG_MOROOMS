@@ -12,15 +12,15 @@ describe('Profile page tests', () => {
       cy.get('input[name="password"]').type(passwordValid);
       cy.wait(1000);
       cy.get('button[type="submit"]').click();
-      cy.wait(4000);
+      cy.wait(2000);
       cy.url().should('include', '/');
     });
 
     cy.visit('/');
-    cy.contains('a', 'Profile').click();
   });
 
   it('Profile has the correct name', () => {
+    cy.contains('a', 'Profile').click();
     cy.contains(`${fname} ${lname}`)
       .should('be.visible')
       .and('have.class', 'text-3xl')
@@ -28,12 +28,14 @@ describe('Profile page tests', () => {
   });
 
   it('Profile has the correct email', () => {
+    cy.contains('a', 'Profile').click();
     cy.contains(`${emailValid}`)
       .should('be.visible')
       .and('have.class', 'text-lg');
   });
 
   it('Profile has the correct contact email', () => {
+    cy.contains('a', 'Profile').click();
     cy.contains(`Email: ${emailValid}`)
       .should('be.visible')
       .and('have.class', 'text-sm');
