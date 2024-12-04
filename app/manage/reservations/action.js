@@ -31,6 +31,31 @@ export const fetchReservationsByUserId = async userId => {
   }
 };
 
+export const fetchAllReservations = async () => {
+  try {
+    const { data, error } = await supabase.rpc('get_all_reservations');
+
+    if (error) {
+      console.error('Error fetching reservations:', error);
+      return [];
+    }
+
+    // Map and format data as needed
+    return data.map(reservation => ({
+      ...reservation,
+      reservationTime: reservation.reservation_time, // Format range if needed
+      roomName: reservation.room_id,
+      status: reservation.reservation_status,
+      reservationPurpose: reservation.reservation_purpose,
+      reservationCount: reservation.reservation_count,
+      endorsementLetter: reservation.endorsement_letter, // Add this field if present
+    }));
+  } catch (err) {
+    console.error('Unexpected error fetching reservations:', err);
+    return [];
+  }
+};
+
 export const fetchRoomDetailsByRoomId = async roomId => {
   try {
     const { data, error } = await supabase.rpc('get_room_by_id', {
@@ -60,9 +85,12 @@ export const fetchRoomDetailsByRoomId = async roomId => {
   }
 };
 
-export const fetchReservationsWithRoomNames = async userId => {
+export const fetchReservationsWithRoomNames = async (userId, isAdmin) => {
   try {
-    const reservations = await fetchReservationsByUserId(userId);
+    // Determine the reservations to fetch based on isAdmin
+    const reservations = isAdmin
+      ? await fetchAllReservations() // Fetch all reservations if the user is an admin
+      : await fetchReservationsByUserId(userId); // Fetch only the user's reservations if not an admin
 
     // Fetch room names for each reservation
     const reservationsWithRoomNames = await Promise.all(
