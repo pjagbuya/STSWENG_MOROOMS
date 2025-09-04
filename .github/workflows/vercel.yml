@@ -26,14 +26,14 @@ jobs:
       - name: Build the app
         run: npm run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: https://vvhdkxostggyorvfousm.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aGRreG9zdGdneW9ydmZvdXNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4MjkxMDUsImV4cCI6MjA3MjQwNTEwNX0.Aiwv3dSxnJ0ILhfWxvtP2StGnfE7Qx0C2jnrDnfUiIE
-          NEXT_SERVICE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aGRreG9zdGdneW9ydmZvdXNtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjgyOTEwNSwiZXhwIjoyMDcyNDA1MTA1fQ.kThEhIYyTwUBltHTR7yKOg9f9t7FEb2tiO8wIm2LA74
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
 
       - name: Deploy to Vercel
         env:
-          VERCEL_TOKEN: zodNS4ObLAWzdw1PrFwYjQp8
-          NEXT_PUBLIC_SUPABASE_URL: https://vvhdkxostggyorvfousm.supabase.co
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aGRreG9zdGdneW9ydmZvdXNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4MjkxMDUsImV4cCI6MjA3MjQwNTEwNX0.Aiwv3dSxnJ0ILhfWxvtP2StGnfE7Qx0C2jnrDnfUiIE
-          NEXT_SERVICE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ2aGRreG9zdGdneW9ydmZvdXNtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjgyOTEwNSwiZXhwIjoyMDcyNDA1MTA1fQ.kThEhIYyTwUBltHTR7yKOg9f9t7FEb2tiO8wIm2LA74
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
         run: vercel --prod --yes

@@ -60,6 +60,7 @@
     "babel-jest": "^29.7.0",
     "cypress": "^13.16.0",
     "cypress-file-upload": "^5.0.8",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
     "eslint-config-prettier": "^9.1.0",
@@ -81,6 +82,9 @@
   "lint-staged": {
     "*.{js,jsx}": [
       "npx prettier --config .prettierrc --write"
+    ],
+    "*.{js,ts,jsx,tsx}": [
+      "cross-env DOTENV_CONFIG_PATH=.env.local eslint --fix"
     ]
   }
 }
