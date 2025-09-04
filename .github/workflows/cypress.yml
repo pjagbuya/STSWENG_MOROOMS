@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: Debug env
-        run: echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}"
+        run: echo "NEXT_PUBLIC_SUPABASE_URL=${{ env.NEXT_PUBLIC_SUPABASE_URL }}"
 
       - name: Check out the code
         uses: actions/checkout@v3
@@ -24,16 +24,16 @@ jobs:
       - name: Build the app
         run: npm run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ env.NEXT_SERVICE_SUPABASE_ANON_KEY }}
 
       - name: Start the app w/ credentials
         run: npm start &
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ env.NEXT_SERVICE_SUPABASE_ANON_KEY }}
         continue-on-error: false
 
       - name: Wait for the app to respond
