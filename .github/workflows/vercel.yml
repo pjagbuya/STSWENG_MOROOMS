@@ -8,6 +8,10 @@ jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,15 +29,9 @@ jobs:
 
       - name: Build the app
         run: npm run build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
 
       - name: Deploy to Vercel
         env:
           VERCEL_TOKEN: ${{ vars.VERCEL_TOKEN }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
+
         run: vercel --prod --yes
