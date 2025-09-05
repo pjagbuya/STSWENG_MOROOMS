@@ -29,7 +29,7 @@ export default async function Header() {
       <nav className="flex-1">
         <HeaderNavLink link="/">Home</HeaderNavLink>
         <HeaderNavLink link={`/users/${userInfo.userId}/profile`}>
-          Profile
+          {'Profile'}
         </HeaderNavLink>
         <HeaderNavLink link="/rooms">
           {isAdmin ? 'Reservations / Manage Rooms' : 'Reservations'}

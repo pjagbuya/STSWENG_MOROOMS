@@ -36,7 +36,7 @@ describe('Reservation / Manage Room tests', () => {
   });
 
   it('Can search a room', () => {
-    cy.visit('/');
+    // cy.visit('/');
     cy.contains('a', 'Reservations / Manage Rooms').click();
     cy.wait(1000);
     cy.contains('Reserve a Room').should('be.visible');

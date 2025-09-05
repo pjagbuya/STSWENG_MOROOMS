@@ -5,6 +5,7 @@ describe('Profile page tests', () => {
   const lname = 'User';
 
   beforeEach(() => {
+    // Test
     //establish a session so you don't need to keep logging in
     cy.session('userSession', () => {
       cy.visit('/login');
