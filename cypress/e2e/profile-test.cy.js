@@ -8,6 +8,11 @@ describe('Profile page tests', () => {
     // Test
     //establish a session so you don't need to keep logging in
     cy.session('userSession', () => {
+      cy.get('body').then($body => {
+        if ($body.find('button:contains("Log Out")').length) {
+          cy.contains('button', 'Log Out').click();
+        }
+      });
       cy.visit('/login');
       cy.document().then(doc => {
         console.log('ON LOGIN: \n\n');
