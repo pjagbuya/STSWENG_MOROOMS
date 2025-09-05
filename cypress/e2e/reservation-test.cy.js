@@ -1,6 +1,6 @@
 describe('Reservation / Manage Room tests', () => {
-  const emailValid = 'pjagbuya2@gmail.com';
-  const passwordValid = 'testuser';
+  const emailValid = 'jamessmitherine69@gmail.com';
+  const passwordValid = 'aaaaqqqq';
   const searchTerm = 'Function';
   const searchRoom = 'Function Room A';
   const reservationName = 'This is a test event name';
