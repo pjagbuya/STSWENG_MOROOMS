@@ -9,16 +9,31 @@ describe('Profile page tests', () => {
     //establish a session so you don't need to keep logging in
     cy.session('userSession', () => {
       cy.visit('/login');
+      cy.document().then(doc => {
+        console.log('ON LOGIN: \n\n');
+        console.log(doc.documentElement.outerHTML); // dumps HTML into console
+      });
       cy.get('input[name="email"]').type(emailValid);
       cy.get('input[name="password"]').type(passwordValid);
       cy.wait(1000);
       cy.get('button[type="submit"]').click();
       cy.wait(2000);
-      cy.url().should('include', '/');
+    });
+
+    cy.document().then(doc => {
+      console.log('AFTER LOGIN: \n\n');
+      console.log(doc.documentElement.outerHTML); // dumps HTML into console
     });
   });
   it('Profile has the correct name', () => {
+    cy.document().then(doc => {
+      console.log('Before profile Click');
+      console.log(doc.documentElement.outerHTML); // dumps HTML into console
+    });
     cy.contains('a', 'Profile').click();
+    cy.document().then(doc => {
+      console.log(doc.documentElement.outerHTML); // dumps HTML into console
+    });
     cy.contains(`${fname} ${lname}`)
       .should('be.visible')
       .and('have.class', 'text-3xl')
@@ -26,16 +41,12 @@ describe('Profile page tests', () => {
   });
 
   it('Profile has the correct email', () => {
-    cy.contains('a', 'Profile').click();
-
     cy.contains(`${emailValid}`)
       .should('be.visible')
       .and('have.class', 'text-lg');
   });
 
   it('Profile has the correct contact email', () => {
-    cy.contains('a', 'Profile').click();
-
     cy.contains(`Email: ${emailValid}`)
       .should('be.visible')
       .and('have.class', 'text-sm');
