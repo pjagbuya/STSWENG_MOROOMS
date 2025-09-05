@@ -5,7 +5,6 @@ on: [push, pull_request]
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
-    environment: MOROOMS_SUPABASE
 
     steps:
       - name: Debug env
@@ -28,16 +27,16 @@ jobs:
       - name: Build the app
         run: npm run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ vars.NEXT_SERVICE_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
 
       - name: Start the app w/ credentials
         run: npm start &
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ vars.NEXT_SERVICE_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ secrets.NEXT_SERVICE_SUPABASE_ANON_KEY }}
         continue-on-error: false
 
       - name: Wait for the app to respond
