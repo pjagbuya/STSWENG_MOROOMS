@@ -1,5 +1,5 @@
 describe('Profile page tests', () => {
-  const emailValid = 'test@gmail.com';
+  const emailValid = 'pjagbuya2@gmail.com';
   const passwordValid = 'testuser';
   const fname = 'Test';
   const lname = 'User';

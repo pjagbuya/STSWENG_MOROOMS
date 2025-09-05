@@ -1,5 +1,5 @@
 describe('Reservation / Manage Room tests', () => {
-  const emailValid = 'test@gmail.com';
+  const emailValid = 'pjagbuya2@gmail.com';
   const passwordValid = 'testuser';
   const searchTerm = 'Function';
   const searchRoom = 'Function Room A';
