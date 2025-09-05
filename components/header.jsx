@@ -28,7 +28,10 @@ export default async function Header() {
 
       <nav className="flex-1">
         <HeaderNavLink link="/">Home</HeaderNavLink>
-        <HeaderNavLink link={`/users/${userInfo.userId}/profile`}>
+        <HeaderNavLink
+          data-cy="header-profile-link"
+          link={`/users/${userInfo.userId}/profile`}
+        >
           Profile
         </HeaderNavLink>
         <HeaderNavLink link="/rooms">

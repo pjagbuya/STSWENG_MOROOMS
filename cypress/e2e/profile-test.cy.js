@@ -18,9 +18,8 @@ describe('Profile page tests', () => {
 
     cy.visit('/');
   });
-
   it('Profile has the correct name', () => {
-    cy.contains('a', 'Profile').click();
+    cy.get('[data-cy="header-profile-link"]').click();
     cy.contains(`${fname} ${lname}`)
       .should('be.visible')
       .and('have.class', 'text-3xl')
@@ -28,14 +27,16 @@ describe('Profile page tests', () => {
   });
 
   it('Profile has the correct email', () => {
-    cy.contains('a', 'Profile').click();
+    cy.get('[data-cy="header-profile-link"]').click();
+
     cy.contains(`${emailValid}`)
       .should('be.visible')
       .and('have.class', 'text-lg');
   });
 
   it('Profile has the correct contact email', () => {
-    cy.contains('a', 'Profile').click();
+    cy.get('[data-cy="header-profile-link"]').click();
+
     cy.contains(`Email: ${emailValid}`)
       .should('be.visible')
       .and('have.class', 'text-sm');
