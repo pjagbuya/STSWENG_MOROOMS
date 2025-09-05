@@ -10,8 +10,9 @@ jobs:
     steps:
       - name: Debug env
         run: |
-          echo "URL=$NEXT_PUBLIC_SUPABASE_URL"
-          echo "KEY length=${#NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+          echo "URL: $NEXT_PUBLIC_SUPABASE_URL"
+          echo "Anon key length: ${#NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+          echo "Service key length: ${#SUPABASE_SERVICE_ROLE_KEY}"
 
       - name: Check out the code
         uses: actions/checkout@v3
