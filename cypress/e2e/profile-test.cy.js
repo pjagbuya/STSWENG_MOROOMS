@@ -16,8 +16,6 @@ describe('Profile page tests', () => {
       cy.wait(2000);
       cy.url().should('include', '/');
     });
-
-    cy.visit('/');
   });
   it('Profile has the correct name', () => {
     cy.contains('a', 'Profile').click();
