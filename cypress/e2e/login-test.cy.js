@@ -1,5 +1,5 @@
 describe('Login page tests', () => {
-  const emailValid = 'test@gmail.com';
+  const emailValid = 'pjagbuya2@gmail.com';
   const passwordValid = 'testuser';
   const passwordInvalid = 'thispasswordiswrong';
 
