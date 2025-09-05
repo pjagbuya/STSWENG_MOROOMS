@@ -6,14 +6,8 @@ jobs:
   e2e-tests:
     runs-on: ubuntu-latest
     environment: MOROOMS_SUPABASE
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      NEXT_SERVICE_SUPABASE_ANON_KEY: ${{ vars.NEXT_SERVICE_SUPABASE_ANON_KEY }}
 
     steps:
-      - name: Dump envs
-        run: env | grep SUPABASE || true
       - name: Debug env
         run: |
           echo "URL=$NEXT_PUBLIC_SUPABASE_URL"

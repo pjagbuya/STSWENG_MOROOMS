@@ -58,10 +58,11 @@
     "@types/phoenix": "^1.6.5",
     "@types/react": "18.3.12",
     "babel-jest": "^29.7.0",
+    "cross-env": "^10.0.0",
     "cypress": "^13.16.0",
     "cypress-file-upload": "^5.0.8",
     "dotenv-cli": "^10.0.0",
-    "eslint": "^8",
+    "eslint": "^8.57.1",
     "eslint-config-next": "14.2.15",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
@@ -82,9 +83,6 @@
   "lint-staged": {
     "*.{js,jsx}": [
       "npx prettier --config .prettierrc --write"
-    ],
-    "*.{js,ts,jsx,tsx}": [
-      "cross-env DOTENV_CONFIG_PATH=.env.local eslint --fix"
     ]
   }
 }

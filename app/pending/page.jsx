@@ -1,4 +1,6 @@
+import { Button } from '@/components/ui/button';
 import { AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import Link from 'next/link';
 
 function PendingUserPage() {
   return (
@@ -71,6 +73,15 @@ function PendingUserPage() {
           <p className="text-sm text-blue-800">
             We'll notify you via email once your application has been reviewed.
           </p>
+        </div>
+
+        {/* Go back to Login */}
+        <div className="pt-4 text-center">
+          <Link href="../login">
+            <Button variant="outline" className="w-full">
+              Back to Login
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
