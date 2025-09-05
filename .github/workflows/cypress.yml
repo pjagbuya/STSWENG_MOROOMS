@@ -14,7 +14,7 @@ jobs:
         run: |
           echo "URL: $NEXT_PUBLIC_SUPABASE_URL"
           echo "Anon key length: ${#NEXT_PUBLIC_SUPABASE_ANON_KEY}"
-          echo "Service key length: ${#SUPABASE_SERVICE_ROLE_KEY}"
+          echo "Service key length: ${#NEXT_SERVICE_SUPABASE_ANON_KEY}"
 
       - name: Check out the code
         uses: actions/checkout@v3
