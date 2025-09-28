@@ -38,6 +38,23 @@ export async function isAdminServerSide() {
   return data.toLowerCase() == 'admin';
 }
 
+export async function isProfServerSide() {
+  const supabase = createClientServerSide();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data, error } = await supabase.rpc('get_user_role', {
+    p_user_id: user.id,
+  });
+
+  if (error) {
+    throw new Error(error);
+  }
+
+  return data.toLowerCase() == 'prof';
+}
+
 export function convertKeysToCamelCase(data) {
   return data.map(obj => {
     const newObj = {};

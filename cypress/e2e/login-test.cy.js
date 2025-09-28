@@ -23,12 +23,13 @@ describe('Login page tests', () => {
     cy.contains('MoRooms').should('be.visible');
   });
 
-  it('Is redirected to the error page when using invalid credentials', () => {
+  it('Is shown to error page when using invalid credentials', () => {
     cy.get('input[name="email"]').type(emailValid);
     cy.get('input[name="password"]').type(passwordInvalid);
     cy.get('button[type="submit"]').click();
 
-    //asserts
-    cy.url().should('include', '/error');
+    // Assert that the error message is visible
+    cy.get('.text-red-600').should('be.visible');
+    cy.get('.text-red-600').should('contain', 'Invalid');
   });
 });

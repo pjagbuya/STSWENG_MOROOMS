@@ -7,7 +7,7 @@ export default function Page() {
       <Image
         src="/images/Login-bg.png"
         alt="DLSU classroom"
-        layout="fill"
+        fill
         className="absolute -z-10 opacity-50"
       />
       <LoginForm />

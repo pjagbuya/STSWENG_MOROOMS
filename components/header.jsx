@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { getCurrentUserInfo } from '@/app/users/[user_id]/profile/action';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { createClient } from '@/utils/supabase/server';
-import { isAdminServerSide } from '@/utils/utils';
+import { isAdminServerSide, isProfServerSide } from '@/utils/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -17,6 +17,7 @@ export default async function Header() {
   const isLoggedIn = user !== null;
   const isAdmin = await isAdminServerSide();
 
+  const isProf = await isProfServerSide();
   const userInfo = await getCurrentUserInfo();
 
   return (
@@ -32,7 +33,7 @@ export default async function Header() {
           {'Profile'}
         </HeaderNavLink>
         <HeaderNavLink link="/rooms">
-          {isAdmin ? 'Reservations / Manage Rooms' : 'Reservations'}
+          {isAdmin || isProf ? 'Reservations / Manage Rooms' : 'Reservations'}
         </HeaderNavLink>
 
         {isAdmin && (
@@ -43,6 +44,7 @@ export default async function Header() {
             <HeaderNavLink link={`/users/${userInfo.userId}/home/admin/users`}>
               Manage Users
             </HeaderNavLink>
+            <HeaderNavLink link={'/logger'}>View Logs</HeaderNavLink>
           </>
         )}
       </nav>

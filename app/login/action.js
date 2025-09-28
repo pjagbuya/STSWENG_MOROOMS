@@ -1,26 +1,49 @@
 'use server';
 
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export async function login(formData) {
+export async function login(prevState, formData) {
   const supabase = createClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email'),
-    password: formData.get('password'),
-  };
+  // Extract data as simple strings
+  const email = formData.get('email')?.toString();
+  const password = formData.get('password')?.toString();
 
-  const { error } = await supabase.auth.signInWithPassword(data);
-
-  if (error) {
-    console.log(error.message);
-    redirect('/error');
+  if (!email || !password) {
+    return { error: 'Email and password are required' };
   }
 
-  revalidatePath('/', 'layout');
-  redirect('/');
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      await APILogger.log(
+        'login',
+        'POST',
+        'auth',
+        null,
+        { email },
+        error.message,
+      );
+      return { error: error.message || 'Authentication failed' };
+    }
+
+    await APILogger.log('login', 'POST', 'auth', data.user?.id, { email });
+
+    // On successful login, revalidate relevant paths
+    revalidatePath('/', 'layout');
+
+    // Success case - return a success flag
+    return { success: true };
+  } catch (err) {
+    await APILogger.log('login', 'POST', 'auth', null, { email }, err.message);
+    return { error: 'An unexpected error occurred' };
+  }
 }

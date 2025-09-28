@@ -14,7 +14,7 @@ export default function RoomDetails({ roomDetails }) {
       </div>
 
       <div className="flex-1 bg-red-100">
-        <img
+        <Image
           className="overflow-none h-full w-full object-cover"
           src={roomDetails.room_image || '/test_image.png'}
           alt={`${roomDetails.room_name} Image`}

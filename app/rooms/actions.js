@@ -4,9 +4,7 @@ import { FORM_SCHEMA } from './form_schema';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-const BUCKET_URL =
-  'https://rcfzezkhwvgtwpqcyhac.supabase.co/storage/v1/object/public/Morooms-file';
-
+const BUCKET_URL = process.env.BUCKET_URL;
 /**
  * Adds a new room using form data.
  *
@@ -254,6 +252,7 @@ export async function editRoomAction(id, prevState, formData) {
   }
 
   const fileExtension = imageFile.type.split('/')[1];
+  console.log('File extension:', fileExtension);
   const imgUrl = `/room_images/${id}.${fileExtension}`;
 
   const { error: imgDeleteError } = await supabase.storage
