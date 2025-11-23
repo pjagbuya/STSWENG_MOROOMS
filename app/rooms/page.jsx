@@ -8,14 +8,19 @@ import SearchFilter from '@/components/rooms/search_filter';
 import { SetResult } from '@/components/rooms/set_result';
 import { Button } from '@/components/ui/button';
 import { get24HourTime, getDateString } from '@/utils/time';
-import { isAdminServerSide } from '@/utils/utils';
+import { isAdminServerSide, isRMServerSide } from '@/utils/utils';
 import { Settings } from 'lucide-react';
 import { Layers } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 export default async function RoomSearchPage({ searchParams }) {
-  const isAdmin = await isAdminServerSide();
+  var isEditable = await isAdminServerSide();
+  const isRM = await isRMServerSide();
+
+  if (!isEditable) {
+    isEditable = isRM;
+  }
 
   const searchFilters = {
     name: searchParams.name,
@@ -55,7 +60,7 @@ export default async function RoomSearchPage({ searchParams }) {
             />
           </div>
 
-          {isAdmin && (
+          {isEditable && (
             <div className="flex gap-4">
               <AddRoomButton />
 
@@ -84,7 +89,7 @@ export default async function RoomSearchPage({ searchParams }) {
             rooms.map(({ set_id, set_name, rooms }) => (
               <SetResult
                 key={set_id}
-                isAdmin={isAdmin}
+                isEditable={isEditable}
                 setName={set_name}
                 rooms={rooms.map(r => ({
                   ...r,

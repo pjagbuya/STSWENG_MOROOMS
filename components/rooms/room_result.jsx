@@ -4,11 +4,13 @@ import DeleteRoomButton from './delete_room_button';
 import EditRoomButton from './edit_room_button';
 import { RoomStatus } from './room_status';
 import { deleteRoomAction } from '@/app/rooms/actions';
+import { Can } from '@/components/auth_components/authcomponents';
+import { PERMISSIONS } from '@/lib/rbac-config';
 import { Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
-export function RoomResult({ isAdmin, room, roomSets, roomTypes }) {
+export function RoomResult({ isEditable, room, roomSets, roomTypes }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
 
@@ -40,7 +42,7 @@ export function RoomResult({ isAdmin, room, roomSets, roomTypes }) {
         </article>
       </Link>
 
-      {isAdmin && (
+      <Can permissions={[PERMISSIONS.ROOM_UPDATE, PERMISSIONS.ROOM_DELETE]}>
         <div className="absolute bottom-2 right-2 flex space-x-2">
           <EditRoomButton
             room={room}
@@ -63,7 +65,7 @@ export function RoomResult({ isAdmin, room, roomSets, roomTypes }) {
             onOpenChange={setOpenDeleteDialog}
           />
         </div>
-      )}
+      </Can>
     </div>
   );
 }

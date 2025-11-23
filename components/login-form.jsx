@@ -1,6 +1,6 @@
 'use client';
 
-import { login } from '@/app/login/action';
+import { SubmitButton } from '@/components/buttons/submit-button';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -9,60 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { ErrorMessage } from '@/components/ui/error-message';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useLogin } from '@/hooks/use-login';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { useFormState } from 'react-dom';
-import { useFormStatus } from 'react-dom';
-
-// Separate button component that uses form status
-function SubmitButton({ isRedirecting }) {
-  const { pending } = useFormStatus();
-  return (
-    <Button
-      type="submit"
-      className="w-full"
-      disabled={pending || isRedirecting}
-    >
-      {pending || isRedirecting ? 'Logging in...' : 'Login'}
-    </Button>
-  );
-}
 
 export function LoginForm() {
-  const router = useRouter();
-  const [isRedirecting, setIsRedirecting] = useState(false);
-
-  // Handle form submission with client-side redirect
-  const handleLoginAction = async (prevState, formData) => {
-    const result = await login(prevState, formData);
-    if (result.success) {
-      setIsRedirecting(true);
-      // Small delay before redirect to ensure UI updates
-      setTimeout(() => {
-        router.push('/');
-      }, 100);
-    }
-    return result;
-  };
-
-  // Initialize form state with our custom handler
-  const [state, formAction] = useFormState(handleLoginAction, { error: '' });
-
-  // Use this to handle redirection if state updates outside of action
-  useEffect(() => {
-    if (state.success) {
-      setIsRedirecting(true);
-      // Small delay before redirect to ensure UI updates
-      const redirectTimer = setTimeout(() => {
-        router.push('/');
-      }, 100);
-      return () => clearTimeout(redirectTimer);
-    }
-  }, [state.success, router]);
-
+  const { state, formAction, isRedirecting } = useLogin();
   return (
     <Card className="mx-auto w-[425px] max-w-lg">
       <CardHeader>
@@ -73,11 +27,8 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <form action={formAction}>
-          {state.error && (
-            <div className="mb-4 rounded-md bg-red-50 p-3">
-              <p className="text-sm text-red-600">{state.error}</p>
-            </div>
-          )}
+          <ErrorMessage error={state.error} />
+
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -103,13 +54,21 @@ export function LoginForm() {
               />
             </div>
             <div className="flex gap-2 pt-4">
-              <SubmitButton isRedirecting={isRedirecting} />
+              <SubmitButton isRedirecting={isRedirecting}>Login</SubmitButton>
             </div>
           </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
             <Link href="/signup" className="underline">
               Sign up
+            </Link>
+          </div>
+          <div className="text-center text-sm">
+            <Link
+              href="/login/forgot-password"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              Forgot your password?
             </Link>
           </div>
         </form>

@@ -2,6 +2,11 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
 export async function updateSession(request) {
+  // Allow endpoints to api calls to be passed next
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -62,6 +67,8 @@ export async function updateSession(request) {
     const { data: isApproved } = await supabase.rpc('is_user_approved', {
       p_user_id: user.id,
     });
+    console.log('User ID:', user.id);
+    console.log('isApproved:', isApproved);
     if (!isApproved) {
       const url = request.nextUrl.clone();
       url.pathname = '/pending';

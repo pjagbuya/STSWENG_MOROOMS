@@ -1,4 +1,5 @@
 import './globals.css';
+import { AuthProvider } from '@/components/auth_components/authprovider';
 import Header from '@/components/header';
 import localFont from 'next/font/local';
 
@@ -24,7 +25,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

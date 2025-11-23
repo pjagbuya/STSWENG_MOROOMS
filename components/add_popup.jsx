@@ -17,6 +17,7 @@ export function AddPopup({ formSchema, title, open, onAdd, onOpenChange }) {
         <AddPopupForm
           onSubmit={(form, values) => onAdd(form, values)}
           formSchema={formSchema}
+          includeSecurityQuestions={false}
         />
       </DialogContent>
     </Dialog>

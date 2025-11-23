@@ -71,7 +71,7 @@ export default function ReservationTable({ userId, mode }) {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const isAdmin = mode === 'admin';
+  const isAdmin = mode === 'edit';
 
   const handleDeleteReservation = async reservationId => {
     if (!confirm('Are you sure you want to delete this reservation?')) return;

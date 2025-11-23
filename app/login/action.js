@@ -1,5 +1,6 @@
 'use server';
 
+import { refreshUser } from '@/components/auth_components/authprovider';
 import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
@@ -22,6 +23,7 @@ export async function login(prevState, formData) {
       email,
       password,
     });
+    console.log('LoginForm error state: ', error);
 
     if (error) {
       await APILogger.log(
@@ -32,14 +34,14 @@ export async function login(prevState, formData) {
         { email },
         error.message,
       );
-      return { error: error.message || 'Authentication failed' };
+
+      return { error: error.message || 'Invalid username or password' };
     }
 
     await APILogger.log('login', 'POST', 'auth', data.user?.id, { email });
 
     // On successful login, revalidate relevant paths
     revalidatePath('/', 'layout');
-
     // Success case - return a success flag
     return { success: true };
   } catch (err) {

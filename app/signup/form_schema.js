@@ -1,4 +1,7 @@
-import { userEditFormSchema } from '../users/[user_id]/home/admin/users/form_schema';
+import {
+  securityQuestionFormSchema,
+  userEditFormSchema,
+} from '../users/[user_id]/home/admin/users/form_schema';
 import { sign } from 'crypto';
 import { z } from 'zod';
 
@@ -11,7 +14,7 @@ const ACCEPTED_IMAGE_TYPES = [
   'application/pdf',
 ];
 
-export const singupSchema = z
+export const signupSchema = z
   .object({
     email: z
       .string()
@@ -36,3 +39,7 @@ export const singupSchema = z
       .describe('Image'),
   })
   .merge(userEditFormSchema);
+
+export const signUpSecurityQuestionsSchema = signupSchema.merge(
+  securityQuestionFormSchema,
+);

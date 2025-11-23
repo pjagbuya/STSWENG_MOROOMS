@@ -20,3 +20,8 @@ export const roleFormSchema = z.object({
     message: 'Type max number must be at least 1.',
   }),
 });
+
+export const securityQuestionFormSchema = z.object({
+  securityAnswer1: z.string().min(2, 'Answer must be at least 2 characters'),
+  securityAnswer2: z.string().min(2, 'Answer must be at least 2 characters'),
+});

@@ -18,6 +18,7 @@ export default async function Home() {
         layout="fill"
         className="absolute inset-0 -z-10 object-cover opacity-50"
       />
+
       {/* Background overlay */}
       <div className="absolute inset-0 -z-10 bg-black opacity-40"></div>
       <main className="relative flex-grow">

@@ -1,10 +1,12 @@
+'use server';
+
 import HeaderNavLink from './header_navlink';
 import SignOutButton from './signout_btn';
 import { Button } from './ui/button';
 import { getCurrentUserInfo } from '@/app/users/[user_id]/profile/action';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { createClient } from '@/utils/supabase/server';
-import { isAdminServerSide, isProfServerSide } from '@/utils/utils';
+import { isAdminServerSide, isRMServerSide } from '@/utils/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -17,7 +19,7 @@ export default async function Header() {
   const isLoggedIn = user !== null;
   const isAdmin = await isAdminServerSide();
 
-  const isProf = await isProfServerSide();
+  const isRM = await isRMServerSide();
   const userInfo = await getCurrentUserInfo();
 
   return (
@@ -33,14 +35,15 @@ export default async function Header() {
           {'Profile'}
         </HeaderNavLink>
         <HeaderNavLink link="/rooms">
-          {isAdmin || isProf ? 'Reservations / Manage Rooms' : 'Reservations'}
+          {isAdmin || isRM ? 'Reservations / Manage Rooms' : 'Reservations'}
+        </HeaderNavLink>
+
+        <HeaderNavLink link="/manage/reservations">
+          Manage Reservations
         </HeaderNavLink>
 
         {isAdmin && (
           <>
-            <HeaderNavLink link="/manage/reservations">
-              Manage Reservations
-            </HeaderNavLink>
             <HeaderNavLink link={`/users/${userInfo.userId}/home/admin/users`}>
               Manage Users
             </HeaderNavLink>

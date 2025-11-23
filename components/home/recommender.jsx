@@ -1,4 +1,3 @@
-import { RoomResult } from '../rooms/room_result';
 import { Card, CardContent } from '../ui/card';
 import { fetchRoomSets } from '@/app/manage/room_sets/actions';
 import { fetchRoomTypes } from '@/app/manage/room_types/actions';

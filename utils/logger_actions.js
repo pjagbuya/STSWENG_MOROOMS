@@ -14,7 +14,7 @@ export class APILogger {
       method,
       table,
       user_id: userId,
-      data: data ? JSON.stringify(data) : null,
+      data: data ? JSON.stringify(data) : null, //is in JSONB
       error: error ? error.message || error : null,
       status: error ? 'error' : 'success',
     };
