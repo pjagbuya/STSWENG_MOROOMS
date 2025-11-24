@@ -19,7 +19,7 @@ async function uploadFile(file, path) {
 }
 
 export async function signup(prevState, formData) {
-  const supabase = createClient();
+  const supabase = createClient(true);
 
   console.log(
     'Security Answers:',

@@ -42,6 +42,7 @@ export async function login(prevState, formData) {
 
     // On successful login, revalidate relevant paths
     revalidatePath('/', 'layout');
+
     // Success case - return a success flag
     return { success: true };
   } catch (err) {
