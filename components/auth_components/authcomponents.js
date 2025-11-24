@@ -62,9 +62,9 @@ export function ProtectedContent({
 
     // Redirect to login if not authenticated
     if (!isAuthenticated) {
-      router.push(
-        `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
-      );
+      // router.push(
+      //   `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
+      // );
       return;
     }
 
