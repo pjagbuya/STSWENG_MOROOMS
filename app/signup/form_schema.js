@@ -27,7 +27,7 @@ export const signupSchema = z
       .max(32, { message: 'Password must not exceed 32 characters' })
       .describe('password'),
     proof: z
-      .any()
+      .instanceof(File, { message: 'File is required' })
       .refine(file => {
         return file?.length !== 0;
       }, 'File is required')
