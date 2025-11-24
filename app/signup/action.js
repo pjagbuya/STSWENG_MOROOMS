@@ -46,7 +46,7 @@ export async function signup(prevState, formData) {
     const { error: historyInsertError } = await supabase
       .from('password_history')
       .insert({
-        user_id: userId,
+        user_id: user_signin_data.user.id,
         hashed_password: hashedNewPassword,
         created_at: new Date().toISOString(),
       });
