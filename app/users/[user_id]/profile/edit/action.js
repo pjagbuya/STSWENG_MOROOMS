@@ -2,6 +2,7 @@
 
 import { callFunctionWithFormData } from '@/utils/action_template';
 import { createClient } from '@/utils/supabase/server';
+import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 
 export async function getUserInfo() {
@@ -41,26 +42,59 @@ async function uploadFile(file, path) {
   }
 }
 
-export async function editProfile(formData) {
+export async function editProfile(prevState, formData) {
+  let editStatus = '';
+
+  const supabase = createClient();
+
   // sign up
   const data = {
     email: formData.get('email'),
   };
+
   const password = formData.get('password');
   console.log('password', password);
+
   if (password && password != 'undefined') {
-    data.password = password;
+    const { data: userInfo, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !userInfo?.user) {
+      return { error: 'Unable to authenticate user' };
+    }
+
+    const userId = userInfo.user.id;
+
+    if (await passwordRecentlyChanged(supabase, userId)) {
+      editStatus = 'Cannot change password more than once within 24 hours.';
+    }
+
+    if (await passwordHasBeenUsedBefore(supabase, userId, password)) {
+      editStatus = 'Cannot reuse previous passwords.';
+    }
+
+    if (!editStatus) {
+      data.password = password;
+    }
   }
 
   console.log('data', data);
-
-  const supabase = createClient();
 
   const { data: user_signin_data, error } =
     await supabase.auth.updateUser(data);
 
   if (error) {
     console.log(error.message);
+  }
+
+  if (data.password) {
+    // Log password hash in password history
+    const hashedNewPassword = await bcrypt.hash(data.password, 12);
+
+    await supabase.from('password_history').insert({
+      user_id: user_signin_data.user.id,
+      hashed_password: hashedNewPassword,
+      created_at: new Date().toISOString(),
+    });
   }
 
   const file = formData.get('userProfilepic');
@@ -81,6 +115,10 @@ export async function editProfile(formData) {
     redirect('/error');
   }
 
+  if (editStatus) {
+    return { error: editStatus };
+  }
+
   // create user info
   callFunctionWithFormData(null, 'edit_user_by_id', '/private', formData, null);
   if (file && file != 'undefined') {
@@ -88,4 +126,44 @@ export async function editProfile(formData) {
   }
 
   redirect('./');
+}
+
+async function passwordHasBeenUsedBefore(supabase, userId, newPassword) {
+  const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+  const { data: passwordHistory, error } = await supabase
+    .from('password_history')
+    .select('hashed_password')
+    .eq('user_id', userId)
+    .eq('hashed_password', hashedPassword)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  if (error) {
+    return false;
+  }
+
+  console.log(65656, passwordHistory);
+
+  return passwordHistory && passwordHistory.length > 0;
+}
+
+async function passwordRecentlyChanged(supabase, userId) {
+  const { data: passwordHistory, error } = await supabase
+    .from('password_history')
+    .select('created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!passwordHistory || error) {
+    return false;
+  }
+
+  const lastPasswordChange = new Date(passwordHistory.created_at);
+  const now = new Date();
+  const hoursSinceLastChange = (now - lastPasswordChange) / (1000 * 60 * 60);
+
+  return hoursSinceLastChange < 24;
 }

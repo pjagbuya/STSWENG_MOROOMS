@@ -14,16 +14,20 @@ import {
 } from '@/components/ui/card';
 import { ErrorMessage } from '@/components/ui/error-message';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
 
 export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
-  const [state, formAction] = useFormState(signup, { error: '' });
+  const [signupState, signupAction] = useFormState(signup, { error: '' });
+  const [editState, editAction] = useFormState(editProfile, { error: '' });
+
+  const state = isEdit ? editState : signupState;
+  const formAction = isEdit ? editAction : signupAction;
+
   const finalSchema = isEdit
     ? editProfileSchema
     : signUpSecurityQuestionsSchema;
 
-  // Handle successful signup
   useEffect(() => {
     if (state.success) {
       window.location.href = '/login?message=Account created successfully';
@@ -73,14 +77,8 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
       formData.append('question2', selectedQuestions.q2);
     }
 
-    if (isEdit) {
-      await editProfile(formData);
-    } else {
-      // Use formAction for proper state management
-      console.log('Form Data', formData);
-
-      await formAction(formData);
-    }
+    console.log('Form Data', formData);
+    await formAction(formData);
   };
 
   return (
