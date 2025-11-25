@@ -27,7 +27,7 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <form action={formAction}>
-          <ErrorMessage error={state.error} />
+          <ErrorMessage error={state.error} isLocked={state.locked} />
 
           <div className="grid gap-4">
             <div className="grid gap-2">
