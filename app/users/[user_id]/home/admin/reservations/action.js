@@ -11,7 +11,7 @@ export const fetchReservationsByUserId = async userId => {
     });
 
     if (error) {
-      console.error('Error fetching reservations:', error);
+      //console.error('Error fetching reservations:', error);
       return [];
     }
 
@@ -26,7 +26,7 @@ export const fetchReservationsByUserId = async userId => {
       endorsementLetter: reservation.endorsement_letter, // Add this field if present
     }));
   } catch (err) {
-    console.error('Unexpected error fetching reservations:', err);
+    //console.error('Unexpected error fetching reservations:', err);
     return [];
   }
 };
@@ -38,10 +38,10 @@ export const fetchRoomDetailsByRoomId = async roomId => {
     });
 
     if (error) {
-      console.error(
-        `Error fetching room details for room ID ${roomId}:`,
-        error,
-      );
+      //console.error(
+       // `Error fetching room details for room ID ${roomId}:`,
+        //error,
+      //);
       return null;
     }
 
@@ -52,10 +52,10 @@ export const fetchRoomDetailsByRoomId = async roomId => {
     console.warn(`Room with ID ${roomId} not found.`);
     return null;
   } catch (err) {
-    console.error(
+    /*console.error(
       `Unexpected error fetching room details for room ID ${roomId}:`,
       err,
-    );
+    );*/
     return null;
   }
 };
@@ -77,14 +77,14 @@ export const fetchReservationsWithRoomNames = async userId => {
 
     return reservationsWithRoomNames;
   } catch (err) {
-    console.error('Error fetching reservations with room names:', err);
+    //console.error('Error fetching reservations with room names:', err);
     return [];
   }
 };
 
 export async function updateReservationStatus(reservationId, status) {
-  console.log('id: ', reservationId);
-  console.log('status: ', status);
+  //console.log('id: ', reservationId);
+  //console.log('status: ', status);
   // Call the PostgreSQL function you defined
   const { data, error } = await supabase.rpc('update_reservation_status', {
     p_reservation_id: reservationId,
@@ -92,7 +92,7 @@ export async function updateReservationStatus(reservationId, status) {
   });
 
   if (error) {
-    console.error('Error updating reservation status:', error);
+    //console.error('Error updating reservation status:', error);
     return { error };
   }
 

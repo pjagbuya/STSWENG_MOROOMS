@@ -89,7 +89,6 @@ export async function fetchRoomSets() {
   const { data, error } = await supabase.rpc('get_room_sets');
 
   if (error) {
-    console.error('Error fetching room sets:', error);
     throw error;
   }
 

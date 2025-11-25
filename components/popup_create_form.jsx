@@ -66,6 +66,13 @@ export function AddPopupForm({
           onSubmit(form, values, selectedQuestions);
         })}
       >
+        {/* Display root form errors */}
+        {form.formState.errors.root && (
+          <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+            {form.formState.errors.root.message}
+          </div>
+        )}
+
         {/* Two-column layout */}
         <div
           className={`grid gap-6 ${includeSecurityQuestions ? 'grid-cols-2' : 'grid-cols-1'}`}

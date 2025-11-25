@@ -26,34 +26,41 @@ const Management = async () => {
   return (
     <div className="flex w-full flex-col gap-2 p-8">
       <h1 className="text-3xl font-bold">User Management</h1>
-      {/* <ProtectedContent
+      <ProtectedContent
         permissions={[
+          PERMISSIONS.USER_READ,
+          PERMISSIONS.USER_DELETE,
           PERMISSIONS.USER_ROLE_UPDATE,
           PERMISSIONS.ROLE_REQUEST_APPROVE,
+          PERMISSIONS.ROLE_CREATE,
+          PERMISSIONS.ROLE_DELETE,
         ]}
         redirectTo="/unauthorized"
-      > */}
-      <Tabs defaultValue="users" className="w-full">
-        <TabsList>
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="role_settings">Role Settings</TabsTrigger>
-          <TabsTrigger value="verify_user">Verify User</TabsTrigger>
-          <TabsTrigger value="role_request">Role Request</TabsTrigger>
-        </TabsList>
-        <TabsContent value="users">
-          <UserTable data={users} roles={roles} />
-        </TabsContent>
-        <TabsContent value="role_settings">
-          <RoleTable data={rolesWithPermission} roles={roles} />
-        </TabsContent>
-        <TabsContent value="verify_user">
-          <VerifyUserTable data={usersWithProof} approveTypes={approveTypes} />
-        </TabsContent>
-        <TabsContent value="role_request">
-          <UpgradeRoleUserTable data={roleRequests} />
-        </TabsContent>
-      </Tabs>
-      {/* </ProtectedContent> */}
+      >
+        <Tabs defaultValue="users" className="w-full">
+          <TabsList>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="role_settings">Role Settings</TabsTrigger>
+            <TabsTrigger value="verify_user">Verify User</TabsTrigger>
+            <TabsTrigger value="role_request">Role Request</TabsTrigger>
+          </TabsList>
+          <TabsContent value="users">
+            <UserTable data={users} roles={roles} />
+          </TabsContent>
+          <TabsContent value="role_settings">
+            <RoleTable data={rolesWithPermission} roles={roles} />
+          </TabsContent>
+          <TabsContent value="verify_user">
+            <VerifyUserTable
+              data={usersWithProof}
+              approveTypes={approveTypes}
+            />
+          </TabsContent>
+          <TabsContent value="role_request">
+            <UpgradeRoleUserTable data={roleRequests} />
+          </TabsContent>
+        </Tabs>
+      </ProtectedContent>
     </div>
   );
 };

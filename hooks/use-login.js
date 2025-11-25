@@ -1,12 +1,14 @@
 'use client';
 
 import { login } from '@/app/login/action';
+import { useAuth } from '@/components/auth_components/authprovider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useFormState } from 'react-dom';
 
 export function useLogin() {
   const router = useRouter();
+  const { user, refreshUser } = useAuth();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Handle form submission with client-side redirect
@@ -14,6 +16,8 @@ export function useLogin() {
     const result = await login(prevState, formData);
     if (result.success) {
       setIsRedirecting(true);
+      await refreshUser();
+
       // Small delay before redirect to ensure UI updates
       setTimeout(() => {
         router.push('/');

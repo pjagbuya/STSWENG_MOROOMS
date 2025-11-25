@@ -6,7 +6,7 @@ export async function getLogs(page = 0, limit = 20, filters = {}) {
   const supabase = createClient();
 
   try {
-    let query = supabase
+    let query = await supabase
       .from('logs')
       .select(
         `
@@ -47,7 +47,6 @@ export async function getLogs(page = 0, limit = 20, filters = {}) {
     const { data, error, count } = await query;
 
     if (error) {
-      console.error('Error fetching logs:', error);
       return { error: error.message };
     }
 
@@ -58,7 +57,6 @@ export async function getLogs(page = 0, limit = 20, filters = {}) {
       total: count,
     };
   } catch (err) {
-    console.error('Failed to fetch logs:', err);
     return { error: 'Failed to fetch logs' };
   }
 }
