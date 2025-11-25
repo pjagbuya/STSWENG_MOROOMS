@@ -64,6 +64,34 @@ export async function editProfile(prevState, formData) {
 
     const userId = userInfo.user.id;
 
+    // Validate re-authentication token for password changes
+    const reauthToken = formData.get('reauthToken');
+
+    if (!reauthToken) {
+      return { error: 'Re-authentication required to change password' };
+    }
+
+    // Parse and validate the token
+    const tokenParts = reauthToken.split(':');
+    if (tokenParts.length !== 2) {
+      return { error: 'Invalid re-authentication token' };
+    }
+
+    const [tokenUserId, tokenTimestamp] = tokenParts;
+
+    // Verify the token belongs to the current user
+    if (tokenUserId !== userId) {
+      return { error: 'Re-authentication token mismatch' };
+    }
+
+    // Verify the token is recent (within last 5 minutes = 300000 milliseconds)
+    const tokenAge = Date.now() - parseInt(tokenTimestamp);
+    if (tokenAge > 300000) {
+      return {
+        error: 'Re-authentication expired. Please verify your password again.',
+      };
+    }
+
     if (await passwordRecentlyChanged(supabase, userId)) {
       editStatus = 'Cannot change password more than once within 24 hours.';
     }
