@@ -1,4 +1,4 @@
-import { getCurrentUserInfo } from './action';
+import { getCurrentUserInfo, getLastLogin } from './action';
 import ProfileCalender from './profile-calendar';
 import GradientBox from '@/components/gradient-box';
 import Header from '@/components/header';
@@ -16,6 +16,7 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
   const userInfo = await getCurrentUserInfo();
+  const lastLogin = await getLastLogin(user.email);
 
   return (
     <div>
@@ -32,6 +33,12 @@ export default async function ProfilePage() {
                 {userInfo.userFirstname} {userInfo.userLastname}
               </h1>
               <h3 className="text-lg">{user.email}</h3>
+              <h3 className="text-lg">
+                Last login:{' '}
+                <span className={lastLogin.isError ? 'text-red-500' : ''}>
+                  {lastLogin.text}
+                </span>
+              </h3>
             </div>
           </div>
           <div className="flex h-full flex-col gap-2">
