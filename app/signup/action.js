@@ -21,11 +21,11 @@ async function uploadFile(file, path) {
 export async function signup(prevState, formData) {
   const supabase = createClient();
 
-  console.log(
+  /*console.log(
     'Security Answers:',
     formData.get('securityAnswer1'),
     formData.get('securityAnswer2'),
-  );
+  );*/
 
   // Sign up user with auth first
   const data = {
@@ -36,7 +36,6 @@ export async function signup(prevState, formData) {
   const { data: user_signin_data, error } = await supabase.auth.signUp(data);
 
   if (error) {
-    console.log(error.message);
     return { error: error.message };
   }
 
@@ -55,7 +54,8 @@ export async function signup(prevState, formData) {
       console.error('Failed to save password to history:', historyInsertError);
       // Don't fail the request if history saving fails
     } else {
-      console.log('Password saved to history');
+      
+      /*console.log('Password saved to history');*/
     }
   } catch (historyError) {
     console.error('Error managing password history:', historyError);
