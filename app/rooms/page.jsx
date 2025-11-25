@@ -40,7 +40,9 @@ export default async function RoomSearchPage({ searchParams }) {
     'use server';
 
     const queryParamString = new URLSearchParams(filters).toString();
+  
     redirect(`/rooms?${queryParamString}`);
+
   }
 
   return (
