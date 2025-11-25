@@ -23,7 +23,7 @@ export default async function ProfilePage() {
       <Header />
       <div className="flex h-screen w-full flex-col items-center justify-center gap-10 px-64 py-24">
         <div className="flex h-[300px] w-full items-center justify-between gap-6 py-6">
-          <div className="flex w-full gap-5 rounded-3xl border-8 border-slate-400 bg-slate-200 p-6">
+          <div className="flex w-full gap-5 rounded-3xl bg-slate-200 p-6">
             <Avatar className="h-[211px] w-[211px]">
               <AvatarImage src={userInfo.profileURL} />
               <AvatarFallback>CN</AvatarFallback>
@@ -34,7 +34,7 @@ export default async function ProfilePage() {
               </h1>
               <h3 className="text-lg">{user.email}</h3>
               <h3 className="text-lg">
-                Last login:{' '}
+                Last Login:{' '}
                 <span className={lastLogin.isError ? 'text-red-500' : ''}>
                   {lastLogin.text}
                 </span>
