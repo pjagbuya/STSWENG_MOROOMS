@@ -62,7 +62,7 @@ export function ReauthModal({ open, onOpenChange, userEmail, onSuccess }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md [&>button:first-of-type]:hidden">
         <DialogHeader>
           <DialogTitle>Confirm Password Change</DialogTitle>
           <DialogDescription>
