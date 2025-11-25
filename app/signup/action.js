@@ -87,12 +87,6 @@ export async function signup(prevState, formData) {
       return { error: 'Please select different security questions' };
     }
 
-    // Save security answers
-    await SecurityService.saveSecurityAnswers(
-      user_signin_data.user.id,
-      securityAnswers,
-    );
-
     // Handle file upload
 
     const file = formData.get('proof');
@@ -120,6 +114,11 @@ export async function signup(prevState, formData) {
       '/login',
       procedureFormData,
       null, // No id column name needed since procedure handles it
+    );
+    // Save security answers
+    await SecurityService.saveSecurityAnswers(
+      user_signin_data.user.id,
+      securityAnswers,
     );
 
     return { success: true };
