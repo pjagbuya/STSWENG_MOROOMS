@@ -5,6 +5,141 @@ import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 
+// ============================================================================
+// Password Change Eligibility Check
+// ============================================================================
+
+/**
+ * Check if user can change their password (not changed within 24 hours).
+ * This is a server action called BEFORE showing the re-auth modal.
+ * Compatible with useFormState - takes prevState as first argument.
+ */
+export async function checkPasswordChangeEligibility(prevState) {
+  const supabase = createClient();
+
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !authData?.user) {
+    return { allowed: false, error: 'You must be logged in' };
+  }
+
+  const recentlyChanged = await passwordRecentlyChanged(
+    supabase,
+    authData.user.id,
+  );
+
+  if (recentlyChanged) {
+    return {
+      allowed: false,
+      error: 'Cannot change password more than once within 24 hours.',
+    };
+  }
+
+  return { allowed: true, error: '' };
+}
+
+/**
+ * Server action to verify current password and change to new password.
+ * This combines re-authentication and password change in one step.
+ */
+export async function reauthenticateAndChangePassword(prevState, formData) {
+  const currentPassword = formData.get('currentPassword');
+  const newPassword = formData.get('newPassword');
+  const email = formData.get('email');
+
+  if (!currentPassword || !email || !newPassword) {
+    return { error: 'All fields are required' };
+  }
+
+  const supabase = createClient(true);
+
+  // Get current authenticated user
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !authData?.user) {
+    return { error: 'You must be logged in to perform this action' };
+  }
+
+  const userId = authData.user.id;
+
+  // Verify the email matches the current user
+  if (authData.user.email !== email) {
+    return { error: 'Email mismatch' };
+  }
+
+  // Verify the current password by attempting to sign in
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password: currentPassword,
+  });
+
+  if (signInError) {
+    return { error: 'Invalid current password. Please try again.' };
+  }
+
+  // Check if password was recently changed (within 24 hours)
+  const recentlyChanged = await passwordRecentlyChanged(supabase, userId);
+  if (recentlyChanged) {
+    return {
+      error: 'Cannot change password more than once within 24 hours.',
+    };
+  }
+
+  // Check if password has been used before
+  if (await passwordHasBeenUsedBefore(supabase, userId, newPassword)) {
+    return { error: 'Cannot reuse previous passwords.' };
+  }
+
+  // All validations passed - update password
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (updateError) {
+    return { error: 'Failed to update password. Please try again.' };
+  }
+
+  // Log password hash in password history
+  const salt = await bcrypt.genSalt(12);
+  const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+  await supabase.from('password_history').insert({
+    user_id: userId,
+    hashed_password: hashedNewPassword,
+    created_at: new Date().toISOString(),
+    salt: salt,
+  });
+
+  return { success: true };
+}
+
+/**
+ * Check if password was recently changed (within 24 hours)
+ */
+async function passwordRecentlyChanged(supabase, userId) {
+  const { data: passwordHistory, error } = await supabase
+    .from('password_history')
+    .select('created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!passwordHistory || error) {
+    return false;
+  }
+
+  const lastPasswordChange = new Date(passwordHistory.created_at);
+  const now = new Date();
+  const hoursSinceLastChange = (now - lastPasswordChange) / (1000 * 60 * 60);
+
+  return hoursSinceLastChange < 24;
+}
+
+// ============================================================================
+// User Profile Actions
+// ============================================================================
+
 export async function getUserInfo() {
   const supabase = createClient();
   const { data: userInfo, error } = await supabase.auth.getUser();
@@ -43,67 +178,20 @@ async function uploadFile(file, path) {
 }
 
 export async function editProfile(prevState, formData) {
-  let editStatus = '';
+  const supabase = createClient(true);
 
-  const supabase = createClient();
+  const { data: userInfo, error: authError } = await supabase.auth.getUser();
 
-  // sign up
+  if (authError || !userInfo?.user) {
+    return { error: 'Unable to authenticate user' };
+  }
+
+  const userId = userInfo.user.id;
+
+  // Update email if changed
   const data = {
     email: formData.get('email'),
   };
-
-  const password = formData.get('password');
-  console.log('password', password);
-
-  if (password && password != 'undefined') {
-    const { data: userInfo, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !userInfo?.user) {
-      return { error: 'Unable to authenticate user' };
-    }
-
-    const userId = userInfo.user.id;
-
-    // Validate re-authentication token for password changes
-    const reauthToken = formData.get('reauthToken');
-
-    if (!reauthToken) {
-      return { error: 'Re-authentication required to change password' };
-    }
-
-    // Parse and validate the token
-    const tokenParts = reauthToken.split(':');
-    if (tokenParts.length !== 2) {
-      return { error: 'Invalid re-authentication token' };
-    }
-
-    const [tokenUserId, tokenTimestamp] = tokenParts;
-
-    // Verify the token belongs to the current user
-    if (tokenUserId !== userId) {
-      return { error: 'Re-authentication token mismatch' };
-    }
-
-    // Verify the token is recent (within last 5 minutes = 300000 milliseconds)
-    const tokenAge = Date.now() - parseInt(tokenTimestamp);
-    if (tokenAge > 300000) {
-      return {
-        error: 'Re-authentication expired. Please verify your password again.',
-      };
-    }
-
-    if (await passwordRecentlyChanged(supabase, userId)) {
-      editStatus = 'Cannot change password more than once within 24 hours.';
-    }
-
-    if (await passwordHasBeenUsedBefore(supabase, userId, password)) {
-      editStatus = 'Cannot reuse previous passwords.';
-    }
-
-    if (!editStatus) {
-      data.password = password;
-    }
-  }
 
   console.log('data', data);
 
@@ -114,25 +202,14 @@ export async function editProfile(prevState, formData) {
     console.log(error.message);
   }
 
-  if (data.password) {
-    // Log password hash in password history
-    const hashedNewPassword = await bcrypt.hash(data.password, 12);
-
-    await supabase.from('password_history').insert({
-      user_id: user_signin_data.user.id,
-      hashed_password: hashedNewPassword,
-      created_at: new Date().toISOString(),
-    });
-  }
-
   const file = formData.get('userProfilepic');
-  const path = user_signin_data.user.id;
+  const path = userId;
   console.log('file', file);
 
   formData.delete('email');
   formData.delete('password');
   formData.delete('userProfilepic');
-  formData.append('user_id', user_signin_data.user.id);
+  formData.append('user_id', userId);
   if (file && file != 'undefined') {
     formData.append('userProfilepic', file.name);
   }
@@ -141,10 +218,6 @@ export async function editProfile(prevState, formData) {
   if (error) {
     console.log(error.message);
     redirect('/error');
-  }
-
-  if (editStatus) {
-    return { error: editStatus };
   }
 
   // create user info
@@ -157,41 +230,26 @@ export async function editProfile(prevState, formData) {
 }
 
 async function passwordHasBeenUsedBefore(supabase, userId, newPassword) {
-  const hashedPassword = await bcrypt.hash(newPassword, 12);
-
+  // Fetch all password history entries with their hashed passwords
   const { data: passwordHistory, error } = await supabase
     .from('password_history')
     .select('hashed_password')
     .eq('user_id', userId)
-    .eq('hashed_password', hashedPassword)
     .order('created_at', { ascending: false })
     .limit(5);
 
-  if (error) {
+  if (error || !passwordHistory || passwordHistory.length === 0) {
     return false;
   }
 
-  console.log(65656, passwordHistory);
-
-  return passwordHistory && passwordHistory.length > 0;
-}
-
-async function passwordRecentlyChanged(supabase, userId) {
-  const { data: passwordHistory, error } = await supabase
-    .from('password_history')
-    .select('created_at')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (!passwordHistory || error) {
-    return false;
+  // Compare the new password against each stored hash
+  for (const entry of passwordHistory) {
+    const isMatch = await bcrypt.compare(newPassword, entry.hashed_password);
+    if (isMatch) {
+      console.log('Password has been used before');
+      return true;
+    }
   }
 
-  const lastPasswordChange = new Date(passwordHistory.created_at);
-  const now = new Date();
-  const hoursSinceLastChange = (now - lastPasswordChange) / (1000 * 60 * 60);
-
-  return hoursSinceLastChange < 24;
+  return false;
 }

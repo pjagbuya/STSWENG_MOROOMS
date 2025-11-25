@@ -4,7 +4,10 @@ import { AddPopupForm } from './popup_create_form';
 import { ReauthModal } from './reauth-modal';
 import { signup } from '@/app/signup/action';
 import { signUpSecurityQuestionsSchema } from '@/app/signup/form_schema';
-import { editProfile } from '@/app/users/[user_id]/profile/edit/action';
+import {
+  checkPasswordChangeEligibility,
+  editProfile,
+} from '@/app/users/[user_id]/profile/edit/action';
 import { editProfileSchema } from '@/app/users/[user_id]/profile/edit/form_schema';
 import {
   Card,
@@ -21,25 +24,52 @@ import { useFormState } from 'react-dom';
 export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
   const [signupState, signupAction] = useFormState(signup, { error: '' });
   const [editState, editAction] = useFormState(editProfile, { error: '' });
+  const [eligibilityState, checkEligibility] = useFormState(
+    checkPasswordChangeEligibility,
+    { error: '', allowed: null },
+  );
 
   // Re-authentication state for password changes
   const [showReauthModal, setShowReauthModal] = useState(false);
-  const [reauthToken, setReauthToken] = useState('');
+  const [pendingNewPassword, setPendingNewPassword] = useState('');
   const [pendingFormData, setPendingFormData] = useState(null);
-  const [isPasswordChanged, setIsPasswordChanged] = useState(false);
 
   const state = isEdit ? editState : signupState;
+  // Combine errors from edit state and eligibility check
+  const displayError = eligibilityState.error || state.error;
   const formAction = isEdit ? editAction : signupAction;
 
   const finalSchema = isEdit
     ? editProfileSchema
     : signUpSecurityQuestionsSchema;
 
+  // Ensure all form fields have defined values to prevent uncontrolled to controlled warning
+  const mergedDefaultValues = {
+    userFirstname: '',
+    userLastname: '',
+    email: '',
+    password: '',
+    securityAnswer1: '',
+    securityAnswer2: '',
+    proof: undefined,
+    userProfilepic: undefined,
+    ...defaultValues,
+    // Always ensure password is an empty string (never undefined)
+    password: defaultValues?.password ?? '',
+  };
+
   useEffect(() => {
     if (state.success) {
       window.location.href = '/login?message=Account created successfully';
     }
   }, [state.success]);
+
+  // When eligibility check passes, show the re-auth modal
+  useEffect(() => {
+    if (eligibilityState.allowed === true && pendingFormData) {
+      setShowReauthModal(true);
+    }
+  }, [eligibilityState.allowed, pendingFormData]);
 
   const handleFormSubmit = async (form, values, selectedQuestions) => {
     // Only validate security questions for new signups (not edits)
@@ -89,38 +119,27 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
       isEdit && values.password && values.password.trim() !== '';
 
     if (passwordChanged) {
-      setIsPasswordChanged(true);
-
-      // If no re-authentication token, show modal
-      if (!reauthToken) {
-        setPendingFormData({ form, values, selectedQuestions, formData });
-        setShowReauthModal(true);
-        return;
-      }
-
-      // Add re-authentication token to form data
-      formData.append('reauthToken', reauthToken);
+      // Store pending data and check eligibility first (server-side)
+      setPendingNewPassword(values.password);
+      setPendingFormData({ form, values, selectedQuestions, formData });
+      // Call server action to check eligibility - result will be in eligibilityState
+      checkEligibility();
+      return;
     }
 
     console.log('Form Data', formData);
     await formAction(formData);
-
-    // Clear re-auth token after submission
-    if (passwordChanged) {
-      setReauthToken('');
-      setIsPasswordChanged(false);
-    }
   };
 
-  const handleReauthSuccess = token => {
-    setReauthToken(token);
-
-    // If there's pending form data, submit it now
+  const handlePasswordChangeSuccess = () => {
+    // Password was changed successfully, now submit the rest of the form
     if (pendingFormData) {
       const { formData } = pendingFormData;
-      formData.append('reauthToken', token);
+      // Remove password from form data since it was already changed
+      formData.delete('password');
       formAction(formData);
       setPendingFormData(null);
+      setPendingNewPassword('');
     }
   };
 
@@ -138,21 +157,12 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ErrorMessage error={state.error} />
+          <ErrorMessage error={displayError} />
 
           <AddPopupForm
             onSubmit={handleFormSubmit}
             formSchema={finalSchema}
-            defaultValues={
-              defaultValues || {
-                first_name: '',
-                last_name: '',
-                email: '',
-                password: '',
-                securityAnswer1: '',
-                securityAnswer2: '',
-              }
-            }
+            defaultValues={mergedDefaultValues}
             includeSecurityQuestions={!isEdit} // Only show for new signups
             securityQuestions={var2securityQuestions}
           />
@@ -174,7 +184,8 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
           open={showReauthModal}
           onOpenChange={setShowReauthModal}
           userEmail={defaultValues?.email || ''}
-          onSuccess={handleReauthSuccess}
+          newPassword={pendingNewPassword}
+          onSuccess={handlePasswordChangeSuccess}
         />
       )}
     </>

@@ -1,5 +1,6 @@
 'use client';
 
+import { reauthenticateAndChangePassword } from '@/app/users/[user_id]/profile/edit/action';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,52 +12,37 @@ import {
 import { ErrorMessage } from '@/components/ui/error-message';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { createClient } from '@/utils/supabase/client';
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 
-export function ReauthModal({ open, onOpenChange, userEmail, onSuccess }) {
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+function SubmitButton({ disabled }) {
+  const { pending } = useFormStatus();
 
-  const handleReauthenticate = async e => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+  return (
+    <Button type="submit" disabled={disabled || pending}>
+      {pending ? 'Changing Password...' : 'Change Password'}
+    </Button>
+  );
+}
 
-    try {
-      const supabase = createClient();
-      const { data, error: authError } = await supabase.auth.signInWithPassword(
-        {
-          email: userEmail,
-          password: password,
-        },
-      );
+export function ReauthModal({
+  open,
+  onOpenChange,
+  userEmail,
+  newPassword,
+  onSuccess,
+}) {
+  const [state, formAction] = useFormState(reauthenticateAndChangePassword, {});
 
-      if (authError) {
-        setError('Invalid password. Please try again.');
-        setIsLoading(false);
-        return;
-      }
-
-      // Generate a re-authentication token (timestamp-based)
-      const reauthToken = `${data.user.id}:${Date.now()}`;
-
-      // Clear password and call success callback
-      setPassword('');
-      setError('');
-      setIsLoading(false);
-      onSuccess(reauthToken);
+  // Handle successful password change
+  useEffect(() => {
+    if (state.success) {
+      onSuccess();
       onOpenChange(false);
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
-      setIsLoading(false);
     }
-  };
+  }, [state.success, onSuccess, onOpenChange]);
 
   const handleCancel = () => {
-    setPassword('');
-    setError('');
     onOpenChange(false);
   };
 
@@ -66,13 +52,16 @@ export function ReauthModal({ open, onOpenChange, userEmail, onSuccess }) {
         <DialogHeader>
           <DialogTitle>Confirm Password Change</DialogTitle>
           <DialogDescription>
-            For security reasons, please re-enter your current password to
-            change your password.
+            For security reasons, please enter your current password to confirm
+            the password change.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleReauthenticate}>
-          <ErrorMessage error={error} />
+        <form action={formAction}>
+          <input type="hidden" name="email" value={userEmail} />
+          <input type="hidden" name="newPassword" value={newPassword} />
+
+          {state.error && <ErrorMessage error={state.error} />}
 
           <div className="grid gap-4">
             <div className="grid gap-2">
@@ -89,29 +78,20 @@ export function ReauthModal({ open, onOpenChange, userEmail, onSuccess }) {
               <Label htmlFor="reauth-password">Current Password</Label>
               <Input
                 id="reauth-password"
+                name="currentPassword"
                 type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
                 placeholder="Enter your current password"
                 required
-                disabled={isLoading}
                 autoFocus
               />
             </div>
           </div>
 
           <div className="mt-6 flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isLoading}
-            >
+            <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || !password}>
-              {isLoading ? 'Verifying...' : 'Verify'}
-            </Button>
+            <SubmitButton />
           </div>
         </form>
       </DialogContent>
