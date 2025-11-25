@@ -18,7 +18,8 @@ export async function getLogs(page = 0, limit = 20, filters = {}) {
         user_id,
         data,
         error,
-        status
+        status,
+        submission_time
       `,
       )
       .order('timestamp', { ascending: false })
