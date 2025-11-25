@@ -1,6 +1,5 @@
 'use client';
 
-import { reauthenticateAndChangePassword } from '@/app/users/[user_id]/profile/edit/action';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,41 +8,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { ErrorMessage } from '@/components/ui/error-message';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useState } from 'react';
 
-function SubmitButton({ disabled }) {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button type="submit" disabled={disabled || pending}>
-      {pending ? 'Changing Password...' : 'Change Password'}
-    </Button>
-  );
-}
-
-export function ReauthModal({
-  open,
-  onOpenChange,
-  userEmail,
-  newPassword,
-  onSuccess,
-}) {
-  const [state, formAction] = useFormState(reauthenticateAndChangePassword, {});
-
-  // Handle successful password change
-  useEffect(() => {
-    if (state.success) {
-      onSuccess();
-      onOpenChange(false);
-    }
-  }, [state.success, onSuccess, onOpenChange]);
+export function ReauthModal({ open, onOpenChange, userEmail, onSuccess }) {
+  const [currentPassword, setCurrentPassword] = useState('');
 
   const handleCancel = () => {
+    setCurrentPassword('');
     onOpenChange(false);
+  };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    if (currentPassword.trim()) {
+      onSuccess(currentPassword);
+      setCurrentPassword('');
+      onOpenChange(false);
+    }
   };
 
   return (
@@ -57,12 +40,7 @@ export function ReauthModal({
           </DialogDescription>
         </DialogHeader>
 
-        <form action={formAction}>
-          <input type="hidden" name="email" value={userEmail} />
-          <input type="hidden" name="newPassword" value={newPassword} />
-
-          {state.error && <ErrorMessage error={state.error} />}
-
+        <form onSubmit={handleSubmit}>
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="reauth-email">Email</Label>
@@ -78,9 +56,10 @@ export function ReauthModal({
               <Label htmlFor="reauth-password">Current Password</Label>
               <Input
                 id="reauth-password"
-                name="currentPassword"
                 type="password"
                 placeholder="Enter your current password"
+                value={currentPassword}
+                onChange={e => setCurrentPassword(e.target.value)}
                 required
                 autoFocus
               />
@@ -91,7 +70,7 @@ export function ReauthModal({
             <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <SubmitButton />
+            <Button type="submit">Confirm</Button>
           </div>
         </form>
       </DialogContent>

@@ -24,6 +24,8 @@ import { useFormState } from 'react-dom';
 export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
   const [signupState, signupAction] = useFormState(signup, { error: '' });
   const [editState, editAction] = useFormState(editProfile, { error: '' });
+  const formAction = isEdit ? editAction : signupAction;
+
   const [eligibilityState, checkEligibility] = useFormState(
     checkPasswordChangeEligibility,
     { error: '', allowed: null },
@@ -31,13 +33,11 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
 
   // Re-authentication state for password changes
   const [showReauthModal, setShowReauthModal] = useState(false);
-  const [pendingNewPassword, setPendingNewPassword] = useState('');
   const [pendingFormData, setPendingFormData] = useState(null);
 
   const state = isEdit ? editState : signupState;
   // Combine errors from edit state and eligibility check
   const displayError = eligibilityState.error || state.error;
-  const formAction = isEdit ? editAction : signupAction;
 
   const finalSchema = isEdit
     ? editProfileSchema
@@ -54,7 +54,6 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
     proof: undefined,
     userProfilepic: undefined,
     ...defaultValues,
-    // Always ensure password is an empty string (never undefined)
     password: defaultValues?.password ?? '',
   };
 
@@ -91,12 +90,10 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
 
     const formData = new FormData();
 
-    // Add all form values
     for (const key in values) {
       const value = values[key];
 
       if (value !== undefined && value !== null) {
-        // Handle File objects specifically
         if (value instanceof File) {
           console.log(`Adding file: ${key}`, value.name, value.size);
           formData.append(key, value);
@@ -114,32 +111,28 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
       formData.append('question2', selectedQuestions.q2);
     }
 
-    // Check if password is being changed in edit mode
-    const passwordChanged =
-      isEdit && values.password && values.password.trim() !== '';
-
-    if (passwordChanged) {
+    // Does the user intend to change their password?
+    if (isEdit && values.password && values.password.trim() !== '') {
       // Store pending data and check eligibility first (server-side)
-      setPendingNewPassword(values.password);
       setPendingFormData({ form, values, selectedQuestions, formData });
-      // Call server action to check eligibility - result will be in eligibilityState
+
       checkEligibility();
       return;
     }
 
     console.log('Form Data', formData);
-    await formAction(formData);
+    formAction(formData);
   };
 
-  const handlePasswordChangeSuccess = () => {
-    // Password was changed successfully, now submit the rest of the form
+  const handleReauthSuccess = currentPassword => {
     if (pendingFormData) {
       const { formData } = pendingFormData;
-      // Remove password from form data since it was already changed
-      formData.delete('password');
+
+      // Add the current password for server-side verification
+      formData.append('currentPassword', currentPassword);
+
       formAction(formData);
       setPendingFormData(null);
-      setPendingNewPassword('');
     }
   };
 
@@ -178,14 +171,12 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
         </CardContent>
       </Card>
 
-      {/* Re-authentication modal for password changes */}
       {isEdit && (
         <ReauthModal
           open={showReauthModal}
           onOpenChange={setShowReauthModal}
           userEmail={defaultValues?.email || ''}
-          newPassword={pendingNewPassword}
-          onSuccess={handlePasswordChangeSuccess}
+          onSuccess={handleReauthSuccess}
         />
       )}
     </>

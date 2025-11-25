@@ -5,10 +5,6 @@ import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 
-// ============================================================================
-// Password Change Eligibility Check
-// ============================================================================
-
 /**
  * Check if user can change their password (not changed within 24 hours).
  * This is a server action called BEFORE showing the re-auth modal.
@@ -39,81 +35,6 @@ export async function checkPasswordChangeEligibility(prevState) {
 }
 
 /**
- * Server action to verify current password and change to new password.
- * This combines re-authentication and password change in one step.
- */
-export async function reauthenticateAndChangePassword(prevState, formData) {
-  const currentPassword = formData.get('currentPassword');
-  const newPassword = formData.get('newPassword');
-  const email = formData.get('email');
-
-  if (!currentPassword || !email || !newPassword) {
-    return { error: 'All fields are required' };
-  }
-
-  const supabase = createClient(true);
-
-  // Get current authenticated user
-  const { data: authData, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !authData?.user) {
-    return { error: 'You must be logged in to perform this action' };
-  }
-
-  const userId = authData.user.id;
-
-  // Verify the email matches the current user
-  if (authData.user.email !== email) {
-    return { error: 'Email mismatch' };
-  }
-
-  // Verify the current password by attempting to sign in
-  const { error: signInError } = await supabase.auth.signInWithPassword({
-    email,
-    password: currentPassword,
-  });
-
-  if (signInError) {
-    return { error: 'Invalid current password. Please try again.' };
-  }
-
-  // Check if password was recently changed (within 24 hours)
-  const recentlyChanged = await passwordRecentlyChanged(supabase, userId);
-  if (recentlyChanged) {
-    return {
-      error: 'Cannot change password more than once within 24 hours.',
-    };
-  }
-
-  // Check if password has been used before
-  if (await passwordHasBeenUsedBefore(supabase, userId, newPassword)) {
-    return { error: 'Cannot reuse previous passwords.' };
-  }
-
-  // All validations passed - update password
-  const { error: updateError } = await supabase.auth.updateUser({
-    password: newPassword,
-  });
-
-  if (updateError) {
-    return { error: 'Failed to update password. Please try again.' };
-  }
-
-  // Log password hash in password history
-  const salt = await bcrypt.genSalt(12);
-  const hashedNewPassword = await bcrypt.hash(newPassword, salt);
-
-  await supabase.from('password_history').insert({
-    user_id: userId,
-    hashed_password: hashedNewPassword,
-    created_at: new Date().toISOString(),
-    salt: salt,
-  });
-
-  return { success: true };
-}
-
-/**
  * Check if password was recently changed (within 24 hours)
  */
 async function passwordRecentlyChanged(supabase, userId) {
@@ -135,10 +56,6 @@ async function passwordRecentlyChanged(supabase, userId) {
 
   return hoursSinceLastChange < 24;
 }
-
-// ============================================================================
-// User Profile Actions
-// ============================================================================
 
 export async function getUserInfo() {
   const supabase = createClient();
@@ -187,6 +104,58 @@ export async function editProfile(prevState, formData) {
   }
 
   const userId = userInfo.user.id;
+  const newPassword = formData.get('password');
+  const currentPassword = formData.get('currentPassword');
+  const isChangingPassword = newPassword && newPassword.trim() !== '';
+
+  // Handle password change if requested
+  if (isChangingPassword) {
+    // SECURITY: Require current password verification for password changes
+    if (!currentPassword) {
+      return { error: 'Current password is required to change password.' };
+    }
+
+    // Verify the current password
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: userInfo.user.email,
+      password: currentPassword,
+    });
+
+    if (signInError) {
+      return { error: 'Invalid current password.' };
+    }
+
+    const recentlyChanged = await passwordRecentlyChanged(supabase, userId);
+    if (recentlyChanged) {
+      return {
+        error: 'Cannot change password more than once within 24 hours.',
+      };
+    }
+
+    if (await passwordHasBeenUsedBefore(supabase, userId, newPassword)) {
+      return { error: 'Cannot reuse previous passwords.' };
+    }
+
+    // Update password
+    const { error: passwordError } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (passwordError) {
+      return { error: 'Failed to update password. Please try again.' };
+    }
+
+    // Log password hash in password history
+    const salt = await bcrypt.genSalt(12);
+    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+    await supabase.from('password_history').insert({
+      user_id: userId,
+      hashed_password: hashedNewPassword,
+      created_at: new Date().toISOString(),
+      salt: salt,
+    });
+  }
 
   // Update email if changed
   const data = {
