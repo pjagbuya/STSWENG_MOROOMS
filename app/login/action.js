@@ -145,7 +145,7 @@ export async function login(prevState, formData) {
       email,
       password,
     });
-    console.log('LoginForm error state: ', error);
+  
 
     if (error) {
       await APILogger.log(

@@ -189,7 +189,6 @@ export async function deleteReservation(reservationId) {
         const { data, error } = await supabase.rpc('delete_reservation', payload);
 
         if (error) {
-            console.error('Error deleting reservation:', error);
             // Log DB Error
             await APILogger.log(action, method, table, userId, payload, error);
             return { error };
@@ -199,7 +198,6 @@ export async function deleteReservation(reservationId) {
         await APILogger.log(action, method, table, userId, payload, null);
         return { data };
     } catch (err) {
-        console.error('Unexpected error deleting reservation:', err);
         // Log Unexpected Error
         await APILogger.log(action, method, table, userId, payload, err);
         return { error: err };

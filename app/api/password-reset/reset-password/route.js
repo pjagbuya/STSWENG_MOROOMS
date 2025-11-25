@@ -29,7 +29,6 @@ export async function POST(request) {
 
     const supabase = createClient(true); // Admin client
 
-    console.log('Finding auth user by email:', email);
 
     // Find the auth user by email using admin API
     const { data: authUsers, error: authError } =
