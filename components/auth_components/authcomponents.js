@@ -2,7 +2,6 @@
 
 // AuthComponents.js - Next.js Client Components
 import { useAuth } from './authprovider';
-import { APILogger } from '@/utils/logger_actions';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -80,15 +79,6 @@ export function ProtectedContent({
 
     // Redirect if no access
     if (!hasAccess) {
-      APILogger.log(
-        'unauthorized_access',
-        'REDIRECT',
-        'protected_content',
-        null,
-        { permission, permissions },
-        null,
-      );
-
       router.push(redirectTo);
     }
   }, [
@@ -132,14 +122,6 @@ export function ProtectedContent({
 
   // Don't render if no access
   if (!hasAccess) {
-    APILogger.log(
-      'unauthorized_access',
-      'NO_RENDER',
-      'protected_content',
-      null,
-      { permission, permissions },
-      null,
-    );
     return null;
   }
 
