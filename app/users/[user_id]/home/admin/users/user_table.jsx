@@ -28,7 +28,7 @@ export function UserTable({ data, roles }) {
     addActionColumn(
       columns,
       row => {
-        console.log('Edit', row.original);
+        // console.log('Edit', row.original);
         setPopup(row.original, setRowData, setOpenDeletePopup);
       },
       row => {
@@ -60,7 +60,7 @@ export function UserTable({ data, roles }) {
             );
             setRowData(null);
             setOpenRoleChangePopup(false);
-            console.log(url);
+            // console.log(url);
           };
 
           action();

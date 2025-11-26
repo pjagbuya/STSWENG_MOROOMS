@@ -27,7 +27,7 @@ export async function callFunctionWithFormData(
   const { error } = await supabase.rpc(function_name, userInfo);
 
   if (error) {
-    console.error(error);
+    // console.error(error);
     // redirect('/error');
   }
 
@@ -42,7 +42,7 @@ export async function callFunctionWithNoFormData(data, function_name, url) {
   const { error } = await supabase.rpc(function_name, data);
 
   if (error) {
-    console.error(error.message);
+    // console.error(error.message);
     return error;
   }
 

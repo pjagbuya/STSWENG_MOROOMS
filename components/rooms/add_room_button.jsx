@@ -54,7 +54,7 @@ export default function AddRoomButton() {
     if (state.status === 'success') {
       setOpen(false);
     } else if (state.status === 'error') {
-      console.log('Error adding room:', state.error);
+      // console.log('Error adding room:', state.error);
       roomForm.form.setError('name', state.error); // Temporary hack
     }
   }, [state]);

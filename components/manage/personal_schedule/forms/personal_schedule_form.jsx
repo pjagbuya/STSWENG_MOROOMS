@@ -33,7 +33,7 @@ export default function PersonalScheduleForm({ values, onSubmit, rooms }) {
       end_time: values?.end_time ?? '23:59',
     },
   });
-  console.log('form: ', form.getValues());
+  // console.log('form: ', form.getValues());
 
   const endTimeRender = useMemo(
     () =>

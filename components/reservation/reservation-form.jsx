@@ -74,7 +74,7 @@ export default function RoomReservationForm({ roomId, userID }) {
         );
         setHourStates(data);
       } catch (error) {
-        console.error('Error fetching hour states:', error);
+        // console.error('Error fetching hour states:', error);
       } finally {
         setIsLoading(false);
       }
@@ -135,7 +135,7 @@ export default function RoomReservationForm({ roomId, userID }) {
         });
         router.push('/rooms'); // Redirect to the /rooms page
       } catch (error) {
-        console.error('Error submitting reservation:', error);
+        // console.error('Error submitting reservation:', error);
         toast({
           description: 'Failed to submit reservation. Please try again.',
           variant: 'error',
@@ -143,7 +143,7 @@ export default function RoomReservationForm({ roomId, userID }) {
         router.push('/error');
       }
     } else {
-      console.log('Errors: ', errors);
+      // console.log('Errors: ', errors);
     }
   };
 

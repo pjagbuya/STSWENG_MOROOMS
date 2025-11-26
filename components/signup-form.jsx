@@ -57,15 +57,15 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
       if (value !== undefined && value !== null) {
         // Handle File objects specifically
         if (value instanceof File) {
-          console.log(`Adding file: ${key}`, value.name, value.size);
+          // console.log(`Adding file: ${key}`, value.name, value.size);
           formData.append(key, value);
         } else {
-          console.log(`Adding field: ${key}`, value);
+          // console.log(`Adding field: ${key}`, value);
           formData.append(key, value);
         }
       }
     }
-    console.log('Values given', values);
+    // console.log('Values given', values);
 
     // Add security questions for new signups
     if (!isEdit && selectedQuestions) {
@@ -77,7 +77,7 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
       await editProfile(formData);
     } else {
       // Use formAction for proper state management
-      console.log('Form Data', formData);
+      // console.log('Form Data', formData);
 
       await formAction(formData);
     }

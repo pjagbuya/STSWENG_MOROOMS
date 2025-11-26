@@ -39,7 +39,7 @@ export function AddPopupForm({
 
   function onChange(key, e) {
     const file = e.target.files?.[0];
-    console.log(file);
+    // console.log(file);
     if (file) {
       form.setValue(key, file, { shouldValidate: true });
     }
@@ -61,8 +61,8 @@ export function AddPopupForm({
       <form
         className="flex min-h-[600px] flex-col gap-6"
         onSubmit={form.handleSubmit(values => {
-          console.log('Popup form - values:', values); // Values are this forms dictionary of data
-          console.log('Popup form - selectedQuestions:', selectedQuestions);
+          // console.log('Popup form - values:', values); // Values are this forms dictionary of data
+          // console.log('Popup form - selectedQuestions:', selectedQuestions);
           onSubmit(form, values, selectedQuestions);
         })}
       >
@@ -160,7 +160,7 @@ export function AddPopupForm({
                     <Select
                       value={selectedQuestions.q1}
                       onValueChange={value => {
-                        console.log('Selected question 1:', value);
+                        // console.log('Selected question 1:', value);
                         setSelectedQuestions(prev => ({ ...prev, q1: value }));
                       }}
                     >
@@ -204,7 +204,7 @@ export function AddPopupForm({
                     <Select
                       value={selectedQuestions.q2}
                       onValueChange={value => {
-                        console.log('Selected question 2:', value);
+                        // console.log('Selected question 2:', value);
                         setSelectedQuestions(prev => ({ ...prev, q2: value }));
                       }}
                     >

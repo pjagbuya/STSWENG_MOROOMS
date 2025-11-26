@@ -89,7 +89,7 @@ export async function updateSession(request) {
 
   if (request.nextUrl.pathname.includes('/admin')) {
     APILogger.log({
-      action: 'Admin homepage login',
+      action: 'Admin homepage login attempt',
       method: 'GET',
       userId: user ? user.id : null,
     });

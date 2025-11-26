@@ -13,7 +13,7 @@ export async function getCurrentUserInfo() {
     p_user_id: userId,
   });
   if (error) {
-    console.error(error.message);
+    // console.error(error.message);
   }
 
   data.map(user => {

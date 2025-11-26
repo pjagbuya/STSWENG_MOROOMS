@@ -10,14 +10,14 @@ export default async function Page() {
   try {
     varsecurityQuestions = await SecurityService.getSecurityQuestions();
   } catch (error) {
-    console.error('Failed to load security questions:', error);
+    // console.error('Failed to load security questions:', error);
     // Use fallback questions
     varsecurityQuestions = [
       { id: 1, question: "DEFAULT: What is your mother's maiden name?" },
       { id: 2, question: 'N/A' },
     ];
   }
-  console.log('Security Questions:', varsecurityQuestions);
+  // console.log('Security Questions:', varsecurityQuestions);
   return (
     <div className="flex h-screen w-full items-center justify-center px-4">
       <Image
