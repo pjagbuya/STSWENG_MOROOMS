@@ -25,11 +25,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useFormWithLogging } from '@/hooks/useFormwithLogging';
 import { get24HourTime, getDateString } from '@/utils/time';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 // NOTE: <input type="time"> takes in nonstandard time strings for some reason,
@@ -46,7 +46,7 @@ export default function SearchFilter({ filters, roomSets, onSearch }) {
   const [startTime, setStartTime] = useState(filters.startTime);
   const [openDialog, setOpenDialog] = useState(false);
 
-  const form = useForm({
+  const form = useFormWithLogging('search-filter', {
     resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       ...filters,

@@ -1,30 +1,32 @@
 'use server';
 
 import { FORM_SCHEMA } from './form_schema';
+import { PERMISSIONS } from '@/lib/rbac-config';
+import { checkPermission, getCurrentUser } from '@/lib/server-rbac';
 import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 const BUCKET_URL = process.env.BUCKET_URL;
 
-// Helper function to simulate getting the user ID for logging admin actions
-const getLogUserId = () => {
-  // NOTE: Replace this with actual user ID derivation (e.g., from an admin session)
-  return 'SYSTEM_ADMIN_ROOM_MGMT';
-};
-
 /**
  * Executes a Supabase RPC, logs the outcome, and handles errors consistently.
- * * Success logs are created for MUTATE methods. Errors are always logged before throwing.
- * * @param {string} rpcName - The name of the Supabase function to call.
+ * Success logs are created for MUTATE methods. Errors are always logged before throwing.
+ * @param {string} rpcName - The name of the Supabase function to call.
  * @param {Object} params - The parameters for the Supabase function.
  * @param {string} logAction - The ROOM_ACTION enum for logging.
+ * @param {string} logUserId - The user ID for logging.
  * @param {string} [method='RPC-MUTATE'] - The method type for logging.
  * @returns {Promise<Object>} The data returned by the RPC, or throws the error.
  */
-async function callRoomRpc(rpcName, params, logAction, method = 'RPC-MUTATE') {
+async function callRoomRpc(
+  rpcName,
+  params,
+  logAction,
+  logUserId,
+  method = 'RPC-MUTATE',
+) {
   const supabase = createClient();
-  const userId = getLogUserId();
   const table = 'rooms';
 
   const { data, error } = await supabase.rpc(rpcName, params);
@@ -32,7 +34,7 @@ async function callRoomRpc(rpcName, params, logAction, method = 'RPC-MUTATE') {
   if (error) {
     // console.error(`Error in RPC '${rpcName}':`, error);
     // Log DB Error
-    await APILogger.log(logAction, method, table, userId, params, error);
+    await APILogger.log(logAction, method, table, logUserId, params, error);
     throw error;
   }
 
@@ -42,7 +44,7 @@ async function callRoomRpc(rpcName, params, logAction, method = 'RPC-MUTATE') {
       logAction,
       method,
       table,
-      userId,
+      logUserId,
       { ...params, response: data },
       null,
     );
@@ -57,8 +59,22 @@ async function callRoomRpc(rpcName, params, logAction, method = 'RPC-MUTATE') {
  * Adds a new room using form data.
  */
 export async function addRoomAction(prevState, formData) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_CREATE, 'addRoomAction');
+
+  if (!authorized) {
+    return {
+      status: 'error',
+      message: authError || 'You do not have permission to create rooms.',
+    };
+  }
+
   const supabase = createClient();
-  const userId = getLogUserId();
+  const userId = user?.id || 'UNKNOWN';
   const action = 'ROOM_CREATE';
   const method = 'RPC-MUTATE';
   const table = 'rooms';
@@ -95,7 +111,7 @@ export async function addRoomAction(prevState, formData) {
 
   try {
     // RPC call and logging (Success/Error) handled by helper
-    const roomID = await callRoomRpc('create_room', rpcPayload, action);
+    const roomID = await callRoomRpc('create_room', rpcPayload, action, userId);
 
     const imageFile = formData.get('image_file');
     const logData = {
@@ -153,6 +169,7 @@ export async function addRoomAction(prevState, formData) {
       'edit_room',
       { p_room_id: roomID, p_new_image: newImageUrl },
       action,
+      userId,
     );
 
     revalidatePath('/rooms');
@@ -180,8 +197,22 @@ export async function addRoomAction(prevState, formData) {
  * Deletes a room and its associated image by room ID.
  */
 export async function deleteRoomAction(id) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_DELETE, 'deleteRoomAction');
+
+  if (!authorized) {
+    return {
+      status: 'error',
+      message: authError || 'You do not have permission to delete rooms.',
+    };
+  }
+
   const supabase = createClient();
-  const userId = getLogUserId();
+  const userId = user?.id || 'UNKNOWN';
   const action = 'ROOM_DELETE';
   const table = 'rooms';
   const method = 'RPC-MUTATE';
@@ -193,6 +224,7 @@ export async function deleteRoomAction(id) {
       'get_room_by_id',
       payload,
       action,
+      userId,
       'RPC-READ',
     );
     const room_image = roomData[0]?.room_image;
@@ -226,7 +258,7 @@ export async function deleteRoomAction(id) {
     }
 
     // 2. Delete room from DB (RPC call and logging handled by helper)
-    await callRoomRpc('delete_room', payload, action);
+    await callRoomRpc('delete_room', payload, action, userId);
 
     revalidatePath('/rooms');
     return { status: 'success' };
@@ -249,8 +281,22 @@ export async function deleteRoomAction(id) {
  * Edits an existing room using form data and updates its image if provided.
  */
 export async function editRoomAction(id, prevState, formData) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_UPDATE, 'editRoomAction');
+
+  if (!authorized) {
+    return {
+      status: 'error',
+      message: authError || 'You do not have permission to edit rooms.',
+    };
+  }
+
   const supabase = createClient();
-  const userId = getLogUserId();
+  const userId = user?.id || 'UNKNOWN';
   const action = 'ROOM_UPDATE';
   const table = 'rooms';
   const method = 'RPC-MUTATE';
@@ -286,7 +332,7 @@ export async function editRoomAction(id, prevState, formData) {
 
   try {
     // 1. Edit room details in DB (RPC call and logging handled by helper)
-    await callRoomRpc('edit_room', rpcPayload, action);
+    await callRoomRpc('edit_room', rpcPayload, action, userId);
 
     const imageFile = formData.get('image_file');
 
@@ -297,6 +343,7 @@ export async function editRoomAction(id, prevState, formData) {
         'get_room_by_id',
         { p_room_id: id },
         action,
+        userId,
         'RPC-READ',
       );
       const room_image = roomData[0]?.room_image;
@@ -333,6 +380,7 @@ export async function editRoomAction(id, prevState, formData) {
           'edit_room',
           { p_room_id: id, p_new_image: '' },
           action,
+          userId,
         );
       }
 
@@ -423,6 +471,7 @@ export async function editRoomAction(id, prevState, formData) {
       'edit_room',
       { p_room_id: id, p_new_image: newImageUrl },
       action,
+      userId,
     );
 
     revalidatePath('/rooms', 'page');
@@ -448,6 +497,8 @@ export async function editRoomAction(id, prevState, formData) {
  */
 export async function filterRooms(filter) {
   const action = 'ROOM_READ';
+  const user = await getCurrentUser();
+  const userId = user?.id || null;
 
   try {
     const data = await callRoomRpc(
@@ -459,6 +510,7 @@ export async function filterRooms(filter) {
         p_min_capacity: filter.minCapacity,
       },
       action,
+      userId,
       'RPC-READ',
     );
 
@@ -473,6 +525,8 @@ export async function filterRooms(filter) {
 
 export async function getRoomByID(roomID) {
   const action = 'ROOM_READ';
+  const user = await getCurrentUser();
+  const userId = user?.id || null;
 
   try {
     // RPC call and error logging handled by helper (success logging skipped via 'RPC-READ')
@@ -480,6 +534,7 @@ export async function getRoomByID(roomID) {
       'get_room_by_id',
       { p_room_id: roomID },
       action,
+      userId,
       'RPC-READ',
     );
     return data[0];

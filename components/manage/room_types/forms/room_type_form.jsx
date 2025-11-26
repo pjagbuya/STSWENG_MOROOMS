@@ -9,14 +9,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useFormWithLogging } from '@/hooks/useFormwithLogging';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 export default function RoomTypeForm({ values, onSubmit }) {
   const [startTime, setStartTime] = useState(values?.minReserveTime ?? '00:00');
 
-  const form = useForm({
+  const form = useFormWithLogging('room-type-form', {
     resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       name: values?.name ?? '',

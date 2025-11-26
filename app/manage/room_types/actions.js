@@ -1,7 +1,9 @@
 'use server';
 
+import { PERMISSIONS } from '@/lib/rbac-config';
+import { checkPermission } from '@/lib/server-rbac';
 import { APILogger } from '@/utils/logger_actions';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 /**
@@ -23,7 +25,21 @@ export async function addRoomType(
   minReserveTime,
   maxReserveTime,
 ) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_TYPE_CREATE, 'addRoomType');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to create room types.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('create_room_type', {
     p_name: name,
@@ -38,17 +54,17 @@ export async function addRoomType(
       'addRoomType',
       'POST',
       'room_types',
-      null,
+      userId,
       { name, details, capacity, minReserveTime, maxReserveTime },
       error.message,
     );
     return error;
   }
-  APILogger.log(
+  await APILogger.log(
     'addRoomType',
     'POST',
     'room_types',
-    null,
+    userId,
     { name, details, capacity, minReserveTime, maxReserveTime },
     null,
   );
@@ -66,7 +82,21 @@ export async function addRoomType(
  * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
  */
 export async function deleteRoomType(id) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_TYPE_DELETE, 'deleteRoomType');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to delete room types.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('delete_room_type', {
     p_room_type_id: id,
@@ -78,17 +108,17 @@ export async function deleteRoomType(id) {
       'deleteRoomType',
       'DELETE',
       'room_types',
-      null,
+      userId,
       { roomTypeId: id },
       error.message,
     );
     return error;
   }
-  APILogger.log(
+  await APILogger.log(
     'deleteRoomType',
     'DELETE',
     'room_types',
-    null,
+    userId,
     { roomTypeId: id },
     null,
   );
@@ -116,7 +146,21 @@ export async function editRoomType(
   minReserveTime,
   maxReserveTime,
 ) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_TYPE_UPDATE, 'editRoomType');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to edit room types.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('edit_room_type', {
     p_room_type_id: id,
@@ -133,7 +177,7 @@ export async function editRoomType(
       'editRoomType',
       'PUT',
       'room_types',
-      null,
+      userId,
       {
         roomTypeId: id,
         newName: name,
@@ -146,11 +190,11 @@ export async function editRoomType(
     );
     return error;
   }
-  APILogger.log(
+  await APILogger.log(
     'editRoomType',
     'PUT',
     'room_types',
-    null,
+    userId,
     {
       roomTypeId: id,
       newName: name,

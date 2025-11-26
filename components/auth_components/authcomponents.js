@@ -2,6 +2,7 @@
 
 // AuthComponents.js - Next.js Client Components
 import { useAuth } from './authprovider';
+import { logAccessControlFailure } from '@/app/logger/access-control-actions';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -54,14 +55,24 @@ export function ProtectedContent({
   redirectTo = '/unauthorized',
   children,
 }) {
-  const { isAuthenticated, can, canAny, canAll, loading } = useAuth();
+  const { isAuthenticated, can, canAny, canAll, loading, user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   React.useEffect(() => {
     if (loading) return;
 
     // Redirect to login if not authenticated
     if (!isAuthenticated) {
+      // Log unauthenticated access attempt
+      logAccessControlFailure({
+        reason: 'UNAUTHENTICATED',
+        attemptedResource: pathname,
+        userId: null,
+        userRole: null,
+        requiredPermission: permission || null,
+        requiredPermissions: permissions ? permissions.join(', ') : null,
+      });
       router.push(
         `/login?redirect=${encodeURIComponent(window.location.pathname)}`,
       );
@@ -79,6 +90,15 @@ export function ProtectedContent({
 
     // Redirect if no access
     if (!hasAccess) {
+      // Log permission denied
+      logAccessControlFailure({
+        reason: 'PERMISSION_DENIED',
+        attemptedResource: pathname,
+        userId: user?.id || null,
+        userRole: user?.role || null,
+        requiredPermission: permission || null,
+        requiredPermissions: permissions ? permissions.join(', ') : null,
+      });
       router.push(redirectTo);
     }
   }, [
@@ -92,6 +112,8 @@ export function ProtectedContent({
     canAll,
     router,
     redirectTo,
+    user,
+    pathname,
   ]);
 
   // Show loading state while checking auth
@@ -139,7 +161,46 @@ export function withAuth(
   requireAll = false,
 ) {
   return function AuthenticatedComponent(props) {
-    const { can, canAny, canAll, isAuthenticated } = useAuth();
+    const { can, canAny, canAll, isAuthenticated, user } = useAuth();
+    const pathname = usePathname();
+    const hasLoggedRef = React.useRef(false);
+
+    // Log access failures once
+    React.useEffect(() => {
+      if (hasLoggedRef.current) return;
+
+      if (!isAuthenticated) {
+        hasLoggedRef.current = true;
+        logAccessControlFailure({
+          reason: 'UNAUTHENTICATED',
+          attemptedResource: pathname,
+          userId: null,
+          userRole: null,
+          requiredPermission: permission || null,
+          requiredPermissions: permissions ? permissions.join(', ') : null,
+        });
+      } else {
+        let hasAccess = false;
+        if (permission) {
+          hasAccess = can(permission);
+        } else if (permissions) {
+          hasAccess = requireAll ? canAll(permissions) : canAny(permissions);
+        } else {
+          hasAccess = true;
+        }
+        if (!hasAccess) {
+          hasLoggedRef.current = true;
+          logAccessControlFailure({
+            reason: 'PERMISSION_DENIED',
+            attemptedResource: pathname,
+            userId: user?.id || null,
+            userRole: user?.role || null,
+            requiredPermission: permission || null,
+            requiredPermissions: permissions ? permissions.join(', ') : null,
+          });
+        }
+      }
+    }, [isAuthenticated, can, canAny, canAll, user, pathname]);
 
     if (!isAuthenticated) {
       return (
@@ -215,7 +276,57 @@ export function PermissionGuard({
   unauthorized: unauthorizedComponent = <div>Unauthorized</div>,
   children,
 }) {
-  const { loading, can, canAny, canAll, isAuthenticated } = useAuth();
+  const { loading, can, canAny, canAll, isAuthenticated, user } = useAuth();
+  const pathname = usePathname();
+  const hasLoggedRef = React.useRef(false);
+
+  // Log access failures once
+  React.useEffect(() => {
+    if (loading || hasLoggedRef.current) return;
+
+    if (!isAuthenticated) {
+      hasLoggedRef.current = true;
+      logAccessControlFailure({
+        reason: 'UNAUTHENTICATED',
+        attemptedResource: pathname,
+        userId: null,
+        userRole: null,
+        requiredPermission: permission || null,
+        requiredPermissions: permissions ? permissions.join(', ') : null,
+      });
+      return;
+    }
+
+    let hasAccess = false;
+    if (permission) {
+      hasAccess = can(permission);
+    } else if (permissions) {
+      hasAccess = requireAll ? canAll(permissions) : canAny(permissions);
+    }
+
+    if (!hasAccess) {
+      hasLoggedRef.current = true;
+      logAccessControlFailure({
+        reason: 'PERMISSION_DENIED',
+        attemptedResource: pathname,
+        userId: user?.id || null,
+        userRole: user?.role || null,
+        requiredPermission: permission || null,
+        requiredPermissions: permissions ? permissions.join(', ') : null,
+      });
+    }
+  }, [
+    loading,
+    isAuthenticated,
+    can,
+    canAny,
+    canAll,
+    user,
+    pathname,
+    permission,
+    permissions,
+    requireAll,
+  ]);
 
   if (loading) {
     return loadingComponent;

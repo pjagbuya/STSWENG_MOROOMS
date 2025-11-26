@@ -16,9 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useFormWithLogging } from '@/hooks/useFormwithLogging';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 export function AddPopupForm({
   formSchema,
@@ -32,7 +32,7 @@ export function AddPopupForm({
     q2: '',
   });
 
-  const form = useForm({
+  const form = useFormWithLogging('add-popup-form', {
     resolver: formSchema ? zodResolver(formSchema) : undefined,
     defaultValues: defaultValues || {},
   });

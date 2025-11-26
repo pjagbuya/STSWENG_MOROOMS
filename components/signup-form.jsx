@@ -93,7 +93,8 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
     for (const key in values) {
       const value = values[key];
 
-      if (value !== undefined && value !== null) {
+      // Skip undefined, null, and empty strings (for optional fields like password)
+      if (value !== undefined && value !== null && value !== '') {
         if (value instanceof File) {
           // console.log(`Adding file: ${key}`, value.name, value.size);
           formData.append(key, value);
@@ -111,13 +112,7 @@ export function Signup({ defaultValues, isEdit, var2securityQuestions }) {
       formData.append('question2', selectedQuestions.q2);
     }
 
-    if (isEdit) {
-      await editProfile(formData);
-    } else {
-      // Use formAction for proper state management
-      // console.log('Form Data', formData);
-      // Does the user intend to change their password?
-    }
+    // Check if password is being changed (for edit mode)
     if (isEdit && values.password && values.password.trim() !== '') {
       // Store pending data and check eligibility first (server-side)
       setPendingFormData({ form, values, selectedQuestions, formData });

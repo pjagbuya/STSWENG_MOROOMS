@@ -1,11 +1,23 @@
 'use server';
 
 import { SecurityService } from '@/lib/security';
+import { passwordSchema } from '@/lib/validation-schemas';
 import { callFunctionWithFormData } from '@/utils/action_template';
 import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+// Server-side validation schema (must match client-side)
+const serverSignupSchema = z.object({
+  email: z.string().min(1).email(),
+  password: passwordSchema,
+  userFirstname: z.string().min(2).max(50),
+  userLastname: z.string().min(2).max(50),
+  securityAnswer1: z.string().min(2).max(100),
+  securityAnswer2: z.string().min(2).max(100),
+});
 
 async function uploadFile(file, path) {
   const supabase = createClient();
@@ -22,11 +34,30 @@ async function uploadFile(file, path) {
 export async function signup(prevState, formData) {
   const supabase = createClient(true);
 
-  /*console.log(
-    'Security Answers:',
-    formData.get('securityAnswer1'),
-    formData.get('securityAnswer2'),
-  );*/
+  // SECURITY: Server-side validation (2.1.4, 2.1.5, 2.3.2)
+  // Client-side validation can be bypassed, so we must validate on server
+  const validationData = {
+    email: formData.get('email'),
+    password: formData.get('password'),
+    userFirstname: formData.get('userFirstname'),
+    userLastname: formData.get('userLastname'),
+    securityAnswer1: formData.get('securityAnswer1'),
+    securityAnswer2: formData.get('securityAnswer2'),
+  };
+
+  const validation = serverSignupSchema.safeParse(validationData);
+  if (!validation.success) {
+    const errors = validation.error.errors.map(e => e.message).join(' ');
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      null,
+      { email: validationData.email },
+      `Validation failed: ${errors}`,
+    );
+    return { error: errors };
+  }
 
   // Sign up user with auth first
   const data = {

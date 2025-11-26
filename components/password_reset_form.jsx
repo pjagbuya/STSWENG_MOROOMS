@@ -1,9 +1,11 @@
 'use client';
 
+import { logValidationError } from '@/app/logger/validation-actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { passwordSchema } from '@/lib/validation-schemas';
 // import { APILogger } from '@/utils/logger_actions';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -109,8 +111,10 @@ export function PasswordResetForm({ onBackToLogin }) {
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters long');
+    const passwordValidation = passwordSchema.safeParse(newPassword);
+    if (!passwordValidation.success) {
+      const errorMessage = passwordValidation.error.errors[0].message;
+      setError(errorMessage);
       return;
     }
 
@@ -130,14 +134,6 @@ export function PasswordResetForm({ onBackToLogin }) {
 
       const result = await response.json();
       if (result.success) {
-        // APILogger.log(
-        //   'Password Reset Form',
-        //   'PASSWORD-RESET',
-        //   'password_reset',
-        //   userId,
-        //   { email, userId },
-        //   null,
-        // );
         alert(
           'Password reset successful! You can now login with your new password.',
         );
@@ -148,18 +144,11 @@ export function PasswordResetForm({ onBackToLogin }) {
           window.location.href = '/login';
         }
       } else {
+        // Display the specific error from the server (e.g., password reuse error)
         setError(result.error || 'Failed to reset password');
       }
     } catch (error) {
-      // console.error('Password reset error:', error);
-      // APILogger.log(
-      //   'PasswordResetForm',
-      //   'PASSWORD-RESET',
-      //   'password_reset',
-      //   null,
-      //   { email, userId },
-      //   error.message,
-      // );
+      // Network error or JSON parsing error
       setError('Failed to reset password. Please try again.');
     } finally {
       setLoading(false);

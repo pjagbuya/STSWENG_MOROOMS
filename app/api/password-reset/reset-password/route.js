@@ -1,3 +1,4 @@
+import { passwordSchema } from '@/lib/validation-schemas';
 import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
@@ -30,20 +31,22 @@ export async function POST(request) {
       );
     }
 
-    if (newPassword.length < 8) {
+    // Validate password with full complexity requirements (2.1.4 & 2.1.5)
+    const passwordValidation = passwordSchema.safeParse(newPassword);
+    if (!passwordValidation.success) {
+      const errors = passwordValidation.error.errors
+        .map(e => e.message)
+        .join(' ');
       await APILogger.log(
         'Password Reset',
         'UPDATE',
         'auth.users',
         userId,
         { email },
-        { error: 'Password must be at least 8 characters long' },
+        { error: errors },
       );
 
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: errors }, { status: 400 });
     }
 
     const supabase = createClient(true); // Admin client
@@ -228,7 +231,19 @@ export async function POST(request) {
         //   'Failed to save password to history:',
         //   historyInsertError,
         // );
-        // Don't fail the request if history saving fails
+        // Don't fail the request if history saving fails - password was already updated
+        await APILogger.log(
+          'Password Reset',
+          'UPDATE',
+          'password_history',
+          userId,
+          { email },
+          {
+            warning:
+              'Password updated but failed to save to history: ' +
+              historyInsertError.message,
+          },
+        );
       } else {
         // console.log('Password saved to history');
       }
@@ -257,19 +272,19 @@ export async function POST(request) {
       // }
     } catch (historyError) {
       // console.error('Error inserting password to history:', historyError);
+      // Don't fail the request - password was already updated successfully
       await APILogger.log(
         'Password Reset',
         'UPDATE',
-        'auth.users',
+        'password_history',
         userId,
         { email },
-        historyError,
+        {
+          warning:
+            'Password updated but history insert threw exception: ' +
+            historyError.message,
+        },
       );
-      return NextResponse.json(
-        { error: 'Internal server error: ' + historyError.message },
-        { status: 500 },
-      );
-      // Don't fail the request if history management fails
     }
 
     // Optional: Log the password reset event in your User table

@@ -81,8 +81,6 @@ async function checkAccountLockout(email) {
       }
     });
 
-    console.log(999999, matchingAttempts);
-
     const attemptCount = matchingAttempts.length;
 
     // Check if account should be locked

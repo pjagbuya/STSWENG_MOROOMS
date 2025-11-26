@@ -116,7 +116,7 @@ export default function ReservationTable({ userId, mode }) {
     };
 
     if (userId) loadReservations();
-  }, [userId]);
+  }, [userId, isAdmin]);
 
   const paginatedReservations = reservations.slice(
     (currentPage - 1) * itemsPerPage,

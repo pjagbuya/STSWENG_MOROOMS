@@ -17,9 +17,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import FileInput from '@/components/util/file_input';
+import { useFormWithLogging } from '@/hooks/useFormwithLogging';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
-import { useForm } from 'react-hook-form';
 
 const RoomForm = forwardRef(function RoomForm(
   { roomSets, roomTypes, values, onSubmit },
@@ -27,7 +27,7 @@ const RoomForm = forwardRef(function RoomForm(
 ) {
   const formRef = useRef();
 
-  const form = useForm({
+  const form = useFormWithLogging('room-form', {
     resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       name: values?.name ?? '',

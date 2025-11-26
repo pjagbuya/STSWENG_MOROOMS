@@ -1,5 +1,7 @@
 'use server';
 
+import { PERMISSIONS } from '@/lib/rbac-config';
+import { checkPermission } from '@/lib/server-rbac';
 import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
@@ -13,7 +15,21 @@ import { revalidatePath } from 'next/cache';
  * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
  */
 export async function addRoomSet(name) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_SET_CREATE, 'addRoomSet');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to create room sets.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('create_room_set', {
     p_name: name,
@@ -24,14 +40,21 @@ export async function addRoomSet(name) {
       'addRoomSet',
       'POST',
       'room_sets',
-      null,
+      userId,
       { name },
       error.message,
     );
     // console.error('Error adding room set:', error);
     return error;
   }
-  APILogger.log('addRoomSet', 'POST', 'room_sets', null, { name }, null);
+  await APILogger.log(
+    'addRoomSet',
+    'POST',
+    'room_sets',
+    userId,
+    { name },
+    null,
+  );
 
   revalidatePath('/manage/room_sets');
 }
@@ -45,7 +68,21 @@ export async function addRoomSet(name) {
  * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
  */
 export async function deleteRoomSet(id) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_SET_DELETE, 'deleteRoomSet');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to delete room sets.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('delete_room_set', {
     p_room_set_id: id,
@@ -56,7 +93,7 @@ export async function deleteRoomSet(id) {
       'deleteRoomSet',
       'DELETE',
       'room_sets',
-      null,
+      userId,
       { roomSetId: id },
       error.message,
     );
@@ -64,11 +101,11 @@ export async function deleteRoomSet(id) {
     return error;
   }
 
-  APILogger.log(
+  await APILogger.log(
     'deleteRoomSet',
     'DELETE',
     'room_sets',
-    null,
+    userId,
     { roomSetId: id },
     null,
   );
@@ -86,7 +123,21 @@ export async function deleteRoomSet(id) {
  * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
  */
 export async function editRoomSet(id, name) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_SET_UPDATE, 'editRoomSet');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to edit room sets.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('edit_room_set', {
     p_room_set_id: id,
@@ -98,18 +149,18 @@ export async function editRoomSet(id, name) {
       'editRoomSet',
       'PUT',
       'room_sets',
-      null,
+      userId,
       { roomSetId: id, newName: name },
       error.message,
     );
     // console.error('Error editing room set:', error);
     return error;
   }
-  APILogger.log(
+  await APILogger.log(
     'editRoomSet',
     'PUT',
     'room_sets',
-    null,
+    userId,
     { roomSetId: id, newName: name },
     null,
   );

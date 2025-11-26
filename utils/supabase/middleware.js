@@ -2,6 +2,33 @@ import { APILogger } from '../logger_actions';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
+// Helper function to log access control failures directly (for middleware use)
+async function logAccessFailure(
+  reason,
+  path,
+  userId = null,
+  additionalData = {},
+) {
+  try {
+    await APILogger.log(
+      'ACCESS_CONTROL_FAILURE',
+      'MIDDLEWARE',
+      'access_control',
+      userId,
+      {
+        reason,
+        path,
+        ...additionalData,
+      },
+      reason,
+    );
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Middleware] Failed to log access failure:', err);
+    }
+  }
+}
+
 export async function updateSession(request) {
   // Allow endpoints to api calls to be passed next
   if (request.nextUrl.pathname.startsWith('/api/')) {
@@ -50,6 +77,10 @@ export async function updateSession(request) {
     !request.nextUrl.pathname.startsWith('/error') &&
     !request.nextUrl.pathname.startsWith('/auth')
   ) {
+    // Log unauthenticated access attempt
+    logAccessFailure('UNAUTHENTICATED', request.nextUrl.pathname, null, {
+      attemptedPath: request.nextUrl.pathname,
+    });
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
     url.pathname = '/login';
@@ -71,6 +102,10 @@ export async function updateSession(request) {
     // console.log('User ID:', user.id);
     // console.log('isApproved:', isApproved);
     if (!isApproved) {
+      // Log unapproved user access attempt
+      logAccessFailure('USER_NOT_APPROVED', request.nextUrl.pathname, user.id, {
+        attemptedPath: request.nextUrl.pathname,
+      });
       const url = request.nextUrl.clone();
       url.pathname = '/pending';
       // console.log(url);
@@ -81,6 +116,11 @@ export async function updateSession(request) {
   if (request.nextUrl.pathname.includes('/users')) {
     const userId = request.nextUrl.pathname.split('/')[2];
     if (userId != user.id) {
+      // Log user trying to access another user's profile
+      logAccessFailure('USER_ID_MISMATCH', request.nextUrl.pathname, user.id, {
+        attemptedUserId: userId,
+        actualUserId: user.id,
+      });
       const url = request.nextUrl.clone();
       url.pathname = '/error';
       return NextResponse.redirect(url);
@@ -88,19 +128,24 @@ export async function updateSession(request) {
   }
 
   if (request.nextUrl.pathname.includes('/admin')) {
-    APILogger.log({
-      action: 'Admin homepage login attempt',
-      method: 'GET',
-      userId: user ? user.id : null,
-    });
     const userId = request.nextUrl.pathname.split('/')[2];
     const { data, error } = await supabase.rpc('get_user_role', {
-      p_user_id: userId,
+      p_user_id: user.id,
     });
     if (error) {
       // console.error(error);
     }
-    if (data.toLowerCase() != 'admin') {
+    if (!data || data.toLowerCase() != 'admin') {
+      // Log non-admin trying to access admin route
+      logAccessFailure(
+        'ADMIN_ROUTE_UNAUTHORIZED',
+        request.nextUrl.pathname,
+        user.id,
+        {
+          userRole: data || 'unknown',
+          requiredRole: 'admin',
+        },
+      );
       const url = request.nextUrl.clone();
       url.pathname = '/error';
       return NextResponse.redirect(url);

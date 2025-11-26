@@ -9,11 +9,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useFormWithLogging } from '@/hooks/useFormwithLogging';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 
 export default function RoomSetForm({ values, onSubmit }) {
-  const form = useForm({
+  const form = useFormWithLogging('room-set-form', {
     resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       name: values?.name ?? '',

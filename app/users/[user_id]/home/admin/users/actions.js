@@ -1,5 +1,7 @@
 'use server';
 
+import { PERMISSIONS } from '@/lib/rbac-config';
+import { checkPermission, getCurrentUser } from '@/lib/server-rbac';
 import {
   callFunctionWithFormData,
   callFunctionWithNoFormData,
@@ -9,23 +11,40 @@ import { createClient } from '@/utils/supabase/server';
 import { convertKeysToCamelCase } from '@/utils/utils';
 import { revalidatePath, unstable_noStore } from 'next/cache';
 
-// Import the logger
-
-// Helper function to simulate getting the user ID for system/admin actions
-const getLogUserId = (userContextId = 'SYSTEM_ADMIN_ACCESS') => {
-  // NOTE: Replace this with actual logic to get the logged-in user ID.
-  return userContextId;
-};
-
 // --- MUTATION OPERATIONS (Logging Handled by Action Templates + Auth Admin) ---
 
 export async function updateUserInfo(userId, url, formData) {
+  // Check permission before proceeding
+  const { authorized, error: authError } = await checkPermission(
+    PERMISSIONS.USER_UPDATE,
+    'updateUserInfo',
+  );
+
+  if (!authorized) {
+    return {
+      error: authError || 'You do not have permission to update user info.',
+    };
+  }
+
   // Logging for RPC is assumed to be inside callFunctionWithFormData
   callFunctionWithFormData(userId, 'update_user', url, formData);
   revalidatePath(url, 'page');
 }
 
 export async function deleteUser(id, url) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.USER_DELETE, 'deleteUser');
+
+  if (!authorized) {
+    return {
+      error: authError || 'You do not have permission to delete users.',
+    };
+  }
+
   const supabaseAdmin = createClient(true);
 
   // Logging for RPC is assumed to be inside callFunctionWithNoFormData
@@ -44,7 +63,7 @@ export async function deleteUser(id, url) {
           'USER_DELETE',
           'AUTH-ADMIN',
           'auth.users',
-          getLogUserId('ADMIN_DELETE_USER'),
+          user?.id || null,
           { target_user_id: id },
           authError.message,
         );
@@ -57,7 +76,7 @@ export async function deleteUser(id, url) {
         'USER_DELETE',
         'AUTH-ADMIN',
         'auth.users',
-        getLogUserId('ADMIN_DELETE_USER'),
+        user?.id || null,
         { target_user_id: id },
         e.message,
       );
@@ -67,6 +86,18 @@ export async function deleteUser(id, url) {
 }
 
 export async function updateUserRole(userId, role, url) {
+  // Check permission before proceeding
+  const { authorized, error: authError } = await checkPermission(
+    PERMISSIONS.USER_ROLE_UPDATE,
+    'updateUserRole',
+  );
+
+  if (!authorized) {
+    return {
+      error: authError || 'You do not have permission to change user roles.',
+    };
+  }
+
   // Logging for RPC is assumed to be inside callFunctionWithNoFormData
   callFunctionWithNoFormData(
     { p_user_id: userId, p_role: role },
@@ -77,6 +108,18 @@ export async function updateUserRole(userId, role, url) {
 }
 
 export async function addRole(url, formData) {
+  // Check permission before proceeding
+  const { authorized, error: authError } = await checkPermission(
+    PERMISSIONS.ROLE_CREATE,
+    'addRole',
+  );
+
+  if (!authorized) {
+    return {
+      error: authError || 'You do not have permission to create roles.',
+    };
+  }
+
   // Logging for RPC is assumed to be inside callFunctionWithFormData
   callFunctionWithFormData(
     null,
@@ -89,6 +132,18 @@ export async function addRole(url, formData) {
 }
 
 export async function updateRole(userId, url, formData) {
+  // Check permission before proceeding
+  const { authorized, error: authError } = await checkPermission(
+    PERMISSIONS.ROLE_UPDATE,
+    'updateRole',
+  );
+
+  if (!authorized) {
+    return {
+      error: authError || 'You do not have permission to update roles.',
+    };
+  }
+
   // Logging for RPC is assumed to be inside callFunctionWithFormData
   callFunctionWithFormData(
     userId,
@@ -101,6 +156,18 @@ export async function updateRole(userId, url, formData) {
 }
 
 export async function deleteRole(id, url) {
+  // Check permission before proceeding
+  const { authorized, error: authError } = await checkPermission(
+    PERMISSIONS.ROLE_DELETE,
+    'deleteRole',
+  );
+
+  if (!authorized) {
+    return {
+      error: authError || 'You do not have permission to delete roles.',
+    };
+  }
+
   // Logging for RPC is assumed to be inside callFunctionWithNoFormData
   callFunctionWithNoFormData(
     { p_role_id: id },
@@ -111,6 +178,18 @@ export async function deleteRole(id, url) {
 }
 
 export async function updateUserApprovalType(userId, approveType, url) {
+  // Check permission before proceeding
+  const { authorized, error: authError } = await checkPermission(
+    PERMISSIONS.USER_APPROVE,
+    'updateUserApprovalType',
+  );
+
+  if (!authorized) {
+    return {
+      error: authError || 'You do not have permission to approve users.',
+    };
+  }
+
   // Logging for RPC is assumed to be inside callFunctionWithNoFormData
   callFunctionWithNoFormData(
     { p_user_id: userId, p_is_approved: approveType },
@@ -121,6 +200,19 @@ export async function updateUserApprovalType(userId, approveType, url) {
 }
 
 export async function approveRoleRequest(roleRequestId, url) {
+  // Check permission before proceeding
+  const { authorized, error: authError } = await checkPermission(
+    PERMISSIONS.ROLE_REQUEST_APPROVE,
+    'approveRoleRequest',
+  );
+
+  if (!authorized) {
+    return {
+      error:
+        authError || 'You do not have permission to approve role requests.',
+    };
+  }
+
   // Logging for RPC is assumed to be inside callFunctionWithNoFormData
   callFunctionWithNoFormData(
     { p_role_request_id: roleRequestId },
@@ -131,6 +223,19 @@ export async function approveRoleRequest(roleRequestId, url) {
 }
 
 export async function declineRoleRequest(roleRequestId, url) {
+  // Check permission before proceeding
+  const { authorized, error: authError } = await checkPermission(
+    PERMISSIONS.ROLE_REQUEST_DECLINE,
+    'declineRoleRequest',
+  );
+
+  if (!authorized) {
+    return {
+      error:
+        authError || 'You do not have permission to decline role requests.',
+    };
+  }
+
   // Logging for RPC is assumed to be inside callFunctionWithNoFormData
   callFunctionWithNoFormData(
     { p_role_request_id: roleRequestId },
@@ -145,6 +250,7 @@ export async function declineRoleRequest(roleRequestId, url) {
 export async function getUsers() {
   unstable_noStore();
   const supabase = createClient();
+  const currentUser = await getCurrentUser();
   const action = 'USER_READ';
   const table = 'users';
 
@@ -156,7 +262,7 @@ export async function getUsers() {
       action,
       'RPC-READ',
       table,
-      getLogUserId(),
+      currentUser?.id || null,
       null,
       error.message,
     );
@@ -168,6 +274,7 @@ export async function getUsers() {
 export async function getRolesWithPermission() {
   unstable_noStore();
   const supabase = createClient();
+  const currentUser = await getCurrentUser();
   const action = 'ROLE_READ';
   const table = 'roles';
 
@@ -179,7 +286,7 @@ export async function getRolesWithPermission() {
       action,
       'RPC-READ',
       table,
-      getLogUserId(),
+      currentUser?.id || null,
       null,
       error.message,
     );
@@ -191,6 +298,7 @@ export async function getRolesWithPermission() {
 export async function getRoles() {
   unstable_noStore();
   const supabase = createClient();
+  const currentUser = await getCurrentUser();
   const action = 'ROLE_READ';
   const table = 'role';
 
@@ -202,7 +310,7 @@ export async function getRoles() {
       action,
       'DB-READ',
       table,
-      getLogUserId(),
+      currentUser?.id || null,
       null,
       error.message,
     );
@@ -221,6 +329,7 @@ export async function getRoles() {
 export async function getApproveTypes() {
   unstable_noStore();
   const supabase = createClient();
+  const currentUser = await getCurrentUser();
   const action = 'CONFIG_READ';
   const table = 'config';
 
@@ -232,7 +341,7 @@ export async function getApproveTypes() {
       action,
       'RPC-READ',
       table,
-      getLogUserId(),
+      currentUser?.id || null,
       null,
       error.message,
     );
@@ -251,6 +360,7 @@ export async function getApproveTypes() {
 export async function getRoleRequests() {
   unstable_noStore();
   const supabase = createClient();
+  const currentUser = await getCurrentUser();
   const action = 'REQUEST_READ';
   const table = 'role_requests';
 
@@ -262,7 +372,7 @@ export async function getRoleRequests() {
       action,
       'RPC-READ',
       table,
-      getLogUserId(),
+      currentUser?.id || null,
       null,
       error.message,
     );
@@ -274,9 +384,10 @@ export async function getRoleRequests() {
 export async function getUsersWithProof() {
   unstable_noStore();
   const supabase = createClient();
+  const currentUser = await getCurrentUser();
   const action = 'USER_READ';
   const table = 'users';
-  const logUserId = getLogUserId();
+  const logUserId = currentUser?.id || null;
 
   try {
     const { data, error } = await supabase.rpc('select_all_users_and_proof');

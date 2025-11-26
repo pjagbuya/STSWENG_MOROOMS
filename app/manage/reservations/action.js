@@ -1,23 +1,23 @@
 'use server';
 
+import { PERMISSIONS } from '@/lib/rbac-config';
+import {
+  checkPermission,
+  checkResourceRule,
+  getCurrentUser,
+} from '@/lib/server-rbac';
 import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
-
-const supabase = createClient();
-
-// Helper function to simulate getting the user ID for logging admin/system actions
-const getLogUserId = (userContextId = 'SYSTEM_UNKNOWN_USER') => {
-  // NOTE: This should be replaced with actual logic to get the logged-in user ID (e.g., from cookies or session).
-  return userContextId;
-};
 
 // --- READ OPERATIONS (Logging Errors Only) ---
 
 export const fetchReservationsByUserId = async userId => {
+  const supabase = createClient();
   const action = 'RESERVATION_READ';
   const table = 'reservations';
   const method = 'RPC-READ';
-  const logUserId = getLogUserId(userId);
+  const currentUser = await getCurrentUser();
+  const logUserId = currentUser?.id || userId;
 
   try {
     const { data, error } = await supabase.rpc('get_reservation_by_user_id', {
@@ -35,6 +35,11 @@ export const fetchReservationsByUserId = async userId => {
         { p_user_id: userId },
         error,
       );
+      return [];
+    }
+
+    // Handle null or empty data
+    if (!data || data.length === 0) {
       return [];
     }
 
@@ -64,10 +69,12 @@ export const fetchReservationsByUserId = async userId => {
 };
 
 export const fetchAllReservations = async () => {
+  const supabase = createClient();
   const action = 'RESERVATION_READ';
   const table = 'reservations';
   const method = 'RPC-READ';
-  const logUserId = getLogUserId('ADMIN_READ'); // Assuming admin is reading all
+  const currentUser = await getCurrentUser();
+  const logUserId = currentUser?.id || null;
 
   try {
     const { data, error } = await supabase.rpc('get_all_reservations');
@@ -83,6 +90,11 @@ export const fetchAllReservations = async () => {
         { context: 'all' },
         error,
       );
+      return [];
+    }
+
+    // Handle null or empty data
+    if (!data || data.length === 0) {
       return [];
     }
 
@@ -112,10 +124,12 @@ export const fetchAllReservations = async () => {
 };
 
 export const fetchRoomDetailsByRoomId = async roomId => {
+  const supabase = createClient();
   const action = 'ROOM_READ'; // Assuming you have a ROOM_READ enum
   const table = 'rooms';
   const method = 'RPC-READ';
-  const logUserId = getLogUserId('SYSTEM_FETCH'); // System component reading room details
+  const currentUser = await getCurrentUser();
+  const logUserId = currentUser?.id || null;
   const payload = { p_room_id: roomId };
 
   try {
@@ -148,7 +162,8 @@ export const fetchReservationsWithRoomNames = async (userId, isAdmin) => {
   const action = 'RESERVATION_READ_AGGREGATE';
   const table = 'reservations';
   const method = 'AGGREGATE';
-  const logUserId = getLogUserId(isAdmin ? 'ADMIN_AGGREGATE' : userId);
+  const currentUser = await getCurrentUser();
+  const logUserId = currentUser?.id || userId;
 
   try {
     // Determine the reservations to fetch based on isAdmin
@@ -186,7 +201,30 @@ export const fetchReservationsWithRoomNames = async (userId, isAdmin) => {
 // --- MUTATION OPERATIONS (Logging Success and Errors) ---
 
 export async function updateReservationStatus(reservationId, status) {
-  const userId = getLogUserId('ADMIN_STATUS_UPDATE'); // Assuming admin/system is changing status
+  // Check permission for approving/declining reservations
+  const permission =
+    status === 'approved'
+      ? PERMISSIONS.RESERVATION_APPROVE
+      : PERMISSIONS.RESERVATION_DECLINE;
+
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(permission, `updateReservationStatus_${status}`);
+
+  if (!authorized) {
+    return {
+      error: {
+        message:
+          authError ||
+          'You do not have permission to update reservation status.',
+      },
+    };
+  }
+
+  const supabase = createClient();
+  const userId = user?.id || 'UNKNOWN';
   const action = 'RESERVATION_UPDATE'; // Matches enum
   const table = 'reservations';
   const method = 'RPC-MUTATE';
@@ -220,7 +258,27 @@ export async function updateReservationStatus(reservationId, status) {
 }
 
 export async function deleteReservation(reservationId) {
-  const userId = getLogUserId('USER_DELETE_RESERVATION'); // Assuming user/system is deleting
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(
+    PERMISSIONS.RESERVATION_DELETE,
+    'deleteReservation',
+  );
+
+  if (!authorized) {
+    return {
+      error: {
+        message:
+          authError || 'You do not have permission to delete reservations.',
+      },
+    };
+  }
+
+  const supabase = createClient();
+  const userId = user?.id || 'UNKNOWN';
   const action = 'RESERVATION_DELETE'; // Matches enum
   const table = 'reservations';
   const method = 'RPC-MUTATE';

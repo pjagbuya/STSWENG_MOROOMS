@@ -16,14 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useFormWithLogging } from '@/hooks/useFormwithLogging';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 export default function PersonalScheduleForm({ values, onSubmit, rooms }) {
   const [startTime, setStartTime] = useState(values?.start_time ?? '00:00');
 
-  const form = useForm({
+  const form = useFormWithLogging('personal-schedule-form', {
     resolver: zodResolver(FORM_SCHEMA),
     defaultValues: {
       name: values?.name ?? '',

@@ -1,15 +1,45 @@
-import { ProtectedContent } from '@/components/auth_components/authcomponents';
 import Header from '@/components/header';
 import ReservationTable from '@/components/reservation/reservation_table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { PERMISSIONS } from '@/lib/rbac-config';
+import { PERMISSIONS, hasAllPermissions } from '@/lib/rbac-config';
+import { logPageAccessFailure } from '@/lib/server-rbac';
+import { getUserWithRoleServerSide } from '@/utils/utils';
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 import React from 'react';
 
-export default function ReservationCardList({ params: { user_id } }) {
+export default async function ReservationCardList({ params: { user_id } }) {
+  // Server-side permission check
+  const userWithRole = await getUserWithRoleServerSide();
+
+  const requiredPermissions = [
+    PERMISSIONS.RESERVATION_READ,
+    PERMISSIONS.RESERVATION_UPDATE,
+    PERMISSIONS.RESERVATION_DELETE,
+  ];
+
+  if (!userWithRole) {
+    await logPageAccessFailure({
+      pagePath: '/users/[user_id]/home/admin/reservations',
+      user: null,
+      requiredPermissions,
+      reason: 'UNAUTHENTICATED',
+    });
+    redirect('/login');
+  }
+
+  const hasAccess = hasAllPermissions(userWithRole, requiredPermissions);
+
+  if (!hasAccess) {
+    await logPageAccessFailure({
+      pagePath: '/users/[user_id]/home/admin/reservations',
+      user: userWithRole,
+      requiredPermissions,
+      reason: 'PERMISSION_DENIED',
+    });
+    redirect('/unauthorized');
+  }
+
   return (
     <>
       <Header />
@@ -21,25 +51,14 @@ export default function ReservationCardList({ params: { user_id } }) {
           className="absolute -z-10 opacity-50"
         />
 
-        <ProtectedContent
-          permissions={[
-            PERMISSIONS.RESERVATION_READ,
-            PERMISSIONS.RESERVATION_UPDATE,
-            PERMISSIONS.RESERVATION_DELETE,
-          ]}
-          requireAll={true}
-          redirectTo="/unauthorized"
-        >
-          <div className="container flex w-full flex-col p-8">
-            <h1 className="mb-5 text-2xl font-bold">Reservation Management</h1>
-            <ScrollArea className="h-[calc(100vh-120px)]">
-              <div className="space-y-4 rounded-lg bg-white p-8 shadow-md">
-                <ReservationTable userId={user_id} mode={'admin'} />{' '}
-                {/*TODO: add userID and if mode is admin or user*/}
-              </div>
-            </ScrollArea>
-          </div>
-        </ProtectedContent>
+        <div className="container flex w-full flex-col p-8">
+          <h1 className="mb-5 text-2xl font-bold">Reservation Management</h1>
+          <ScrollArea className="h-[calc(100vh-120px)]">
+            <div className="space-y-4 rounded-lg bg-white p-8 shadow-md">
+              <ReservationTable userId={user_id} mode={'admin'} />
+            </div>
+          </ScrollArea>
+        </div>
       </div>
     </>
   );
