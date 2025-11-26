@@ -326,6 +326,7 @@ export default function LoggerPage() {
                           </summary>
                           <pre className="mt-2 overflow-x-auto rounded bg-gray-100 p-2 text-xs">
                             {JSON.stringify(JSON.parse(log.data), null, 2)}
+                            Timestamp: {log.timestamp}
                           </pre>
                         </details>
                       </div>
