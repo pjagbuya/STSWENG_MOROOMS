@@ -34,7 +34,7 @@ export async function signup(prevState, formData) {
     password: formData.get('password'),
   };
 
-  const { data: user_signin_data, error } = await supabase.auth.signUp(data);
+  const { data: userSigninData, error } = await supabase.auth.signUp(data);
 
   if (error) {
     APILogger.log(
@@ -54,7 +54,7 @@ export async function signup(prevState, formData) {
     const { error: historyInsertError } = await supabase
       .from('password_history')
       .insert({
-        user_id: user_signin_data.user.id,
+        user_id: userSigninData.user.id,
         hashed_password: hashedNewPassword,
         created_at: new Date().toISOString(),
       });
@@ -137,7 +137,7 @@ export async function signup(prevState, formData) {
     let proofFileName = '';
 
     if (file && file.size > 0) {
-      const path = user_signin_data.user.id;
+      const path = userSigninData.user.id;
       await uploadFile(file, path);
       proofFileName = file.name;
     }
@@ -146,7 +146,7 @@ export async function signup(prevState, formData) {
     const procedureFormData = new FormData();
 
     // Map form fields to procedure parameters
-    procedureFormData.append('user_id', user_signin_data.user.id);
+    procedureFormData.append('user_id', userSigninData.user.id);
     procedureFormData.append('user_firstname', formData.get('userFirstname'));
     procedureFormData.append('user_lastname', formData.get('userLastname'));
     procedureFormData.append('proof', proofFileName);

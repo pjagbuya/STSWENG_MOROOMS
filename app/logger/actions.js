@@ -6,7 +6,7 @@ export async function getLogs(page = 0, limit = 20, filters = {}) {
   const supabase = createClient();
 
   try {
-    let query = supabase
+    let query = await supabase
       .from('logs')
       .select(
         `

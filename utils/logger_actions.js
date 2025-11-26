@@ -34,7 +34,7 @@ export class APILogger {
     // Optionally log to Supabase logs table
     try {
       const { createClient } = await import('@/utils/supabase/server');
-      const supabase = createClient();
+      const supabase = createClient(true);
 
       await supabase.from('logs').insert(logEntry);
     } catch (logError) {

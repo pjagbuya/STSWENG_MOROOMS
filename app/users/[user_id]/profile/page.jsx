@@ -1,4 +1,4 @@
-import { getCurrentUserInfo } from './action';
+import { getCurrentUserInfo, getLastLogin } from './action';
 import ProfileCalender from './profile-calendar';
 import GradientBox from '@/components/gradient-box';
 import Header from '@/components/header';
@@ -16,13 +16,14 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
   const userInfo = await getCurrentUserInfo();
+  const lastLogin = await getLastLogin(user.email);
 
   return (
     <div>
       <Header />
       <div className="flex h-screen w-full flex-col items-center justify-center gap-10 px-64 py-24">
         <div className="flex h-[300px] w-full items-center justify-between gap-6 py-6">
-          <div className="flex w-full gap-5 rounded-3xl border-8 border-slate-400 bg-slate-200 p-6">
+          <div className="flex w-full gap-5 rounded-3xl bg-slate-200 p-6">
             <Avatar className="h-[211px] w-[211px]">
               <AvatarImage src={userInfo.profileURL} />
               <AvatarFallback>CN</AvatarFallback>
@@ -32,6 +33,12 @@ export default async function ProfilePage() {
                 {userInfo.userFirstname} {userInfo.userLastname}
               </h1>
               <h3 className="text-lg">{user.email}</h3>
+              <h3 className="text-lg">
+                Last Login:{' '}
+                <span className={lastLogin.isError ? 'text-red-500' : ''}>
+                  {lastLogin.text}
+                </span>
+              </h3>
             </div>
           </div>
           <div className="flex h-full flex-col gap-2">
