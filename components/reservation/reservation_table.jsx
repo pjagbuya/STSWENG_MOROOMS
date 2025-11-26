@@ -80,7 +80,7 @@ export default function ReservationTable({ userId, mode }) {
       const { error } = await deleteReservation(reservationId);
 
       if (error) {
-        console.error('Error deleting reservation:', error);
+        // console.error('Error deleting reservation:', error);
         alert('Failed to delete reservation.');
       } else {
         // Remove the reservation from the state
@@ -92,7 +92,7 @@ export default function ReservationTable({ userId, mode }) {
         alert('Reservation deleted successfully.');
       }
     } catch (err) {
-      console.error('Unexpected error:', err);
+      // console.error('Unexpected error:', err);
       alert('An unexpected error occurred.');
     }
   };
@@ -116,7 +116,7 @@ export default function ReservationTable({ userId, mode }) {
     };
 
     if (userId) loadReservations();
-  }, [userId]);
+  }, [userId, isAdmin]);
 
   const paginatedReservations = reservations.slice(
     (currentPage - 1) * itemsPerPage,
@@ -138,7 +138,15 @@ export default function ReservationTable({ userId, mode }) {
         ),
       );
     } catch (error) {
-      console.error('Failed to update reservation status:', error);
+      // APILogger.log(
+      //   'Reservation Status Update',
+      //   'UPDATE',
+      //   'reservations',
+      //   userId,
+      //   { reservation_id: reservations[index].reservation_id, newStatus },
+      //   error.message,
+      // );
+      // console.error('Failed to update reservation status:', error);
       // Optionally, you can add some user feedback or error handling
     }
   };

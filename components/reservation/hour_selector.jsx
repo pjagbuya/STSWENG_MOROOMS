@@ -77,10 +77,10 @@ export default function HourSelector({
   const handleMouseUp = () => {
     setIsDragging(false);
     setDragStart(null);
-    console.log(
-      'Selected hours:',
-      selectedHours.sort((a, b) => a - b),
-    );
+    // console.log(
+    //   'Selected hours:',
+    //   selectedHours.sort((a, b) => a - b),
+    // );
     onSelectionChange(selectedHours);
   };
 

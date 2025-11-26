@@ -19,12 +19,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 function logFormData(formData) {
-  console.log('FormData contents:');
+  // console.log('FormData contents:');
   for (let [key, value] of formData.entries()) {
     if (value instanceof File) {
-      console.log(key, ':', value.name, '(File)');
+      // console.log(key, ':', value.name, '(File)');
     } else {
-      console.log(key, ':', value);
+      // console.log(key, ':', value);
     }
   }
 }
@@ -71,11 +71,10 @@ export default function RoomScheduleInput({ roomId, userID }) {
         } else {
           // Parse the raw TZ multirange data into start and end times
           const unavailableRanges = parseTZDateRanges(tzMultirange);
-          console.log('unavailableRanges: ', unavailableRanges);
+          // console.log('unavailableRanges: ', unavailableRanges);
           // Convert each range to numbers representing hours
           const hourRanges = unavailableRanges.map(convertRangeToNumbers);
-          console.log('hour ranges: ', hourRanges);
-
+          // console.log('hour ranges: ', hourRanges);
           // Initialize `hourStates` with 'available' for all hours
           for (let hour = minHour; hour <= maxHour; hour++) {
             newHourStates[hour] = 'available'; // Default state
@@ -96,7 +95,7 @@ export default function RoomScheduleInput({ roomId, userID }) {
         setHourStates(newHourStates);
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to fetch or process hour states:', error);
+        // console.error('Failed to fetch or process hour states:', error);
         setIsLoading(false); // Ensure the loading state is reset even if there's an error
       }
     }
@@ -109,7 +108,7 @@ export default function RoomScheduleInput({ roomId, userID }) {
 
   const handleDaySelect = day => {
     setSelectedDay(day); // Update the selected day state
-    console.log('Selected day:', day);
+    // console.log('Selected day:', day);
   };
 
   const handleFormSubmit = async e => {
@@ -143,7 +142,7 @@ export default function RoomScheduleInput({ roomId, userID }) {
       });
       router.push('/rooms'); // Redirect to the /rooms page
     } catch (error) {
-      console.error('Error submitting roomSchedule:', error);
+      // console.error('Error submitting roomSchedule:', error);
       toast({
         description: 'Failed to submit roomSchedule. Please try again.',
         variant: 'error',

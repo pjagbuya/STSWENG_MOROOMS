@@ -52,8 +52,8 @@ export function RoleUpgradeForm({ roles, currentRole, userId }) {
         }}
         onAction={() => {
           const action = async () => {
-            console.log(userId);
-            console.log(roles[rowData.roleIndex].id);
+            // console.log(userId);
+            // console.log(roles[rowData.roleIndex].id);
             // await updateUserRole(
             //   data[rowData.index].userId,
             //   roles[rowData.roleIndex].value,

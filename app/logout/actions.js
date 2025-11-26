@@ -1,9 +1,14 @@
 // app/logout/actions.js
 'use server';
 
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+
+// app/logout/actions.js
+
+// app/logout/actions.js
 
 // app/logout/actions.js
 
@@ -17,9 +22,11 @@ export async function logout() {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    console.error('Logout error:', error);
+    // console.error('Logout error:', error);
     return { error: error.message };
   }
+
+  await APILogger.log('logout', 'POST', 'auth', null);
 
   revalidatePath('/', 'layout');
   redirect('/login');

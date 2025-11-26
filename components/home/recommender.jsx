@@ -17,7 +17,7 @@ export default async function Recommender({ userID }) {
   const roomSets = await fetchRoomSets();
   const roomTypes = await fetchRoomTypes();
   const details = await get_all_details(userID);
-  console.log('frontend details:', details);
+  // console.log('frontend details:', details);
 
   const roomDetailsPromises = details.map(async detail => {
     const roomData = await getRoomByID(detail.room);

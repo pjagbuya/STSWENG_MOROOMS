@@ -12,6 +12,14 @@ const SignOutButton = () => {
       router.refresh();
       window.location.href = '/login';
     } catch (error) {
+      // await APILogger.log(
+      //   'SignOutButton',
+      //   'LOGOUT',
+      //   'users',
+      //   null,
+      //   null,
+      //   error.message,
+      // );
       console.error('Sign out error:', error);
     }
   };

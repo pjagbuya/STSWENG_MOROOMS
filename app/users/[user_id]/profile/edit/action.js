@@ -1,9 +1,19 @@
 'use server';
 
+import { passwordSchema } from '@/lib/validation-schemas';
 import { callFunctionWithFormData } from '@/utils/action_template';
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+// Server-side validation schema for profile edit
+const serverEditProfileSchema = z.object({
+  email: z.string().min(1).email(),
+  userFirstname: z.string().min(2).max(50),
+  userLastname: z.string().min(2).max(50),
+});
 
 /**
  * Check if user can change their password (not changed within 24 hours).
@@ -65,11 +75,27 @@ export async function getUserInfo() {
   });
 
   if (error) {
-    console.log(error.message);
+    APILogger.log(
+      'getUserInfo',
+      'RPC-READ',
+      'users',
+      userInfo.user.id,
+      null,
+      error.message,
+    );
+    // console.log(error.message);
   }
 
   if (error2) {
-    console.log(error2.message);
+    APILogger.log(
+      'getUserInfo',
+      'RPC-READ',
+      'users',
+      userInfo.user.id,
+      null,
+      error2.message,
+    );
+    // console.log(error2.message);
   }
 
   const finalData = {
@@ -90,7 +116,14 @@ async function uploadFile(file, path) {
       upsert: true,
     });
   if (error) {
-    console.error(error);
+    APILogger.log(
+      'uploadFile',
+      'STORAGE-UPLOAD',
+      'Morooms-file',
+      null,
+      null,
+      error.message,
+    );
   }
 }
 
@@ -104,13 +137,49 @@ export async function editProfile(prevState, formData) {
   }
 
   const userId = userInfo.user.id;
+
+  const validationData = {
+    email: formData.get('email'),
+    userFirstname: formData.get('userFirstname'),
+    userLastname: formData.get('userLastname'),
+  };
+
+  const validation = serverEditProfileSchema.safeParse(validationData);
+  if (!validation.success) {
+    const errors = validation.error.errors.map(e => e.message).join(' ');
+    APILogger.log(
+      'editProfile',
+      'AUTH-UPDATE',
+      'auth.users',
+      userId,
+      null,
+      `Validation failed: ${errors}`,
+    );
+    return { error: errors };
+  }
+
   const newPassword = formData.get('password');
   const currentPassword = formData.get('currentPassword');
   const isChangingPassword = newPassword && newPassword.trim() !== '';
 
-  // Handle password change if requested
   if (isChangingPassword) {
-    // SECURITY: Require current password verification for password changes
+    // SECURITY: Validate password with centralized schema
+    const passwordValidation = passwordSchema.safeParse(newPassword);
+    if (!passwordValidation.success) {
+      const errors = passwordValidation.error.errors
+        .map(e => e.message)
+        .join(' ');
+      APILogger.log(
+        'editProfile',
+        'AUTH-UPDATE',
+        'auth.users',
+        userId,
+        null,
+        `Password validation failed: ${errors}`,
+      );
+      return { error: errors };
+    }
+
     if (!currentPassword) {
       return { error: 'Current password is required to change password.' };
     }
@@ -157,23 +226,30 @@ export async function editProfile(prevState, formData) {
     });
   }
 
-  // Update email if changed
+  // Update email if changed (password already handled above if changing)
   const data = {
     email: formData.get('email'),
   };
-
-  console.log('data', data);
+  // Don't include password here - it's already handled in the isChangingPassword block above
 
   const { data: user_signin_data, error } =
     await supabase.auth.updateUser(data);
 
   if (error) {
-    console.log(error.message);
+    APILogger.log(
+      'editProfile',
+      'AUTH-UPDATE',
+      'auth.users',
+      userId,
+      null,
+      error.message,
+    );
+    // Only redirect to error for critical failures, not for benign errors
+    return { error: 'Failed to update profile. Please try again.' };
   }
 
   const file = formData.get('userProfilepic');
   const path = userId;
-  console.log('file', file);
 
   formData.delete('email');
   formData.delete('password');
@@ -181,12 +257,6 @@ export async function editProfile(prevState, formData) {
   formData.append('user_id', userId);
   if (file && file != 'undefined') {
     formData.append('userProfilepic', file.name);
-  }
-  console.log('formData', formData);
-
-  if (error) {
-    console.log(error.message);
-    redirect('/error');
   }
 
   // create user info

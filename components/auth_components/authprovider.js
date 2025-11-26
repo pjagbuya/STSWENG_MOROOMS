@@ -27,22 +27,22 @@ export function AuthProvider({ children }) {
       });
 
       if (error) {
-        console.error('Error fetching user role:', error);
+        // console.error('Error fetching user role:', error);
         return null;
       }
 
       const internalRole = getInternalRole(role);
-      console.log(
-        '✅ Fetched role for user:',
-        userId,
-        '→',
-        role,
-        '→',
-        internalRole,
-      );
+      // console.log(
+      //   '✅ Fetched role for user:',
+      //   userId,
+      //   '→',
+      //   role,
+      //   '→',
+      //   internalRole,
+      // );
       return internalRole;
     } catch (error) {
-      console.error('Error fetching user role:', error);
+      // console.error('Error fetching user role:', error);
       return null;
     }
   };
@@ -56,14 +56,14 @@ export function AuthProvider({ children }) {
         } = await supabase.auth.getUser();
 
         if (error) {
-          console.error('Error getting user:', error);
+          // console.error('Error getting user:', error);
           setUser(null);
           setLoading(false);
           return;
         }
 
         if (authUser) {
-          console.log('🔐 Init: User found, fetching role...');
+          // console.log('🔐 Init: User found, fetching role...');
           const role = await fetchUserRole(authUser.id);
           setUser({
             id: authUser.id,
@@ -71,13 +71,13 @@ export function AuthProvider({ children }) {
             role: role,
             metadata: authUser.user_metadata,
           });
-          console.log('✅ Init: User set with role:', role);
+          // console.log('✅ Init: User set with role:', role);
         } else {
-          console.log('❌ Init: No user found, clearing state');
+          // console.log('❌ Init: No user found, clearing state');
           setUser(null);
         }
       } catch (error) {
-        console.error('Failed to initialize auth:', error);
+        // console.error('Failed to initialize auth:', error);
         setUser(null);
       } finally {
         setLoading(false);
@@ -89,10 +89,10 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔄 Auth state changed:', event);
+      // console.log('🔄 Auth state changed:', event);
 
       if (event === 'SIGNED_IN' && session?.user) {
-        console.log('✅ SIGNED_IN: Fetching role for new user...');
+        // console.log('✅ SIGNED_IN: Fetching role for new user...');
         const role = await fetchUserRole(session.user.id);
         setUser({
           id: session.user.id,
@@ -100,12 +100,12 @@ export function AuthProvider({ children }) {
           role: role,
           metadata: session.user.user_metadata,
         });
-        console.log('✅ New user set with role:', role);
+        // console.log('✅ New user set with role:', role);
       } else if (event === 'SIGNED_OUT') {
-        console.log('🚪 SIGNED_OUT: Clearing all user state');
+        // console.log('🚪 SIGNED_OUT: Clearing all user state');
         setUser(null);
       } else if (event === 'USER_UPDATED' && session?.user) {
-        console.log('🔄 USER_UPDATED: Refreshing role...');
+        // console.log('🔄 USER_UPDATED: Refreshing role...');
         const role = await fetchUserRole(session.user.id);
         setUser({
           id: session.user.id,
@@ -114,7 +114,7 @@ export function AuthProvider({ children }) {
           metadata: session.user.user_metadata,
         });
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-        console.log('🔄 TOKEN_REFRESHED: Refreshing role...');
+        // console.log('🔄 TOKEN_REFRESHED: Refreshing role...');
         const role = await fetchUserRole(session.user.id);
         setUser({
           id: session.user.id,
@@ -137,7 +137,7 @@ export function AuthProvider({ children }) {
       const role = await fetchUserRole(user.id);
       setUser(prev => ({ ...prev, role }));
     } catch (error) {
-      console.error('Failed to refresh user role:', error);
+      // console.error('Failed to refresh user role:', error);
     }
   };
 
@@ -149,7 +149,7 @@ export function AuthProvider({ children }) {
       } = await supabase.auth.getUser();
 
       if (error) {
-        console.error('Error refreshing user:', error);
+        // console.error('Error refreshing user:', error);
         setUser(null);
         return;
       }
@@ -166,7 +166,7 @@ export function AuthProvider({ children }) {
         setUser(null);
       }
     } catch (error) {
-      console.error('Failed to refresh user:', error);
+      // console.error('Failed to refresh user:', error);
     }
   };
 
@@ -199,6 +199,7 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }

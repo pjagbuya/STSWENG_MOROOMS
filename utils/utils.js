@@ -26,7 +26,7 @@ export async function isAdminServerSide() {
   });
 
   if (error) {
-    console.error('Error checking admin status:', error);
+    // console.error('Error checking admin status:', error);
     return false;
   }
 
@@ -50,7 +50,7 @@ export async function isRMServerSide() {
   });
 
   if (error) {
-    console.error('Error checking RM status:', error);
+    // console.error('Error checking RM status:', error);
     return false;
   }
 
@@ -73,7 +73,7 @@ export async function getUserRoleServerSide() {
   });
 
   if (error) {
-    console.error('Error fetching user role:', error);
+    // console.error('Error fetching user role:', error);
     return null;
   }
 
@@ -98,7 +98,7 @@ export async function getUserWithRoleServerSide() {
   });
 
   if (error) {
-    console.error('Error fetching user role:', error);
+    // console.error('Error fetching user role:', error);
     return {
       id: user.id,
       email: user.email,
@@ -144,7 +144,7 @@ export async function getUserRoleClientSide() {
   });
 
   if (error) {
-    console.error('Error fetching user role:', error);
+    // console.error('Error fetching user role:', error);
     return null;
   }
 
@@ -207,7 +207,7 @@ export function convertKeysToCamelCase(data) {
 export function objectToFormData(obj) {
   const formData = new FormData();
   for (const key in obj) {
-    console.log(key, obj[key]);
+    // console.log(key, obj[key]);
     formData.append(key, obj[key]);
   }
   return formData;

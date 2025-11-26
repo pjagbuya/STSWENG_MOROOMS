@@ -1,10 +1,23 @@
 'use server';
 
 import { SecurityService } from '@/lib/security';
+import { passwordSchema } from '@/lib/validation-schemas';
 import { callFunctionWithFormData } from '@/utils/action_template';
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+// Server-side validation schema (must match client-side)
+const serverSignupSchema = z.object({
+  email: z.string().min(1).email(),
+  password: passwordSchema,
+  userFirstname: z.string().min(2).max(50),
+  userLastname: z.string().min(2).max(50),
+  securityAnswer1: z.string().min(2).max(100),
+  securityAnswer2: z.string().min(2).max(100),
+});
 
 async function uploadFile(file, path) {
   const supabase = createClient();
@@ -14,18 +27,37 @@ async function uploadFile(file, path) {
       upsert: true,
     });
   if (error) {
-    console.error(error);
+    // console.error(error);
   }
 }
 
 export async function signup(prevState, formData) {
   const supabase = createClient(true);
 
-  /*console.log(
-    'Security Answers:',
-    formData.get('securityAnswer1'),
-    formData.get('securityAnswer2'),
-  );*/
+  // SECURITY: Server-side validation (2.1.4, 2.1.5, 2.3.2)
+  // Client-side validation can be bypassed, so we must validate on server
+  const validationData = {
+    email: formData.get('email'),
+    password: formData.get('password'),
+    userFirstname: formData.get('userFirstname'),
+    userLastname: formData.get('userLastname'),
+    securityAnswer1: formData.get('securityAnswer1'),
+    securityAnswer2: formData.get('securityAnswer2'),
+  };
+
+  const validation = serverSignupSchema.safeParse(validationData);
+  if (!validation.success) {
+    const errors = validation.error.errors.map(e => e.message).join(' ');
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      null,
+      { email: validationData.email },
+      `Validation failed: ${errors}`,
+    );
+    return { error: errors };
+  }
 
   // Sign up user with auth first
   const data = {
@@ -36,6 +68,14 @@ export async function signup(prevState, formData) {
   const { data: userSigninData, error } = await supabase.auth.signUp(data);
 
   if (error) {
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      null,
+      { email: data.email },
+      error.message,
+    );
     return { error: error.message };
   }
 
@@ -51,19 +91,40 @@ export async function signup(prevState, formData) {
       });
 
     if (historyInsertError) {
-      console.error('Failed to save password to history:', historyInsertError);
+      APILogger.log(
+        'User Signup',
+        'CREATE',
+        'password_history',
+        null,
+        { user_id: user_signin_data.user.id },
+        historyInsertError.message,
+      );
       // Don't fail the request if history saving fails
     } else {
-      
       /*console.log('Password saved to history');*/
     }
   } catch (historyError) {
-    console.error('Error managing password history:', historyError);
+    // console.error('Error managing password history:', historyError);
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'password_history',
+      null,
+      { user_id: user_signin_data.user.id },
+      historyError.message,
+    );
+    // Don't fail the request if history management fails
     return { error: 'Failed to create account. Please try again.' };
   }
-
-  if (!userSigninData.user) {
-    return { error: 'Failed to create user account' };
+  if (!user_signin_data.user) {
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      null,
+      { email: data.email },
+      'No user data returned after signup',
+    );
   }
 
   try {
@@ -80,18 +141,26 @@ export async function signup(prevState, formData) {
     ];
     // Validate security answers
     if (!securityAnswers[0].answer || !securityAnswers[1].answer) {
-      return { error: 'Both security questions must be answered' };
+      APILogger.log(
+        'User Signup',
+        'CREATE',
+        'security_answers',
+        user_signin_data.user.id,
+        { securityAnswers },
+        'Both security questions must be answered',
+      );
     }
 
     if (securityAnswers[0].questionId === securityAnswers[1].questionId) {
-      return { error: 'Please select different security questions' };
+      APILogger.log(
+        'User Signup',
+        'CREATE',
+        'security_answers',
+        user_signin_data.user.id,
+        { securityAnswers },
+        'Please select different security questions',
+      );
     }
-
-    // Save security answers
-    await SecurityService.saveSecurityAnswers(
-      userSigninData.user.id,
-      securityAnswers,
-    );
 
     // Handle file upload
 
@@ -121,9 +190,29 @@ export async function signup(prevState, formData) {
       procedureFormData,
       null, // No id column name needed since procedure handles it
     );
-
+    // Save security answers
+    await SecurityService.saveSecurityAnswers(
+      user_signin_data.user.id,
+      securityAnswers,
+    );
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      user_signin_data.user.id,
+      { email: data.email },
+      null,
+    );
     return { success: true };
   } catch (error) {
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      user_signin_data.user.id,
+      { email: data.email },
+      error.message,
+    );
     console.error('Signup error:', error);
     return { error: 'Failed to create account. Please try again.' };
   }

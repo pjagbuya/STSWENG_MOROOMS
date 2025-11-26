@@ -1,6 +1,9 @@
 'use server';
 
-import { createClient } from '@/utils/supabase/client';
+import { PERMISSIONS } from '@/lib/rbac-config';
+import { checkPermission } from '@/lib/server-rbac';
+import { APILogger } from '@/utils/logger_actions';
+import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
 /**
@@ -22,7 +25,21 @@ export async function addRoomType(
   minReserveTime,
   maxReserveTime,
 ) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_TYPE_CREATE, 'addRoomType');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to create room types.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('create_room_type', {
     p_name: name,
@@ -33,9 +50,24 @@ export async function addRoomType(
   });
 
   if (error) {
-    console.error('Error adding room type:', error);
+    await APILogger.log(
+      'addRoomType',
+      'POST',
+      'room_types',
+      userId,
+      { name, details, capacity, minReserveTime, maxReserveTime },
+      error.message,
+    );
     return error;
   }
+  await APILogger.log(
+    'addRoomType',
+    'POST',
+    'room_types',
+    userId,
+    { name, details, capacity, minReserveTime, maxReserveTime },
+    null,
+  );
 
   revalidatePath('/manage/room_types');
   revalidatePath('/manage/rooms');
@@ -50,17 +82,46 @@ export async function addRoomType(
  * @returns {Promise<Error|void>} Resolves to void if successful or an error object if an error occurs.
  */
 export async function deleteRoomType(id) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_TYPE_DELETE, 'deleteRoomType');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to delete room types.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('delete_room_type', {
     p_room_type_id: id,
   });
 
   if (error) {
-    console.error('Error deleting room type:', error);
+    // console.error('Error deleting room type:', error);
+    await APILogger.log(
+      'deleteRoomType',
+      'DELETE',
+      'room_types',
+      userId,
+      { roomTypeId: id },
+      error.message,
+    );
     return error;
   }
-
+  await APILogger.log(
+    'deleteRoomType',
+    'DELETE',
+    'room_types',
+    userId,
+    { roomTypeId: id },
+    null,
+  );
   revalidatePath('/manage/room_types');
 }
 
@@ -85,7 +146,21 @@ export async function editRoomType(
   minReserveTime,
   maxReserveTime,
 ) {
+  // Check permission before proceeding
+  const {
+    authorized,
+    user,
+    error: authError,
+  } = await checkPermission(PERMISSIONS.ROOM_TYPE_UPDATE, 'editRoomType');
+
+  if (!authorized) {
+    return {
+      message: authError || 'You do not have permission to edit room types.',
+    };
+  }
+
   const supabase = createClient();
+  const userId = user?.id || null;
 
   const { error } = await supabase.rpc('edit_room_type', {
     p_room_type_id: id,
@@ -97,9 +172,39 @@ export async function editRoomType(
   });
 
   if (error) {
-    console.error('Error editing room type:', error);
+    // console.error('Error editing room type:', error);
+    await APILogger.log(
+      'editRoomType',
+      'PUT',
+      'room_types',
+      userId,
+      {
+        roomTypeId: id,
+        newName: name,
+        newDetails: details,
+        newCapacity: capacity,
+        newMinReserveTime: minReserveTime,
+        newMaxReserveTime: maxReserveTime,
+      },
+      error.message,
+    );
     return error;
   }
+  await APILogger.log(
+    'editRoomType',
+    'PUT',
+    'room_types',
+    userId,
+    {
+      roomTypeId: id,
+      newName: name,
+      newDetails: details,
+      newCapacity: capacity,
+      newMinReserveTime: minReserveTime,
+      newMaxReserveTime: maxReserveTime,
+    },
+    null,
+  );
 
   revalidatePath('/manage/room_types');
 }
@@ -118,7 +223,15 @@ export async function fetchRoomTypes() {
   const { data, error } = await supabase.rpc('get_room_types');
 
   if (error) {
-    console.error('Error fetching room types:', error);
+    // console.error('Error fetching room types:', error);
+    await APILogger.log(
+      'fetchRoomTypes',
+      'RPC-READ',
+      'room_types',
+      null,
+      null,
+      error.message,
+    );
     throw error;
   }
 

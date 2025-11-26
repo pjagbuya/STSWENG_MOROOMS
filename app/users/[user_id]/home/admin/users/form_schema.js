@@ -1,12 +1,22 @@
 import { z } from 'zod';
 
 export const userEditFormSchema = z.object({
-  userFirstname: z.string().min(2, {
-    message: 'Type name must be at least 2 characters.',
-  }),
-  userLastname: z.string().min(2, {
-    message: 'Type name must be at least 2 characters.',
-  }),
+  userFirstname: z
+    .string()
+    .min(2, {
+      message: 'First name must be at least 2 characters.',
+    })
+    .max(50, {
+      message: 'First name cannot exceed 50 characters.',
+    }),
+  userLastname: z
+    .string()
+    .min(2, {
+      message: 'Last name must be at least 2 characters.',
+    })
+    .max(50, {
+      message: 'Last name cannot exceed 50 characters.',
+    }),
 });
 
 export const roleFormSchema = z.object({
@@ -22,6 +32,12 @@ export const roleFormSchema = z.object({
 });
 
 export const securityQuestionFormSchema = z.object({
-  securityAnswer1: z.string().min(2, 'Answer must be at least 2 characters'),
-  securityAnswer2: z.string().min(2, 'Answer must be at least 2 characters'),
+  securityAnswer1: z
+    .string()
+    .min(2, 'Answer must be at least 2 characters')
+    .max(100, 'Answer cannot exceed 100 characters'),
+  securityAnswer2: z
+    .string()
+    .min(2, 'Answer must be at least 2 characters')
+    .max(100, 'Answer cannot exceed 100 characters'),
 });

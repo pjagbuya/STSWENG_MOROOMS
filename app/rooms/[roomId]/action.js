@@ -6,6 +6,7 @@ import {
   parseTZDateRanges,
   toTZMultiRange,
 } from '@/utils/date_utils';
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -13,11 +14,11 @@ import { redirect } from 'next/navigation';
 export async function reserve(formData) {
   const supabase = createClient();
 
-  console.log('form data in reserve: ', formData); // BUG: FORM DATA DATE RECEIVED IS A DAY BEHIND?????????? (click nov 23 on calendar, receive nov 22)
+  // console.log('form data in reserve: ', formData); // BUG: FORM DATA DATE RECEIVED IS A DAY BEHIND?????????? (click nov 23 on calendar, receive nov 22)
 
   const selectedDate = new Date(formData.get('selectedDate'));
   selectedDate.setHours(selectedDate.getHours() + 24);
-  console.log('selected date: ', selectedDate);
+  // console.log('selected date: ', selectedDate);
   const selectedHours = JSON.parse(formData.get('selectedHours')); // Parse the hours from JSON string
 
   // function to convert the hour data & date data into the proper tzmultirange format
@@ -34,7 +35,15 @@ export async function reserve(formData) {
       .upload(fileName, endorsementLetter);
 
     if (uploadError) {
-      console.error('Error uploading file:', uploadError);
+      // console.error('Error uploading file:', uploadError);
+      await APILogger.log(
+        'uploadEndorsementLetter',
+        'STORAGE-UPLOAD',
+        'endorsement_files',
+        formData.get('user_id'),
+        { fileName },
+        uploadError,
+      );
       throw new Error('Failed to upload endorsement letter');
     }
 
@@ -47,7 +56,15 @@ export async function reserve(formData) {
       .getPublicUrl(fileName);
 
     if (urlError) {
-      console.error('Error getting public URL:', urlError);
+      // console.error('Error getting public URL:', urlError);
+      await APILogger.log(
+        'uploadEndorsementLetter',
+        'STORAGE-GET-PUBLIC-URL',
+        'endorsement_files',
+        formData.get('user_id'),
+        { fileName },
+        urlError,
+      );
       throw new Error('Failed to get public URL for endorsement letter');
     }
 
@@ -69,10 +86,26 @@ export async function reserve(formData) {
   });
 
   if (error) {
-    console.error('Error creating reservation:', error.message);
+    // console.error('Error creating reservation:', error.message);
+    await APILogger.log(
+      'createReservation',
+      'RPC-MUTATE',
+      'reservations',
+      formData.get('user_id'),
+      { reservationData: Object.fromEntries(formData.entries()) },
+      error,
+    );
     throw new Error('Failed to create reservation');
   }
-  console.log('Reservation created successfully');
+  // console.log('Reservation created successfully');
+  await APILogger.log(
+    'createReservation',
+    'RPC-MUTATE',
+    'reservations',
+    formData.get('user_id'),
+    { reservationData: Object.fromEntries(formData.entries()) },
+    null,
+  );
   revalidatePath('/reservations');
 }
 
@@ -83,7 +116,15 @@ export async function get_min_max_room_hours(room_id) {
   });
 
   if (error) {
-    console.error('Error fetching room details:', error);
+    // console.error('Error fetching room details:', error);
+    await APILogger.log(
+      'getMinMaxRoomHours',
+      'RPC-READ',
+      'rooms',
+      null,
+      { room_id },
+      error,
+    );
     throw error;
   }
 
@@ -103,7 +144,15 @@ export async function get_room_details(room_id) {
   });
 
   if (error) {
-    console.error('Error fetching room details:', error);
+    await APILogger.log(
+      'getRoomDetails',
+      'RPC-READ',
+      'rooms',
+      null,
+      { room_id },
+      error,
+    );
+    // console.error('Error fetching room details:', error);
     throw error;
   }
 
@@ -123,7 +172,15 @@ export async function get_labelled_room_hours(room_id, _reservation_date) {
   });
 
   if (error) {
-    console.error('Error fetching reservation details:', error);
+    // console.error('Error fetching reservation details:', error);
+    await APILogger.log(
+      'getLabelledRoomHours',
+      'RPC-READ',
+      'rooms',
+      null,
+      { room_id, reservation_date: formattedDate },
+      error,
+    );
     throw error;
   }
 
@@ -166,7 +223,15 @@ export async function get_labelled_room_hours(room_id, _reservation_date) {
   );
 
   if (scheduleError) {
-    console.error('Error fetching room schedule:', scheduleError);
+    // console.error('Error fetching room schedule:', scheduleError);
+    await APILogger.log(
+      'getLabelledRoomHours',
+      'RPC-READ',
+      'rooms',
+      null,
+      { room_id, day_number: dayNumber },
+      scheduleError,
+    );
     throw scheduleError;
   }
 

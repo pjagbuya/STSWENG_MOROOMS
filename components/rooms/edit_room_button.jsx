@@ -22,8 +22,8 @@ export default function EditRoomButton({
   open,
   onOpenChange,
 }) {
-  console.log('EditRoomButton room:', room);
-  console.log('EditRoomButton room image:', room.image); // Fixed: remove .image_file
+  // console.log('EditRoomButton room:', room);
+  // console.log('EditRoomButton room image:', room.image); // Fixed: remove .image_file
 
   const roomFormRef = useRef();
   const [roomImageFile, setRoomImageFile] = useState();
@@ -37,21 +37,21 @@ export default function EditRoomButton({
     async function fetchRoomImageFile() {
       // Fixed: Check room.image instead of room.room_image
       if (!room || !room.image) {
-        console.log('No room or image URL found');
+        // console.log('No room or image URL found');
         setRoomImageFile(null);
         return null;
       }
 
       try {
-        console.log('Fetching image from:', room.image);
+        // console.log('Fetching image from:', room.image);
 
         // First try direct fetch (for public buckets)
         let response = await fetch(room.image);
 
-        console.log('Response status:', response.status);
+        // console.log('Response status:', response.status);
 
         if (!response.ok && response.status === 403) {
-          console.log('403 error, trying signed URL...');
+          // console.log('403 error, trying signed URL...');
 
           const supabase = createClient();
 
@@ -59,7 +59,7 @@ export default function EditRoomButton({
           const urlParts = room.image.split('/');
           const filePath = urlParts.slice(-2).join('/'); // Gets "room_images/filename.ext"
 
-          console.log('Extracted file path:', filePath);
+          // console.log('Extracted file path:', filePath);
 
           // Create a signed URL (valid for 1 hour)
           const { data, error } = await supabase.storage
@@ -67,12 +67,12 @@ export default function EditRoomButton({
             .createSignedUrl(filePath, 3600);
 
           if (error) {
-            console.error('Failed to create signed URL:', error);
+            // console.error('Failed to create signed URL:', error);
             setRoomImageFile(null);
             return null;
           }
 
-          console.log('Created signed URL:', data.signedUrl);
+          // console.log('Created signed URL:', data.signedUrl);
           response = await fetch(data.signedUrl);
         }
 
@@ -81,12 +81,12 @@ export default function EditRoomButton({
         }
 
         const blob = await response.blob();
-        console.log(
-          'Successfully fetched blob:',
-          blob.size,
-          'bytes',
-          blob.type,
-        );
+        // console.log(
+        //   'Successfully fetched blob:',
+        //   blob.size,
+        //   'bytes',
+        //   blob.type,
+        // );
 
         // Create a proper filename with extension
         const urlParts = room.image.split('/');
@@ -96,9 +96,9 @@ export default function EditRoomButton({
         dataTransfer.items.add(new File([blob], filename, { type: blob.type }));
         setRoomImageFile(dataTransfer.files);
 
-        console.log('Set room image file:', dataTransfer.files);
+        // console.log('Set room image file:', dataTransfer.files);
       } catch (error) {
-        console.error('Failed to fetch room image:', error);
+        // console.error('Failed to fetch room image:', error);
         setRoomImageFile(null);
       }
     }
@@ -119,7 +119,8 @@ export default function EditRoomButton({
     if (state.status === 'success') {
       onOpenChange(false);
     } else if (state.status === 'error') {
-      console.log('Error editing room:', state.error);
+      //
+      // console.log('Error editing room:', state.error);
       roomForm.form.setError('name', state.error);
     }
   }, [state, onOpenChange]);

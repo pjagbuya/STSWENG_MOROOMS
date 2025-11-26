@@ -38,7 +38,7 @@ const FileInput = forwardRef(
           input.files = dataTransfer.files;
         }
       } catch (error) {
-        console.warn('Could not set input files:', error);
+        // console.warn('Could not set input files:', error);
         input.value = '';
       }
     }, [value]);

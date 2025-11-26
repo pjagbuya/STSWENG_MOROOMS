@@ -21,14 +21,14 @@ export class APILogger {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[API ${logEntry.status.toUpperCase()}]`, {
-        timestamp: logEntry.timestamp.toISOString(),
-        action: logEntry.action,
-        method: logEntry.method,
-        table: logEntry.table,
-        user: logEntry.user_id,
-        ...(logEntry.error && { error: logEntry.error }),
-      });
+      // console.log(`[API ${logEntry.status.toUpperCase()}]`, {
+      //   timestamp: logEntry.timestamp.toISOString(),
+      //   action: logEntry.action,
+      //   method: logEntry.method,
+      //   table: logEntry.table,
+      //   user: logEntry.user_id,
+      //   ...(logEntry.error && { error: logEntry.error }),
+      // });
     }
 
     // Optionally log to Supabase logs table

@@ -8,13 +8,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useFormWithLogging } from '@/hooks/useFormwithLogging';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 
 export function PopupForm({ formSchema, values, onSubmit }) {
   values = values ? formSchema.parse(values) : null;
 
-  const form = useForm({
+  const form = useFormWithLogging('popup-form', {
     resolver: zodResolver(formSchema),
     defaultValues: {
       ...Object.keys(values || {}).reduce((acc, key) => {

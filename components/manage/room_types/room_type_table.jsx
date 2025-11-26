@@ -68,7 +68,7 @@ export default function RoomTypeTable({ data }) {
   }
 
   async function handleEditContinue(row, form, values) {
-    console.log(values);
+    // console.log(values);
 
     const err = await editRoomType(
       row.original.id,

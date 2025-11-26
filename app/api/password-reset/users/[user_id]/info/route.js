@@ -1,4 +1,5 @@
 // app/api/users/[user_id]/info/route.js
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
@@ -24,7 +25,7 @@ export async function GET(request, { params }) {
       .single();
 
     if (error) {
-      console.error('Error fetching user info:', error);
+      // console.error('Error fetching user info:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -39,7 +40,15 @@ export async function GET(request, { params }) {
       },
     });
   } catch (error) {
-    console.error('API Error:', error);
+    // console.error('API Error:', error);
+    await APILogger.log(
+      'Fetch User Info',
+      'GET',
+      'Users',
+      null,
+      { user_id: params.user_id },
+      error,
+    );
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

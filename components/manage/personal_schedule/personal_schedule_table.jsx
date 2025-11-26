@@ -75,8 +75,8 @@ export default function PersonalScheduleTable({ data, rooms }) {
   }
 
   async function handleEditContinue(row, form, values) {
-    console.log('stuff to edit: ', values);
-    console.log('row data: ', row);
+    // console.log('stuff to edit: ', values);
+    // console.log('row data: ', row);
 
     const err = await edit_personal_schedule(
       row.original.personal_schedule_id,

@@ -109,7 +109,7 @@ export function flattenScheduleRanges(ranges) {
       }
     } else {
       // Handle invalid ranges (if endTime < startTime and not 0)
-      console.warn(`Invalid time range: start=${start}, end=${end}`);
+      // console.warn(`Invalid time range: start=${start}, end=${end}`);
     }
   });
 

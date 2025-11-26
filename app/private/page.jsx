@@ -19,7 +19,7 @@ export default function PrivatePage() {
   const [error, setError] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
 
-  const handleFileChange = e => {
+  const handleFileChange = async e => {
     const file = e.target.files?.[0];
     if (file) {
       try {
@@ -29,10 +29,18 @@ export default function PrivatePage() {
         const reader = new FileReader();
         reader.onload = () => {
           setImageUrl(reader.result);
-          console.log(reader.result);
+          // console.log(reader.result);
         };
         reader.readAsDataURL(file);
       } catch (error) {
+        await APILogger.log(
+          'handleFileChange',
+          'FILE-VALIDATION',
+          'files',
+          null,
+          { fileName: file.name },
+          error.errors[0].message,
+        );
         setError(error.message);
       }
     }
