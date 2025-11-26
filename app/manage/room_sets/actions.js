@@ -1,5 +1,6 @@
 'use server';
 
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
@@ -19,7 +20,15 @@ export async function addRoomSet(name) {
   });
 
   if (error) {
-    console.error('Error adding room set:', error);
+    await APILogger.log(
+      'addRoomSet',
+      'POST',
+      'room_sets',
+      null,
+      { name },
+      error.message,
+    );
+    // console.error('Error adding room set:', error);
     return error;
   }
 
@@ -42,7 +51,15 @@ export async function deleteRoomSet(id) {
   });
 
   if (error) {
-    console.error('Error deleting room set:', error);
+    await APILogger.log(
+      'deleteRoomSet',
+      'DELETE',
+      'room_sets',
+      null,
+      { roomSetId: id },
+      error.message,
+    );
+    // console.error('Error deleting room set:', error);
     return error;
   }
 
@@ -67,7 +84,15 @@ export async function editRoomSet(id, name) {
   });
 
   if (error) {
-    console.error('Error editing room set:', error);
+    await APILogger.log(
+      'editRoomSet',
+      'PUT',
+      'room_sets',
+      null,
+      { roomSetId: id, newName: name },
+      error.message,
+    );
+    // console.error('Error editing room set:', error);
     return error;
   }
 

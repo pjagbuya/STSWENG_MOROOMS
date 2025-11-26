@@ -18,9 +18,7 @@ export async function getLogs(page = 0, limit = 20, filters = {}) {
         user_id,
         data,
         error,
-        status,
-        submission_time
-      `,
+        status`,
       )
       .order('timestamp', { ascending: false })
       .range(page * limit, (page + 1) * limit - 1);
@@ -48,7 +46,6 @@ export async function getLogs(page = 0, limit = 20, filters = {}) {
     const { data, error, count } = await query;
 
     if (error) {
-    
       return { error: error.message };
     }
 
@@ -59,7 +56,6 @@ export async function getLogs(page = 0, limit = 20, filters = {}) {
       total: count,
     };
   } catch (err) {
-    
     return { error: 'Failed to fetch logs' };
   }
 }

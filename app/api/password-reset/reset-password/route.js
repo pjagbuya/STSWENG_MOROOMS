@@ -1,3 +1,4 @@
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
@@ -6,14 +7,23 @@ export async function POST(request) {
   try {
     const { email, token, newPassword, userId } = await request.json();
 
-    console.log('Password reset request:', {
-      email,
-      userId,
-      hasToken: !!token,
-      hasPassword: !!newPassword,
-    });
+    // console.log('Password reset request:', {
+    //   email,
+    //   userId,
+    //   hasToken: !!token,
+    //   hasPassword: !!newPassword,
+    // });
 
     if (!email || !token || !newPassword || !userId) {
+      await APILogger.log(
+        'Password Reset',
+        'UPDATE',
+        'auth.users',
+        userId,
+        { email },
+        { error: 'Email, token, new password, and user ID are required' },
+      );
+
       return NextResponse.json(
         { error: 'Email, token, new password, and user ID are required' },
         { status: 400 },
@@ -21,6 +31,15 @@ export async function POST(request) {
     }
 
     if (newPassword.length < 8) {
+      await APILogger.log(
+        'Password Reset',
+        'UPDATE',
+        'auth.users',
+        userId,
+        { email },
+        { error: 'Password must be at least 8 characters long' },
+      );
+
       return NextResponse.json(
         { error: 'Password must be at least 8 characters long' },
         { status: 400 },
@@ -29,13 +48,19 @@ export async function POST(request) {
 
     const supabase = createClient(true); // Admin client
 
-
     // Find the auth user by email using admin API
     const { data: authUsers, error: authError } =
       await supabase.auth.admin.listUsers();
 
     if (authError) {
-      console.error('Auth admin error:', authError);
+      await APILogger.log(
+        'Password Reset',
+        'UPDATE',
+        'auth.users',
+        userId,
+        { email },
+        { error: 'Failed to find user: ' + authError.message },
+      );
       return NextResponse.json(
         {
           error: 'Failed to find user: ' + authError.message,
@@ -44,18 +69,25 @@ export async function POST(request) {
       );
     }
 
-    console.log('Found', authUsers.users.length, 'total users');
+    // console.log('Found', authUsers.users.length, 'total users');
 
     const authUser = authUsers.users.find(
       user => user.email?.toLowerCase() === email.toLowerCase(),
     );
 
     if (!authUser) {
-      console.log('Auth user not found for email:', email);
+      await APILogger.log(
+        'Password Reset',
+        'UPDATE',
+        'auth.users',
+        userId,
+        { email },
+        { error: 'User not found' },
+      );
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    console.log('Found auth user:', authUser.id);
+    // console.log('Found auth user:', authUser.id);
 
     // ========================= PASSWORD HISTORY CHECK =====================================
 
@@ -67,14 +99,14 @@ export async function POST(request) {
         .order('created_at', { ascending: false });
 
       if (historyError) {
-        console.error('Error fetching password history:', historyError);
+        // console.error('Error fetching password history:', historyError);
         // Continue without history check if table doesn't exist
       } else if (passwordHistory && passwordHistory.length > 0) {
-        console.log(
-          'Found',
-          passwordHistory.length,
-          'previous passwords to check',
-        );
+        // console.log(
+        //   'Found',
+        //   passwordHistory.length,
+        //   'previous passwords to check',
+        // );
 
         // Check if new password matches any recent password
         for (const oldPassword of passwordHistory) {
@@ -83,9 +115,20 @@ export async function POST(request) {
             oldPassword.hashed_password,
           );
           if (isMatch) {
-            console.log(
-              'Password matches previous password from:',
-              oldPassword.created_at,
+            // console.log(
+            //   'Password matches previous password from:',
+            //   oldPassword.created_at,
+            // );
+            await APILogger.log(
+              'Password Reset',
+              'UPDATE',
+              'auth.users',
+              userId,
+              { email },
+              {
+                error:
+                  'You cannot reuse a recent password. Please choose a different password.',
+              },
             );
             return NextResponse.json(
               {
@@ -97,12 +140,12 @@ export async function POST(request) {
           }
         }
 
-        console.log('New password does not match any recent passwords');
+        // console.log('New password does not match any recent passwords');
       } else {
-        console.log('No password history found for user');
+        // console.log('No password history found for user');
       }
     } catch (historyError) {
-      console.log('Password history check skipped:', historyError.message);
+      // console.log('Password history check skipped:', historyError.message);
       // Continue without history check if there's an error
     }
     // Optional: Verify token if you're storing them in database
@@ -142,7 +185,7 @@ export async function POST(request) {
     //   );
     // }
 
-    console.log('Updating password for auth user:', authUser.id);
+    // console.log('Updating password for auth user:', authUser.id);
 
     // Update the user's password in Supabase Auth using admin API
     const { error: updateError } = await supabase.auth.admin.updateUserById(
@@ -151,14 +194,23 @@ export async function POST(request) {
     );
 
     if (updateError) {
-      console.error('Password update error:', updateError);
+      // console.error('Password update error:', updateError);
+
+      await APILogger.log(
+        'Password Reset',
+        'UPDATE',
+        'auth.users',
+        userId,
+        { email },
+        { error: 'Failed to update password: ' + updateError.message },
+      );
       return NextResponse.json(
         { error: 'Failed to update password: ' + updateError.message },
         { status: 500 },
       );
     }
 
-    console.log('Password updated successfully');
+    // console.log('Password updated successfully');
     // ========================= PASSWORD HISTORY =====================================
     // Add new password to history
     try {
@@ -172,13 +224,13 @@ export async function POST(request) {
         });
 
       if (historyInsertError) {
-        console.error(
-          'Failed to save password to history:',
-          historyInsertError,
-        );
+        // console.error(
+        //   'Failed to save password to history:',
+        //   historyInsertError,
+        // );
         // Don't fail the request if history saving fails
       } else {
-        console.log('Password saved to history');
+        // console.log('Password saved to history');
       }
 
       // Optional: Clean up old password history (keep only last 10)
@@ -204,7 +256,15 @@ export async function POST(request) {
       //   }
       // }
     } catch (historyError) {
-      console.error('Error inserting password to history:', historyError);
+      // console.error('Error inserting password to history:', historyError);
+      await APILogger.log(
+        'Password Reset',
+        'UPDATE',
+        'auth.users',
+        userId,
+        { email },
+        historyError,
+      );
       return NextResponse.json(
         { error: 'Internal server error: ' + historyError.message },
         { status: 500 },
@@ -229,13 +289,20 @@ export async function POST(request) {
     //     logError.message,
     //   );
     // }
-
+    await APILogger.log(
+      'Password Reset',
+      'UPDATE',
+      'auth.users',
+      userId,
+      { email },
+      null,
+    );
     return NextResponse.json({
       success: true,
       message: 'Password has been reset successfully',
     });
   } catch (error) {
-    console.error('Error resetting password:', error);
+    // console.error('Error resetting password:', error);
     return NextResponse.json(
       { error: 'Internal server error: ' + error.message },
       { status: 500 },

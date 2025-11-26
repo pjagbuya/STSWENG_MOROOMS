@@ -1,3 +1,4 @@
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
@@ -32,7 +33,7 @@ export async function POST(request) {
       );
       if (found) authUserId = found.id;
     } catch (e) {
-      console.error('Auth lookup failed:', e);
+      // console.error('Auth lookup failed:', e);
       // If admin lookup fails, avoid returning detailed errors to client
       return NextResponse.json(
         { error: 'Internal server error' },
@@ -59,7 +60,15 @@ export async function POST(request) {
       .maybeSingle();
 
     if (userErr) {
-      console.error('User table lookup error:', userErr);
+      // console.error('User table lookup error:', userErr);
+      await APILogger.log(
+        'Fetch User Info',
+        'GET',
+        'User',
+        null,
+        { email },
+        userErr,
+      );
       return NextResponse.json(
         { error: 'Internal server error' },
         { status: 500 },
@@ -82,7 +91,8 @@ export async function POST(request) {
       .eq('user_id', appUserId);
 
     if (answersErr) {
-      console.error('Security answers lookup error:', answersErr);
+      // console.error('Security answers lookup error:', answersErr);
+
       return NextResponse.json(
         { error: 'Internal server error' },
         { status: 500 },
@@ -106,7 +116,7 @@ export async function POST(request) {
       userId: appUserId,
     });
   } catch (err) {
-    console.error('Unexpected error:', err);
+    // console.error('Unexpected error:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

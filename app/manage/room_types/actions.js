@@ -1,5 +1,6 @@
 'use server';
 
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/client';
 import { revalidatePath } from 'next/cache';
 
@@ -33,7 +34,14 @@ export async function addRoomType(
   });
 
   if (error) {
-    console.error('Error adding room type:', error);
+    await APILogger.log(
+      'addRoomType',
+      'POST',
+      'room_types',
+      null,
+      { name, details, capacity, minReserveTime, maxReserveTime },
+      error.message,
+    );
     return error;
   }
 
@@ -57,7 +65,15 @@ export async function deleteRoomType(id) {
   });
 
   if (error) {
-    console.error('Error deleting room type:', error);
+    // console.error('Error deleting room type:', error);
+    await APILogger.log(
+      'deleteRoomType',
+      'DELETE',
+      'room_types',
+      null,
+      { roomTypeId: id },
+      error.message,
+    );
     return error;
   }
 
@@ -97,7 +113,22 @@ export async function editRoomType(
   });
 
   if (error) {
-    console.error('Error editing room type:', error);
+    // console.error('Error editing room type:', error);
+    await APILogger.log(
+      'editRoomType',
+      'PUT',
+      'room_types',
+      null,
+      {
+        roomTypeId: id,
+        newName: name,
+        newDetails: details,
+        newCapacity: capacity,
+        newMinReserveTime: minReserveTime,
+        newMaxReserveTime: maxReserveTime,
+      },
+      error.message,
+    );
     return error;
   }
 
@@ -118,7 +149,15 @@ export async function fetchRoomTypes() {
   const { data, error } = await supabase.rpc('get_room_types');
 
   if (error) {
-    console.error('Error fetching room types:', error);
+    // console.error('Error fetching room types:', error);
+    await APILogger.log(
+      'fetchRoomTypes',
+      'RPC-READ',
+      'room_types',
+      null,
+      null,
+      error.message,
+    );
     throw error;
   }
 

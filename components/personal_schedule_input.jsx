@@ -21,9 +21,9 @@ function logFormData(formData) {
   console.log('FormData contents:');
   for (let [key, value] of formData.entries()) {
     if (value instanceof File) {
-      console.log(key, ':', value.name, '(File)');
+      // console.log(key, ':', value.name, '(File)');
     } else {
-      console.log(key, ':', value);
+      // console.log(key, ':', value);
     }
   }
 }
@@ -50,7 +50,7 @@ export default function PersonalScheduleForm({ userID }) {
 
         // Fetch the unavailable time ranges for the selected room and day
         const tzMultirange = await fetchPersonalSchedule(userID, selectedDay);
-        console.log('tzMultirange: ', tzMultirange);
+        // console.log('tzMultirange: ', tzMultirange);
 
         let newHourStates = {};
         if (!tzMultirange || tzMultirange.length === 0) {
@@ -84,7 +84,7 @@ export default function PersonalScheduleForm({ userID }) {
         setHourStates(newHourStates);
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to fetch or process hour states:', error);
+        // console.error('Failed to fetch or process hour states:', error);
         setIsLoading(false); // Ensure the loading state is reset even if there's an error
       }
     }
@@ -97,7 +97,7 @@ export default function PersonalScheduleForm({ userID }) {
 
   const handleDaySelect = day => {
     setSelectedDay(day); // Update the selected day state
-    console.log('Selected day:', day);
+    // console.log('Selected day:', day);
   };
 
   const handleFormSubmit = async e => {
@@ -113,9 +113,25 @@ export default function PersonalScheduleForm({ userID }) {
       toast({
         description: `Personal Schedule for ${formData.get('user_id')} submitted successfully!`,
       });
+      // APILogger.log(
+      //   'PersonalScheduleForm',
+      //   'FORM-SUBMIT',
+      //   'personal_schedule',
+      //   userID,
+      //   { userID, selectedDay, selectedHours },
+      //   null,
+      // );
       router.push(`/users/${userID}/profile`); // Redirect to the home page
     } catch (error) {
-      console.error('Error submitting PersonalSchedule:', error);
+      // APILogger.log(
+      //   'PersonalScheduleForm',
+      //   'FORM-SUBMIT',
+      //   'personal_schedule',
+      //   null,
+      //   { userID, selectedDay, selectedHours },
+      //   error.message,
+      // );
+      // console.error('Error submitting PersonalSchedule:', error);
       toast({
         description: 'Failed to submit PersonalSchedule. Please try again.',
         variant: 'error',

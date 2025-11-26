@@ -14,7 +14,7 @@ export async function POST(request) {
       await supabase.auth.admin.listUsers();
 
     if (authError) {
-      console.error('Auth error:', authError);
+      // console.error('Auth error:', authError);
       return NextResponse.json(
         { error: 'Failed to verify user' },
         { status: 500 },
@@ -36,7 +36,15 @@ export async function POST(request) {
       .single();
 
     if (userError || !userData) {
-      console.error('User table error:', userError);
+      // console.error('User table error:', userError);
+      await APILogger.log(
+        'Verify Security Answers',
+        'POST',
+        'User',
+        null,
+        { email },
+        userError || 'User profile not found',
+      );
       return NextResponse.json(
         { error: 'User profile not found' },
         { status: 404 },
@@ -53,6 +61,14 @@ export async function POST(request) {
     );
 
     if (!isValid) {
+      await APILogger.log(
+        'Verify Security Answers',
+        'POST',
+        'User Security Answers',
+        userId,
+        { email },
+        { error: 'Security answers are incorrect' },
+      );
       return NextResponse.json(
         { error: 'Security answers are incorrect' },
         { status: 400 },
@@ -76,10 +92,10 @@ export async function POST(request) {
           used: false,
         });
     } catch (tokenError) {
-      console.log(
-        'Token storage failed (table might not exist):',
-        tokenError.message,
-      );
+      // console.log(
+      //   'Token storage failed (table might not exist):',
+      //   tokenError.message,
+      // );
       // Continue without storing - just return the token
     }
 
@@ -90,7 +106,7 @@ export async function POST(request) {
       expiresAt: expiresAt.toISOString(),
     });
   } catch (error) {
-    console.error('Error verifying security answers:', error);
+    // console.error('Error verifying security answers:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 },

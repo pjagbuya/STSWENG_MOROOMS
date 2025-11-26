@@ -17,8 +17,8 @@ export default function AddPersonalScheduleButton({ rooms, userID }) {
   const [open, setOpen] = useState(false);
 
   async function handleSubmit(form, values) {
-    console.log('values in handle submit: ', values);
-    console.log('userID: ', userID);
+    // console.log('values in handle submit: ', values);
+    // console.log('userID: ', userID);
     const err = await create_personal_schedule(
       userID,
       values.name,

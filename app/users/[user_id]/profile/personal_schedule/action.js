@@ -7,6 +7,7 @@ import {
   parseTZDateRanges,
   toTZMultiRange,
 } from '@/utils/date_utils';
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
@@ -16,7 +17,7 @@ export async function updatePersonalSchedule(formData) {
   const selectedDay = formData.get('selectedDay');
   const selectedHours = JSON.parse(formData.get('selectedHours'));
 
-  console.log('form data in room_schedule: ', formData);
+  // console.log('form data in room_schedule: ', formData);
 
   try {
     // Step 1: Fetch the current schedule from the database for the specified day and room
@@ -26,19 +27,19 @@ export async function updatePersonalSchedule(formData) {
     });
 
     if (error) {
-      console.error('Error fetching current schedule:', error);
+      // console.error('Error fetching current schedule:', error);
       return;
     }
 
-    console.log('personal schedule data: ', data);
+    // console.log('personal schedule data: ', data);
 
     let updatedSchedule;
 
     if (!data || data.length === 0) {
       // If no schedule exists, just process the selected hours
-      console.log(
-        'No existing schedule, using selected hours as the schedule.',
-      );
+      // console.log(
+      //   'No existing schedule, using selected hours as the schedule.',
+      // );
       const TZSelectedHours = toTZMultiRange(new Date(), selectedHours);
       const parsedTZSelectedHours = parseTZDateRanges(TZSelectedHours);
       updatedSchedule = parsedTZSelectedHours.map(range =>
@@ -47,20 +48,20 @@ export async function updatePersonalSchedule(formData) {
     } else {
       // Step 2: Fetch and convert the existing schedule into number ranges
       const existingSchedule = parseTZDateRanges(data);
-      console.log('existing schedule: ', existingSchedule);
+      // console.log('existing schedule: ', existingSchedule);
       const existingScheduleRanges = existingSchedule.map(range =>
         convertRangeToNumbers(range),
       );
-      console.log('existing schedule numbers: ', existingScheduleRanges);
+      // console.log('existing schedule numbers: ', existingScheduleRanges);
 
       // Step 3: Convert the selected hours to a number range
       const TZSelectedHours = toTZMultiRange(new Date(), selectedHours);
-      console.log('selected hours formatted: ', TZSelectedHours);
+      // console.log('selected hours formatted: ', TZSelectedHours);
       const parsedTZSelectedHours = parseTZDateRanges(TZSelectedHours);
       const selectedHoursRanges = parsedTZSelectedHours.map(range =>
         convertRangeToNumbers(range),
       );
-      console.log('selected hours range: ', selectedHoursRanges);
+      // console.log('selected hours range: ', selectedHoursRanges);
 
       // Step 4: Compare the existingScheduleRanges with selectedHoursRanges and adjust the schedule
       updatedSchedule = [];
@@ -113,7 +114,7 @@ export async function updatePersonalSchedule(formData) {
           ) {
             isCovered = true; // The selectedRange is completely covered
           }
-          console.log(isCovered);
+          // console.log(isCovered);
         });
         // If it's not covered, add it
         if (!isCovered) {
@@ -140,12 +141,45 @@ export async function updatePersonalSchedule(formData) {
     );
 
     if (updateError) {
-      console.error('Error updating personal schedule:', updateError);
+      APILogger.log(
+        'updatePersonalSchedule',
+        'RPC-UPDATE',
+        'personal_schedules',
+        userId,
+        {
+          day_number: selectedDay,
+          new_schedule_time: updatedScheduleTSMultiRange,
+        },
+        updateError,
+      );
+      // console.error('Error updating personal schedule:', updateError);
     } else {
-      console.log('Personal schedule updated successfully!');
+      APILogger.log(
+        'updatePersonalSchedule',
+        'RPC-UPDATE',
+        'personal_schedules',
+        userId,
+        {
+          day_number: selectedDay,
+          new_schedule_time: updatedScheduleTSMultiRange,
+        },
+        null,
+      );
+      // console.log('Personal schedule updated successfully!');
     }
   } catch (error) {
-    console.error('Error updating personal schedule:', error);
+    APILogger.log(
+      'updatePersonalSchedule',
+      'RPC-UPDATE',
+      'personal_schedules',
+      userId,
+      {
+        day_number: selectedDay,
+        new_schedule_time: updatedScheduleTSMultiRange,
+      },
+      error,
+    );
+    // console.error('Error updating personal schedule:', error);
   }
 }
 
@@ -156,7 +190,17 @@ export async function get_min_max_room_hours(room_id) {
   });
 
   if (error) {
-    console.error('Error fetching room details:', error);
+    // console.error('Error fetching room details:', error);
+    APILogger.log(
+      'getMinMaxRoomHours',
+      'RPC-READ',
+      'rooms',
+      null,
+      {
+        room_id: room_id,
+      },
+      error,
+    );
     throw error;
   }
 
@@ -176,7 +220,17 @@ export async function get_room_details(room_id) {
   });
 
   if (error) {
-    console.error('Error fetching room details:', error);
+    // console.error('Error fetching room details:', error);
+    APILogger.log(
+      'getRoomDetails',
+      'RPC-READ',
+      'rooms',
+      null,
+      {
+        room_id: room_id,
+      },
+      error,
+    );
     throw error;
   }
 
@@ -192,7 +246,17 @@ export async function fetchPersonalSchedule(userId, dayNumber) {
   });
 
   if (error) {
-    console.error('Error fetching personal schedule:', error);
+    // console.error('Error fetching personal schedule:', error);
+    APILogger.log(
+      'fetchPersonalSchedule',
+      'RPC-READ',
+      'personal_schedules',
+      userId,
+      {
+        day_number: dayNumber,
+      },
+      error,
+    );
     throw error;
   }
 
@@ -216,7 +280,7 @@ export async function create_personal_schedule(
     p_start_time: start_time,
     p_end_time: end_time,
   };
-  console.log('data to send: ', data_schedule);
+  // console.log('data to send: ', data_schedule);
 
   const { error } = await supabase.rpc(
     'create_personal_schedule',
@@ -224,7 +288,21 @@ export async function create_personal_schedule(
   );
 
   if (error) {
-    console.error('Error adding personal schedule:', error);
+    // console.error('Error adding personal schedule:', error);
+    APILogger.log(
+      'createPersonalSchedule',
+      'RPC-CREATE',
+      'personal_schedules',
+      userID,
+      {
+        name: name,
+        room_name: room_name,
+        day: day,
+        start_time: start_time,
+        end_time: end_time,
+      },
+      error,
+    );
     return error;
   }
 
@@ -239,7 +317,15 @@ export async function get_user_personal_schedules(userID) {
   });
 
   if (error) {
-    console.error('Error fetching user personal schedules:', error);
+    // console.error('Error fetching user personal schedules:', error);
+    APILogger.log(
+      'getUserPersonalSchedules',
+      'RPC-READ',
+      'personal_schedules',
+      userID,
+      {},
+      error,
+    );
     throw error;
   }
 
@@ -281,7 +367,21 @@ export async function edit_personal_schedule(
   });
 
   if (error) {
-    console.error('Error editing room type:', error);
+    // console.error('Error editing room type:', error);
+    APILogger.log(
+      'editPersonalSchedule',
+      'RPC-UPDATE',
+      'personal_schedules',
+      id,
+      {
+        name: name,
+        room_id: room_id,
+        day: day,
+        start_time: start_time,
+        end_time: end_time,
+      },
+      error,
+    );
     return error;
   }
 
@@ -296,7 +396,15 @@ export async function delete_personal_Schedule(id) {
   });
 
   if (error) {
-    console.error('Error deleting personal Schedule type:', error);
+    // console.error('Error deleting personal Schedule type:', error);
+    APILogger.log(
+      'deletePersonalSchedule',
+      'RPC-DELETE',
+      'personal_schedules',
+      id,
+      {},
+      error,
+    );
     return error;
   }
 
@@ -308,7 +416,8 @@ export async function get_all_rooms() {
   const { data, error } = await supabase.rpc('get_all_rooms');
 
   if (error) {
-    console.error('Error fetching room details:', error);
+    // console.error('Error fetching room details:', error);
+    APILogger.log('getAllRooms', 'RPC-READ', 'rooms', null, {}, error);
     throw error;
   }
 

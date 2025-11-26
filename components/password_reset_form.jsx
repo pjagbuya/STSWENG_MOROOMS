@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+// import { APILogger } from '@/utils/logger_actions';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -30,7 +31,7 @@ export function PasswordResetForm({ onBackToLogin }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      console.log('Email verification response:', response);
+      // console.log('Email verification response:', response);
       const result = await response.json();
       if (result.success) {
         setSecurityQuestions(result.questions);
@@ -40,7 +41,15 @@ export function PasswordResetForm({ onBackToLogin }) {
         setError(result.error || 'Failed to verify email');
       }
     } catch (error) {
-      console.error('Email verification error:', error);
+      // console.error('Email verification error:', error);
+      // APILogger.log(
+      //   'PasswordResetForm',
+      //   'EMAIL-VERIFY',
+      //   'password_reset',
+      //   null,
+      //   { email },
+      //   error.message,
+      // );
       setError('Failed to verify email. Please try again.');
     } finally {
       setLoading(false);
@@ -68,13 +77,22 @@ export function PasswordResetForm({ onBackToLogin }) {
 
       const result = await response.json();
       if (result.success) {
+        // APILogger.log(
+        //   'Password Reset Form',
+        //   'SECURITY-VERIFY',
+        //   'password_reset',
+        //   null,
+        //   { email, userId },
+        //   null,
+        // );
         setResetToken(result.token);
         setStep('reset');
       } else {
         setError(result.error || 'Failed to verify security answers');
       }
     } catch (error) {
-      console.error('Security verification error:', error);
+      // console.error('Security verification error:', error);
+
       setError('Failed to verify security answers. Please try again.');
     } finally {
       setLoading(false);
@@ -112,6 +130,14 @@ export function PasswordResetForm({ onBackToLogin }) {
 
       const result = await response.json();
       if (result.success) {
+        // APILogger.log(
+        //   'Password Reset Form',
+        //   'PASSWORD-RESET',
+        //   'password_reset',
+        //   userId,
+        //   { email, userId },
+        //   null,
+        // );
         alert(
           'Password reset successful! You can now login with your new password.',
         );
@@ -125,7 +151,15 @@ export function PasswordResetForm({ onBackToLogin }) {
         setError(result.error || 'Failed to reset password');
       }
     } catch (error) {
-      console.error('Password reset error:', error);
+      // console.error('Password reset error:', error);
+      // APILogger.log(
+      //   'PasswordResetForm',
+      //   'PASSWORD-RESET',
+      //   'password_reset',
+      //   null,
+      //   { email, userId },
+      //   error.message,
+      // );
       setError('Failed to reset password. Please try again.');
     } finally {
       setLoading(false);

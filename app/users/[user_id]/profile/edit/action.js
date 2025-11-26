@@ -1,6 +1,7 @@
 'use server';
 
 import { callFunctionWithFormData } from '@/utils/action_template';
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
@@ -12,11 +13,27 @@ export async function getUserInfo() {
   });
 
   if (error) {
-    console.log(error.message);
+    APILogger.log(
+      'getUserInfo',
+      'RPC-READ',
+      'users',
+      userInfo.user.id,
+      null,
+      error.message,
+    );
+    // console.log(error.message);
   }
 
   if (error2) {
-    console.log(error2.message);
+    APILogger.log(
+      'getUserInfo',
+      'RPC-READ',
+      'users',
+      userInfo.user.id,
+      null,
+      error2.message,
+    );
+    // console.log(error2.message);
   }
 
   const finalData = {
@@ -37,7 +54,14 @@ async function uploadFile(file, path) {
       upsert: true,
     });
   if (error) {
-    console.error(error);
+    APILogger.log(
+      'uploadFile',
+      'STORAGE-UPLOAD',
+      'Morooms-file',
+      null,
+      null,
+      error.message,
+    );
   }
 }
 
@@ -47,12 +71,12 @@ export async function editProfile(formData) {
     email: formData.get('email'),
   };
   const password = formData.get('password');
-  console.log('password', password);
+  // console.log('password', password);
   if (password && password != 'undefined') {
     data.password = password;
   }
 
-  console.log('data', data);
+  // console.log('data', data);
 
   const supabase = createClient();
 
@@ -60,7 +84,14 @@ export async function editProfile(formData) {
     await supabase.auth.updateUser(data);
 
   if (error) {
-    console.log(error.message);
+    APILogger.log(
+      'editProfile',
+      'AUTH-UPDATE',
+      'auth.users',
+      null,
+      null,
+      error.message,
+    );
   }
 
   const file = formData.get('userProfilepic');
@@ -74,10 +105,18 @@ export async function editProfile(formData) {
   if (file && file != 'undefined') {
     formData.append('userProfilepic', file.name);
   }
-  console.log('formData', formData);
+  // console.log('formData', formData);
 
   if (error) {
-    console.log(error.message);
+    // console.log(error.message);
+    APILogger.log(
+      'editProfile',
+      'AUTH-UPDATE',
+      'auth.users',
+      null,
+      null,
+      error.message,
+    );
     redirect('/error');
   }
 

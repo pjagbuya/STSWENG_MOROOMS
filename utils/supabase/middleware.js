@@ -1,3 +1,4 @@
+import { APILogger } from '../logger_actions';
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
@@ -67,12 +68,12 @@ export async function updateSession(request) {
     const { data: isApproved } = await supabase.rpc('is_user_approved', {
       p_user_id: user.id,
     });
-    console.log('User ID:', user.id);
-    console.log('isApproved:', isApproved);
+    // console.log('User ID:', user.id);
+    // console.log('isApproved:', isApproved);
     if (!isApproved) {
       const url = request.nextUrl.clone();
       url.pathname = '/pending';
-      console.log(url);
+      // console.log(url);
       return NextResponse.redirect(url);
     }
   }
@@ -87,12 +88,17 @@ export async function updateSession(request) {
   }
 
   if (request.nextUrl.pathname.includes('/admin')) {
+    APILogger.log({
+      action: 'Admin homepage login',
+      method: 'GET',
+      userId: user ? user.id : null,
+    });
     const userId = request.nextUrl.pathname.split('/')[2];
     const { data, error } = await supabase.rpc('get_user_role', {
       p_user_id: userId,
     });
     if (error) {
-      console.error(error);
+      // console.error(error);
     }
     if (data.toLowerCase() != 'admin') {
       const url = request.nextUrl.clone();

@@ -7,6 +7,7 @@ import {
   parseTZDateRanges,
   toTZMultiRange,
 } from '@/utils/date_utils';
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -17,7 +18,7 @@ export async function updateRoomSchedule(formData) {
   const selectedHours = JSON.parse(formData.get('selectedHours'));
   const roomId = formData.get('room_id');
 
-  console.log('form data in room_schedule: ', formData);
+  // console.log('form data in room_schedule: ', formData);
 
   try {
     // Step 1: Fetch the current schedule from the database for the specified day and room
@@ -27,7 +28,7 @@ export async function updateRoomSchedule(formData) {
     });
 
     if (error) {
-      console.error('Error fetching current schedule:', error);
+      // console.error('Error fetching current schedule:', error);
       return;
     }
 
@@ -35,9 +36,9 @@ export async function updateRoomSchedule(formData) {
 
     if (!data || data.length === 0) {
       // If no schedule exists, just process the selected hours
-      console.log(
-        'No existing schedule, using selected hours as the schedule.',
-      );
+      // console.log(
+      //   'No existing schedule, using selected hours as the schedule.',
+      // );
       const TZSelectedHours = toTZMultiRange(new Date(), selectedHours);
       const parsedTZSelectedHours = parseTZDateRanges(TZSelectedHours);
       updatedSchedule = parsedTZSelectedHours.map(range =>
@@ -133,12 +134,49 @@ export async function updateRoomSchedule(formData) {
     );
 
     if (updateError) {
-      console.error('Error updating room schedule:', updateError);
+      APILogger.log(
+        'updateRoomSchedule',
+        'RPC-MUTATE',
+        'rooms',
+        null,
+        {
+          room_id: roomId,
+          day_number: selectedDay,
+          new_schedule_time: updatedScheduleTSMultiRange,
+        },
+        updateError,
+      );
+      // console.error('Error updating room schedule:', updateError);
     } else {
-      console.log('Room schedule updated successfully!');
+      APILogger.log(
+        'updateRoomSchedule',
+        'RPC-MUTATE',
+        'rooms',
+        null,
+        {
+          room_id: roomId,
+          day_number: selectedDay,
+          new_schedule_time: updatedScheduleTSMultiRange,
+        },
+        null,
+      );
+      //
+      // console.log('Room schedule updated successfully!');
     }
   } catch (error) {
-    console.error('Error updating room schedule:', error);
+    APILogger.log(
+      'updateRoomSchedule',
+      'RPC-MUTATE',
+      'rooms',
+      null,
+      {
+        room_id: roomId,
+        day_number: selectedDay,
+        new_schedule_time: updatedScheduleTSMultiRange,
+      },
+      error,
+    );
+    // console.error('Error updating room schedule:', error);
   }
 }
 
@@ -149,7 +187,15 @@ export async function get_min_max_room_hours(room_id) {
   });
 
   if (error) {
-    console.error('Error fetching room details:', error);
+    APILogger.log(
+      'getMinMaxRoomHours',
+      'RPC-READ',
+      'rooms',
+      null,
+      { room_id },
+      error,
+    );
+    // console.error('Error fetching room details:', error);
     throw error;
   }
 
@@ -169,7 +215,15 @@ export async function get_room_details(room_id) {
   });
 
   if (error) {
-    console.error('Error fetching room details:', error);
+    APILogger.log(
+      'getRoomDetails',
+      'RPC-READ',
+      'rooms',
+      null,
+      { room_id },
+      error,
+    );
+    // console.error('Error fetching room details:', error);
     throw error;
   }
 
@@ -185,7 +239,15 @@ export async function fetchRoomSchedule(roomId, dayNumber) {
   });
 
   if (error) {
-    console.error('Error fetching room schedule:', error);
+    APILogger.log(
+      'getLabelledRoomHours',
+      'RPC-READ',
+      'rooms',
+      null,
+      { room_id: roomId, day_number: dayNumber },
+      error,
+    );
+    // console.error('Error fetching room schedule:', error);
     throw error;
   }
 

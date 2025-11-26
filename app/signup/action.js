@@ -2,6 +2,7 @@
 
 import { SecurityService } from '@/lib/security';
 import { callFunctionWithFormData } from '@/utils/action_template';
+import { APILogger } from '@/utils/logger_actions';
 import { createClient } from '@/utils/supabase/server';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
@@ -14,7 +15,7 @@ async function uploadFile(file, path) {
       upsert: true,
     });
   if (error) {
-    console.error(error);
+    // console.error(error);
   }
 }
 
@@ -36,6 +37,14 @@ export async function signup(prevState, formData) {
   const { data: user_signin_data, error } = await supabase.auth.signUp(data);
 
   if (error) {
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      null,
+      { email: data.email },
+      error.message,
+    );
     return { error: error.message };
   }
 
@@ -51,19 +60,40 @@ export async function signup(prevState, formData) {
       });
 
     if (historyInsertError) {
-      console.error('Failed to save password to history:', historyInsertError);
+      APILogger.log(
+        'User Signup',
+        'CREATE',
+        'password_history',
+        null,
+        { user_id: user_signin_data.user.id },
+        historyInsertError.message,
+      );
       // Don't fail the request if history saving fails
     } else {
-      
       /*console.log('Password saved to history');*/
     }
   } catch (historyError) {
-    console.error('Error managing password history:', historyError);
+    // console.error('Error managing password history:', historyError);
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'password_history',
+      null,
+      { user_id: user_signin_data.user.id },
+      historyError.message,
+    );
+    // Don't fail the request if history management fails
     return { error: 'Failed to create account. Please try again.' };
   }
-
   if (!user_signin_data.user) {
-    return { error: 'Failed to create user account' };
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      null,
+      { email: data.email },
+      'No user data returned after signup',
+    );
   }
 
   try {
@@ -80,11 +110,25 @@ export async function signup(prevState, formData) {
     ];
     // Validate security answers
     if (!securityAnswers[0].answer || !securityAnswers[1].answer) {
-      return { error: 'Both security questions must be answered' };
+      APILogger.log(
+        'User Signup',
+        'CREATE',
+        'security_answers',
+        user_signin_data.user.id,
+        { securityAnswers },
+        'Both security questions must be answered',
+      );
     }
 
     if (securityAnswers[0].questionId === securityAnswers[1].questionId) {
-      return { error: 'Please select different security questions' };
+      APILogger.log(
+        'User Signup',
+        'CREATE',
+        'security_answers',
+        user_signin_data.user.id,
+        { securityAnswers },
+        'Please select different security questions',
+      );
     }
 
     // Handle file upload
@@ -120,9 +164,24 @@ export async function signup(prevState, formData) {
       user_signin_data.user.id,
       securityAnswers,
     );
-
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      user_signin_data.user.id,
+      { email: data.email },
+      null,
+    );
     return { success: true };
   } catch (error) {
+    APILogger.log(
+      'User Signup',
+      'CREATE',
+      'auth.users',
+      user_signin_data.user.id,
+      { email: data.email },
+      error.message,
+    );
     console.error('Signup error:', error);
     return { error: 'Failed to create account. Please try again.' };
   }
