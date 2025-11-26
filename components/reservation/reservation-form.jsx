@@ -7,6 +7,7 @@ import {
   reserve,
 } from '@/app/rooms/[roomId]/action';
 import HourSelector from '@/components/reservation/hour_selector';
+import { reservationSchema } from '@/components/reservation/reservation-schema';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Input } from '@/components/ui/input';
@@ -95,25 +96,27 @@ export default function RoomReservationForm({ roomId, userID }) {
     fetchHours();
   }, [roomId]);
 
-  // Function for form validation
   const validateForm = formData => {
-    const newErrors = {};
+    const result = reservationSchema.safeParse({
+      reservation_name: formData.get('reservation_name') || '',
+      purpose: formData.get('purpose') || '',
+      count: formData.get('count') || '',
+      selectedDate: selectedDate,
+      selectedHours: selectedHours || [],
+    });
 
-    if (!selectedDate) newErrors.selectedDate = 'Please select a date.';
-    if (!selectedHours || selectedHours.length === 0)
-      newErrors.selectedHours = 'Please select at least one hour.';
-    if (!formData.get('purpose')) {
-      newErrors.purpose = 'Please enter a purpose for the reservation.';
-    } else if (formData.get('purpose').length > 100) {
-      newErrors.purpose = 'Should not exceed 100 characters';
+    if (!result.success) {
+      const newErrors = {};
+      result.error.errors.forEach(err => {
+        const field = err.path[0];
+        newErrors[field] = err.message;
+      });
+      setErrors(newErrors);
+      return false;
     }
-    if (!formData.get('count') || formData.get('count') === '0')
-      newErrors.count = 'Please enter number of participants.';
-    if (!formData.get('reservation_name'))
-      newErrors.reservation_name = 'Please enter a reservation name.';
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors({});
+    return true;
   };
 
   const handleFormSubmit = async e => {
