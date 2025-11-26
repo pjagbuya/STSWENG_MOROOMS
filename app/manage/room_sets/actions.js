@@ -31,6 +31,7 @@ export async function addRoomSet(name) {
     // console.error('Error adding room set:', error);
     return error;
   }
+  APILogger.log('addRoomSet', 'POST', 'room_sets', null, { name }, null);
 
   revalidatePath('/manage/room_sets');
 }
@@ -62,6 +63,15 @@ export async function deleteRoomSet(id) {
     // console.error('Error deleting room set:', error);
     return error;
   }
+
+  APILogger.log(
+    'deleteRoomSet',
+    'DELETE',
+    'room_sets',
+    null,
+    { roomSetId: id },
+    null,
+  );
 
   revalidatePath('/manage/room_sets');
 }
@@ -95,6 +105,14 @@ export async function editRoomSet(id, name) {
     // console.error('Error editing room set:', error);
     return error;
   }
+  APILogger.log(
+    'editRoomSet',
+    'PUT',
+    'room_sets',
+    null,
+    { roomSetId: id, newName: name },
+    null,
+  );
 
   revalidatePath('/manage/room_sets');
   revalidatePath('/manage/rooms');

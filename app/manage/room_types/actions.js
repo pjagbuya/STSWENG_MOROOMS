@@ -44,6 +44,14 @@ export async function addRoomType(
     );
     return error;
   }
+  APILogger.log(
+    'addRoomType',
+    'POST',
+    'room_types',
+    null,
+    { name, details, capacity, minReserveTime, maxReserveTime },
+    null,
+  );
 
   revalidatePath('/manage/room_types');
   revalidatePath('/manage/rooms');
@@ -76,7 +84,14 @@ export async function deleteRoomType(id) {
     );
     return error;
   }
-
+  APILogger.log(
+    'deleteRoomType',
+    'DELETE',
+    'room_types',
+    null,
+    { roomTypeId: id },
+    null,
+  );
   revalidatePath('/manage/room_types');
 }
 
@@ -131,6 +146,21 @@ export async function editRoomType(
     );
     return error;
   }
+  APILogger.log(
+    'editRoomType',
+    'PUT',
+    'room_types',
+    null,
+    {
+      roomTypeId: id,
+      newName: name,
+      newDetails: details,
+      newCapacity: capacity,
+      newMinReserveTime: minReserveTime,
+      newMaxReserveTime: maxReserveTime,
+    },
+    null,
+  );
 
   revalidatePath('/manage/room_types');
 }
